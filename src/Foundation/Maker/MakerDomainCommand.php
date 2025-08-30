@@ -33,25 +33,39 @@ class MakerDomainCommand extends AbstractMakerCommand
         $this
             ->setDescription('Create a new domain')
             ->addArgument('domainName', InputArgument::REQUIRED, 'Domain name')
-            ->addOption('full', null, InputOption::VALUE_OPTIONAL, 'Create full structure domain', false);
+            ->addOption('full', '-f', InputOption::VALUE_NEGATABLE, 'create all domain structure? (Entity, Repository, Event, Listener, Service, Subscriber)',
+                false);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
-        $fileSystem = new Filesystem();
-
         /** @var string $domain */
         $domain = $input->getArgument('domainName');
 
-        $domineRoot = "$this->projectDir/Domain/$domain";
+        $domineRoot = "$this->projectDir/src/Domain/$domain";
 
-        $fullOptions = $input->getOption('full');
-        dd("$domineRoot", $fullOptions);
+        $fullOptionValue = $input->getOption('full');
+        $this->generateAllFolders($domineRoot, $fullOptionValue);
 
-        $io->success('Domain created successfully');
+        $io->success("The $domain Domain created successfully");
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * If you want to create all folders (Entity, Repository, Services etc.) or just an empty domaine.
+     */
+    private function generateAllFolders(string $path, bool $multiple = false): void
+    {
+        $fileSystem = new Filesystem();
+        if (false === $multiple) {
+            $fileSystem->mkdir($path);
+        } else {
+            foreach ($this->directories as $directory) {
+                $fileSystem->mkdir("$path/$directory");
+            }
+        }
     }
 }
