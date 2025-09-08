@@ -1,0 +1,6 @@
+App\Domain\Auth\Entity\User:
+    user (template):
+        email: dummy<current()>\@dummy.com
+        username: Dummy<current()>
+        password: <password('0000')>
+        createdAt: <date_create()>
