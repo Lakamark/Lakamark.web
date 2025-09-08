@@ -1,0 +1,4 @@
+{% extends layout %}
+{% block body %}
+    <a href="{{ url('app_register_confirm', {id: user.id, token: user.confirmationToken}) }}"></a>
+{% endblock %}

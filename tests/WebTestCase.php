@@ -77,6 +77,15 @@ class WebTestCase extends \Symfony\Bundle\FrameworkBundle\Test\WebTestCase
         $this->client->loginUser($user);
     }
 
+    public function expectedFormErrors(?int $expectedErrors = null): void
+    {
+        if (null === $expectedErrors) {
+            $this->assertTrue($this->client->getCrawler()->filter('.form-error')->count() > 0, 'Form errors mismatched.');
+        } else {
+            $this->assertEquals($expectedErrors, $this->client->getCrawler()->filter('.form-error')->count(), 'Form errors mismatched.');
+        }
+    }
+
     private function ensureSessionIsInitialized(): void
     {
         $container = static::$kernel->getContainer();
