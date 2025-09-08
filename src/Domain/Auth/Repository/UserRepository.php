@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Repository;
+namespace App\Domain\Auth\Repository;
 
-use App\Entity\User;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Domain\Auth\Entity\User;
+use App\Foundation\Orm\AbstractRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 /**
- * @extends ServiceEntityRepository<User>
+ * @extends AbstractRepository<User>
  */
-class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
+class UserRepository extends AbstractRepository implements PasswordUpgraderInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -31,6 +31,17 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user->setPassword($newHashedPassword);
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
+    }
+
+    public function findUserForAuth(string $username): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->where('LOWER(u.email) = :username')
+            ->orWhere('LOWER(u.username) = :username')
+            ->setMaxResults(1)
+            ->setParameter('username', mb_strtolower($username))
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
 }

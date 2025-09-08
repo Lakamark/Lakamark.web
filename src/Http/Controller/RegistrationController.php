@@ -1,0 +1,122 @@
+<?php
+
+namespace App\Http\Controller;
+
+use App\Domain\Auth\Authenticator;
+use App\Domain\Auth\Entity\User;
+use App\Domain\Auth\Event\BeforeUserCreatedEvent;
+use App\Domain\Auth\Event\UserCreatedEvent;
+use App\Form\RegistrationFormType;
+use App\Foundation\Security\TokenGeneratorService;
+use Doctrine\ORM\EntityManagerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
+
+class RegistrationController extends AbstractController
+{
+
+    #[Route('/register', name: 'app_register')]
+    public function register(
+        Request $request,
+        UserPasswordHasherInterface $userPasswordHasher,
+        EntityManagerInterface $entityManager,
+        TokenGeneratorService $tokenGenerator,
+        EventDispatcherInterface $dispatcher,
+        UserAuthenticatorInterface $userAuthenticator,
+        Authenticator $authenticator,
+    ): Response {
+        // The current user is already logging we will redirect to the homepage
+        $alreadyLoggedIn = $this->getUser();
+        if ($alreadyLoggedIn) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $user = new User();
+        $isOwner = (bool) $request->get('oauth');
+        $rootErrors = [];
+        $form = $this->createForm(RegistrationFormType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var string $plainPassword */
+            $plainPassword = $form->get('plainPassword')->getData();
+
+            // Save the new user entity
+            $user
+                ->setPassword($userPasswordHasher->hashPassword($user, $plainPassword))
+                ->setCreatedAt(new \DateTimeImmutable())
+                ->setConfirmationToken($tokenGenerator->generateToken(60));
+
+            // Dispatch an beforeEvent
+            $dispatcher->dispatch(new BeforeUserCreatedEvent($user, $request));
+
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            // Dispatch an UserCreatedEvent to send an email
+            $dispatcher->dispatch(new UserCreatedEvent($user, $isOwner));
+
+            if ($isOwner) {
+                return $userAuthenticator->authenticateUser($user, $authenticator, $request);
+            }
+
+            $this->addFlash(
+                'success',
+                'Almost there, you should to confirm your account'
+            );
+
+            return $this->redirectToRoute('app_login');
+        } elseif ($form->isSubmitted()) {
+            /** @var FormError $error */
+            foreach ($form->getErrors() as $error) {
+                if (null === $error->getCause()) {
+                    $rootErrors[] = $error;
+                }
+            }
+        }
+
+        return $this->render('registration/register.html.twig', [
+            'registrationForm' => $form->createView(),
+            'errors' => $rootErrors,
+            'oauth_signup' => $request->get('oauth'),
+        ]);
+    }
+
+    #[Route('/register/confirmation/{id}', name: 'app_register_confirm', requirements: ['id' => '\d+'])]
+    public function confirmAccount(
+        User $user,
+        Request $request,
+        EntityManagerInterface $em,
+    ): RedirectResponse {
+        $token = $request->get('token');
+
+        // If the token is empty
+        // Or does not match with the current user confirmation token in the database
+        if (empty($token || $token !== $user->getConfirmationToken())) {
+            $this->addFlash('error', 'Invalid confirmation token');
+
+            return $this->redirectToRoute('app_register');
+        }
+
+        // If the confirmation token is too old
+        if ($user->getCreatedAt() < new \DateTimeImmutable('-2 hours')) {
+            $this->addFlash('error', 'The token has expired');
+
+            return $this->redirectToRoute('app_register');
+        }
+
+        // We delete the token confirmation.
+        $user->setConfirmationToken(null);
+        $em->flush();
+        $this->addFlash('success', 'Your account has been confirmed');
+
+        return $this->redirectToRoute('app_login');
+    }
+}
