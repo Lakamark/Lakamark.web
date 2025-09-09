@@ -4,3 +4,4 @@ App\Domain\Auth\Entity\User:
         username: Dummy<current()>
         password: <password('0000')>
         createdAt: <date_create()>
+        validatedAt: <date_create()>

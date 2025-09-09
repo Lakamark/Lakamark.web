@@ -47,6 +47,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $confirmation_token = null;
 
+    #[ORM\Column(type: Types::INTEGER, nullable: false, options: ['default' => 0])]
+    private int $registerTimerDuration = 0;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $validatedAt = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -172,6 +178,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setConfirmationToken(?string $confirmation_token): static
     {
         $this->confirmation_token = $confirmation_token;
+
+        return $this;
+    }
+
+    public function getRegisterTimerDuration(): int
+    {
+        return $this->registerTimerDuration;
+    }
+
+    public function setRegisterTimerDuration(int $registerTimerDuration): static
+    {
+        $this->registerTimerDuration = $registerTimerDuration;
+
+        return $this;
+    }
+
+    public function getValidatedAt(): ?\DateTimeImmutable
+    {
+        return $this->validatedAt;
+    }
+
+    public function setValidatedAt(?\DateTimeImmutable $validatedAt): static
+    {
+        $this->validatedAt = $validatedAt;
 
         return $this;
     }
