@@ -8,11 +8,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+#[UniqueEntity(fields: ['username'], message: 'There is already an account with this username')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -21,6 +23,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(type: Types::STRING, length: 180, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 5, max: 100)]
+    #[Assert\Email]
     private ?string $email = null;
 
     /**
@@ -36,6 +41,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private string $password = '';
 
     #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 3, max: 100)]
     private string $username = '';
 
     #[ORM\Column]

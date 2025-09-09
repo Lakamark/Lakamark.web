@@ -15,13 +15,12 @@ class WebTestCase extends \Symfony\Bundle\FrameworkBundle\Test\WebTestCase
 {
     protected KernelBrowser $client;
     protected EntityManagerInterface $em;
-    protected ?SessionInterface $session;
+    protected ?SessionInterface $session = null;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->client = static::createClient();
-        self::bootKernel();
         /** @var EntityManagerInterface $em */
         $emContainer = static::getContainer()->get(EntityManagerInterface::class);
         $this->em = $emContainer;
@@ -80,9 +79,9 @@ class WebTestCase extends \Symfony\Bundle\FrameworkBundle\Test\WebTestCase
     public function expectedFormErrors(?int $expectedErrors = null): void
     {
         if (null === $expectedErrors) {
-            $this->assertTrue($this->client->getCrawler()->filter('.form-error')->count() > 0, 'Form errors mismatched.');
+            $this->assertTrue($this->client->getCrawler()->filter('.form-error-message')->count() > 0, 'Form errors mismatched.');
         } else {
-            $this->assertEquals($expectedErrors, $this->client->getCrawler()->filter('.form-error')->count(), 'Form errors mismatched.');
+            $this->assertEquals($expectedErrors, $this->client->getCrawler()->filter('.form-error-message')->count(), 'Form errors mismatched.');
         }
     }
 

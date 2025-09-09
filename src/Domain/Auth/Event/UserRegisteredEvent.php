@@ -17,7 +17,7 @@ readonly class UserRegisteredEvent
         return $this->user;
     }
 
-    public function isOwner(): bool
+    public function useOauthRequest(): bool
     {
         return $this->useOauthRequest;
     }

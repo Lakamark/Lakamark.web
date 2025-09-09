@@ -64,14 +64,13 @@ class RegistrationController extends AbstractController
             $dispatcher->dispatch(new UserRegisteredEvent($user, $isOwner));
 
             if ($isOwner) {
+                $this->addFlash(
+                    'success',
+                    'Almost there, you should to confirm your account'
+                );
+
                 return $userAuthenticator->authenticateUser($user, $authenticator, $request);
             }
-
-            $this->addFlash(
-                'success',
-                'Almost there, you should to confirm your account'
-            );
-
             return $this->redirectToRoute('app_login');
         } elseif ($form->isSubmitted()) {
             /** @var FormError $error */
@@ -99,7 +98,7 @@ class RegistrationController extends AbstractController
 
         // If the token is empty
         // Or does not match with the current user confirmation token in the database
-        if (empty($token || $token !== $user->getConfirmationToken())) {
+        if (empty($token) || $token !== $user->getConfirmationToken()) {
             $this->addFlash('error', 'Invalid confirmation token');
 
             return $this->redirectToRoute('app_register');
@@ -112,8 +111,12 @@ class RegistrationController extends AbstractController
             return $this->redirectToRoute('app_register');
         }
 
-        // We delete the token confirmation.
-        $user->setConfirmationToken(null);
+        // We delete the token confirmation and to set validatedAt datetime.
+        // Later, we will use a cron task to delete all unconfirmed accounts or bots account in the database
+        $user
+            ->setConfirmationToken(null)
+            ->setValidatedAt(new \DateTimeImmutable('now'));
+
         $em->flush();
         $this->addFlash('success', 'Your account has been confirmed');
 

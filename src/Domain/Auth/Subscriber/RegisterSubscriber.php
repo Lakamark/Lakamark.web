@@ -41,6 +41,6 @@ readonly class RegisterSubscriber implements EventSubscriberInterface
 
     public function onBeforeUserRegister(BeforeUserRegisterEvent $event): void
     {
-        // TODO Create a seter for storage the timer register duration on User Entity
+        $event->user->setRegisterTimerDuration($this->registrationDurationService->getDuration($event->request));
     }
 }

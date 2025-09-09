@@ -1,0 +1,6 @@
+{% extends layout %}
+{% import "mails/macros.twig" as e %}
+
+{% block body %}
+    {{ e.button("Cofirme my email", url('app_register_confirm', {id: user.id, token: user.confirmationToken})) }}
+{% endblock %}
