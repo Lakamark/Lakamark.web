@@ -2,12 +2,12 @@
 
 namespace App\Domain\Auth\Subscriber;
 
-use App\Domain\Auth\Event\BeforeUserCreatedEvent;
+use App\Domain\Auth\Event\BeforeUserRegisterEvent;
 use App\Domain\Auth\Service\RegistrationDurationService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
-readonly class RegistrationSubscriber implements EventSubscriberInterface
+readonly class RegisterSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private RegistrationDurationService $registrationDurationService,
@@ -18,13 +18,16 @@ readonly class RegistrationSubscriber implements EventSubscriberInterface
     {
         return [
             RequestEvent::class => 'onRequest',
-            BeforeUserCreatedEvent::class => 'onRegister',
+            BeforeUserRegisterEvent::class => 'onBeforeUserRegister',
         ];
     }
 
     public function onRequest(RequestEvent $event): void
     {
-        // The request is not register action
+        /*
+         * If the current request is not register request, will do nothing.
+         * Because this event is lunched on all request.
+         */
         if (
             'register' !== $event->getRequest()->attributes->get('_route')
             || !$event->getRequest()->isMethod('GET')
@@ -32,11 +35,12 @@ readonly class RegistrationSubscriber implements EventSubscriberInterface
             return;
         }
 
+        // Otherwise, we start a timer
         $this->registrationDurationService->startTimer($event->getRequest());
     }
 
-    public function onRegister(RequestEvent $event): void
+    public function onBeforeUserRegister(BeforeUserRegisterEvent $event): void
     {
-        $this->registrationDurationService->startTimer($event->getRequest());
+        // TODO Create a seter for storage the timer register duration on User Entity
     }
 }

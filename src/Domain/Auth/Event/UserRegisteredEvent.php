@@ -4,11 +4,11 @@ namespace App\Domain\Auth\Event;
 
 use App\Domain\Auth\Entity\User;
 
-readonly class UserCreatedEvent
+readonly class UserRegisteredEvent
 {
     public function __construct(
         private User $user,
-        private bool $connectedWithOauth = false,
+        private bool $useOauthRequest = false,
     ) {
     }
 
@@ -17,8 +17,8 @@ readonly class UserCreatedEvent
         return $this->user;
     }
 
-    public function isConnectedWithOauth(): bool
+    public function isOwner(): bool
     {
-        return $this->connectedWithOauth;
+        return $this->useOauthRequest;
     }
 }

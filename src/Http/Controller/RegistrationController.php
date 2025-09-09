@@ -4,8 +4,8 @@ namespace App\Http\Controller;
 
 use App\Domain\Auth\Authenticator;
 use App\Domain\Auth\Entity\User;
-use App\Domain\Auth\Event\BeforeUserCreatedEvent;
-use App\Domain\Auth\Event\UserCreatedEvent;
+use App\Domain\Auth\Event\BeforeUserRegisterEvent;
+use App\Domain\Auth\Event\UserRegisteredEvent;
 use App\Form\RegistrationFormType;
 use App\Foundation\Security\TokenGeneratorService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,7 +21,6 @@ use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 
 class RegistrationController extends AbstractController
 {
-
     #[Route('/register', name: 'app_register')]
     public function register(
         Request $request,
@@ -55,13 +54,14 @@ class RegistrationController extends AbstractController
                 ->setConfirmationToken($tokenGenerator->generateToken(60));
 
             // Dispatch an beforeEvent
-            $dispatcher->dispatch(new BeforeUserCreatedEvent($user, $request));
+            $dispatcher->dispatch(new BeforeUserRegisterEvent($user, $request));
 
             $entityManager->persist($user);
             $entityManager->flush();
 
-            // Dispatch an UserCreatedEvent to send an email
-            $dispatcher->dispatch(new UserCreatedEvent($user, $isOwner));
+            // Dispatch an UserCreatedEvent.
+            // A subscriber (AuthSubscriber)to listen this event to send an email
+            $dispatcher->dispatch(new UserRegisteredEvent($user, $isOwner));
 
             if ($isOwner) {
                 return $userAuthenticator->authenticateUser($user, $authenticator, $request);
