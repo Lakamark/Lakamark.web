@@ -1,0 +1,7 @@
+# Services to load for your test environment
+services:
+    App\Foundation\Faker\Provider\PasswordProvider:
+        arguments:
+            '@security.user_password_hasher'
+
+        tags: ['nelmio_alice.faker.provider']

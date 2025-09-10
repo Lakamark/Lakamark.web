@@ -1,0 +1,10 @@
+# Here the services you need for a development environments
+# If you want to load your services for a specific environment (Production, dev or test)
+# It commanded to edit the services config in the right environment.
+# You avoid some miss up the configuration
+services:
+    App\Foundation\Faker\Provider\PasswordProvider:
+        arguments:
+            '@security.user_password_hasher'
+
+        tags: ['nelmio_alice.faker.provider']
