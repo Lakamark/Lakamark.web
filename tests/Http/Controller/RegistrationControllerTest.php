@@ -119,7 +119,7 @@ class RegistrationControllerTest extends WebTestCase
             'GET',
             $this->makeConfirmationToken($users, $user->getConfirmationToken())
         );
-
+        $this->assertResponseRedirects();
         $this->client->followRedirect();
     }
 
@@ -140,10 +140,16 @@ class RegistrationControllerTest extends WebTestCase
         $this->client->followRedirect();
     }
 
-    public function testRedirectUserAlreadyLoggedIn(): void
+    public function testUserAlreadyLoggedIn(): void
     {
-        $this->loadFixtures(['users']);
-        $this->markTestIncomplete('TODO: Write the test.');
+        /** @var User[] $users */
+        $users = $this->loadFixtures(['users']);
+        $user = $users['user1'];
+        $this->login($user);
+        $this->client->request('GET', self::SIGNUP_PATH);
+
+        // TODO Change the redirection exception on profile url
+        $this->assertResponseRedirects('/login');
     }
 
     /**

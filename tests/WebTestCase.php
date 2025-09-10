@@ -34,6 +34,9 @@ class WebTestCase extends \Symfony\Bundle\FrameworkBundle\Test\WebTestCase
         parent::tearDown();
     }
 
+    /**
+     * To prepare a json response if you want to test an API.
+     */
     public function jsonResponse(string $method, string $url, array $data = []): Response
     {
         $this->client->request($method, $url, [], [], [
@@ -44,10 +47,14 @@ class WebTestCase extends \Symfony\Bundle\FrameworkBundle\Test\WebTestCase
         return $this->client->getResponse();
     }
 
+    /**
+     * To simulate a Csrf Token to test some method in POST.
+     * Actuality It is not possible to get access to the session from tests.
+     * You should to use the cookie and to write into a session file to simulate a session.
+     */
     public function setCsrfToken(string $key): string
     {
         $csrf = uniqid();
-        // Write directly into the session file cause there is no way to access the session from tests :(
         foreach ($this->client->getCookieJar()->all() as $cookie) {
             if ('MOCKSESSID' === $cookie->getName()) {
                 $path = self::getContainer()->getParameter('kernel.cache_dir').'/sessions/'.$cookie->getValue().'.mocksess';
@@ -60,6 +67,9 @@ class WebTestCase extends \Symfony\Bundle\FrameworkBundle\Test\WebTestCase
         return $csrf;
     }
 
+    /*
+     * To get the session
+     */
     protected function getSession(): SessionInterface
     {
         $this->ensureSessionIsInitialized();
@@ -68,6 +78,9 @@ class WebTestCase extends \Symfony\Bundle\FrameworkBundle\Test\WebTestCase
         return $this->client->getRequest()->getSession();
     }
 
+    /**
+     * To log in a user.
+     */
     public function login(?User $user): void
     {
         if (null === $user) {
@@ -76,6 +89,9 @@ class WebTestCase extends \Symfony\Bundle\FrameworkBundle\Test\WebTestCase
         $this->client->loginUser($user);
     }
 
+    /**
+     * To count errors form validation.
+     */
     public function expectedFormErrors(?int $expectedErrors = null): void
     {
         if (null === $expectedErrors) {
@@ -85,6 +101,9 @@ class WebTestCase extends \Symfony\Bundle\FrameworkBundle\Test\WebTestCase
         }
     }
 
+    /**
+     * To initialise a session for the test environment.
+     */
     private function ensureSessionIsInitialized(): void
     {
         $container = static::$kernel->getContainer();
