@@ -94,7 +94,7 @@ class RegistrationController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
     ): RedirectResponse {
-        $token = $request->get('token');
+        $token = $request->get('confirmation_token');
 
         // If the token is empty
         // Or does not match with the current user confirmation token in the database

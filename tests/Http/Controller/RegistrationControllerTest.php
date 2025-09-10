@@ -140,6 +140,30 @@ class RegistrationControllerTest extends WebTestCase
         $this->client->followRedirect();
     }
 
+    public function testGetWrongTokenQueryParameter(): void
+    {
+        /** @var User[] $users */
+        $users = $this->loadFixtures(['users']);
+        $user = $users['user_unconfirmed'];
+        $uri = self::CONFIRM_PATH.$user->getId().'?token='.$user->getConfirmationToken();
+
+        $this->client->request('GET', $uri);
+        $request = $this->client->getRequest();
+        $this->assertFalse($request->query->has('confirmation_token'));
+    }
+
+    public function testGetRightTokenQueryParameter(): void
+    {
+        /** @var User[] $users */
+        $users = $this->loadFixtures(['users']);
+        $user = $users['user_unconfirmed'];
+        $uri = self::CONFIRM_PATH.$user->getId().'?confirmation_token='.$user->getConfirmationToken();
+
+        $this->client->request('GET', $uri);
+        $request = $this->client->getRequest();
+        $this->assertTrue($request->query->has('confirmation_token'));
+    }
+
     public function testUserAlreadyLoggedIn(): void
     {
         /** @var User[] $users */
