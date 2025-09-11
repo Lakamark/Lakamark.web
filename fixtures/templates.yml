@@ -15,3 +15,12 @@ App\Domain\Blog\Entity\Post:
         updated_at: <date_create()>
         isOnline: true
         author: '@user1'
+
+App\Domain\Badge\Entity\Badge:
+    badge (template):
+        name: BadgeTest<current()>
+        description: <text(100)>
+        action_name: "<randomActionName(@self)>"
+        action_count: 1
+        unlockable: true
+        updated_at: <date_create()>

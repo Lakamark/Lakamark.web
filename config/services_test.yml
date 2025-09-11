@@ -5,3 +5,8 @@ services:
             '@security.user_password_hasher'
 
         tags: ['nelmio_alice.faker.provider']
+
+    App\Foundation\Faker\Provider\BadgeActionNameProvider:
+        arguments:
+            - '@Faker\Generator'
+        tags: [ 'nelmio_alice.faker.provider' ]
