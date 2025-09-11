@@ -5,3 +5,12 @@ App\Domain\Auth\Entity\User:
         password: <hashPassword(@self, '000000')>
         createdAt: <date_create()>
         validatedAt: <date_create()>
+
+App\Domain\Blog\Entity\Post:
+    post (template):
+        title: <sentence(5, true)>
+        slug: <slug()>
+        content: <text(1500)>
+        created_at: <date_create()>
+        updated_at: <date_create()>
+        isOnline: true

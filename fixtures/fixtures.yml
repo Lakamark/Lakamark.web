@@ -9,3 +9,6 @@ App\Domain\Auth\Entity\User:
     admin (extends user):
         username: Lakamark
         email: lakamark@lakamark.com
+
+App\Domain\Blog\Entity\Post:
+    post{1..50} (extends post):
