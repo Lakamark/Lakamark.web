@@ -3,6 +3,7 @@
 namespace App\Domain\Application\Entity;
 
 use App\Domain\Application\Repository\ContentRepository;
+use App\Domain\Auth\Entity\User;
 use App\Domain\Blog\Entity\Post;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -36,6 +37,10 @@ abstract class Content
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => 0])]
     private bool $isOnline = false;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')]
+    private ?User $author = null;
 
     public function getId(): ?int
     {
@@ -110,6 +115,18 @@ abstract class Content
     public function setIsOnline(bool $isOnline): static
     {
         $this->isOnline = $isOnline;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?User
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?User $author): static
+    {
+        $this->author = $author;
 
         return $this;
     }

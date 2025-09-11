@@ -14,3 +14,4 @@ App\Domain\Blog\Entity\Post:
         created_at: <date_create()>
         updated_at: <date_create()>
         isOnline: true
+        author: '@user1'
