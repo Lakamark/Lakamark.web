@@ -25,6 +25,7 @@ export function debounce(callback, delay) {
 }
 
 /**
+ * To add a delay between each callback
  *
  * @param callback
  * @param {number} delay
