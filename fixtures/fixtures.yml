@@ -12,6 +12,3 @@ App\Domain\Auth\Entity\User:
 
 App\Domain\Blog\Entity\Post:
     post{1..50} (extends post):
-
-App\Domain\Badge\Entity\Badge:
-    badge{1..5} (extends badge):
