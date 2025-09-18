@@ -10,6 +10,8 @@
 ###< symfony/framework-bundle ###
 
 .idea
+/node_modules/
+package-lock.json
 
 ###> phpunit/phpunit ###
 /phpunit.xml

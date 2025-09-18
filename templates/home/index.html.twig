@@ -1,7 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title "HomePage" %}
+
+{% block metas %}
+    <meta name="description" content="Home page">
+{% endblock %}
 
 {% block body %}
-    <h1>Homepage</h1>
+    <div class="container">
+        <h1 class="h1">Homepage</h1>
+    </div>
 {% endblock %}

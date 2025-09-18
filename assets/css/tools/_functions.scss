@@ -1,0 +1,30 @@
+@use "sass:meta";
+@use "sass:math";
+
+/**
+Find and replace a string
+ */
+@function string-replace($string, $search, $replacement: '') {
+    $index: str-index($string, $search);
+
+    @if $index {
+        @return str-slice($string, 1, $index -1) + $replacement + string-replace(str-slice($string, $index), $search);
+    }
+
+    @return $string;
+}
+
+@function unit($number) {
+    @if meta.type-of($number) == "number" and not math.is-unitless($number){
+        @return $number / ($number * 0 + 1);
+    }
+
+    @return $number;
+}
+
+/**
+Spacing helper
+*/
+@function spacing($number) {
+    @return calc(#{$number} * var(--spacing));
+}

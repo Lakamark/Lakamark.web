@@ -1,0 +1,61 @@
+@use "functions";
+@use "mixins";
+
+:root {
+    --container-padding: 20px;
+    --container-width: calc(100vw - var(--container-padding) * 2)
+}
+
+@media screen and (min-width: 980px) {
+    :root {
+        --container-padding: 30px;
+    }
+}
+
+@media screen and (min-width: 1300px) {
+    :root {
+        --container-padding: 20px;
+        --container-width: 1300px;
+    }
+}
+
+/**
+    CONTAINER
+*/
+%container,
+.container {
+    box-sizing: border-box;
+    width: 100%;
+    padding-left: calc(50% - var(--container-width) / 2);
+    padding-right: calc(50% - var(--container-width) / 2);
+}
+
+%spacing-container,
+.spacing-container {
+    margin-left: auto;
+    margin-right: auto;
+    width: var(--container-width);
+}
+
+%narrow-container,
+.narrow-container {
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.ratio-container {
+    width: 100%;
+    aspect-ratio:  16/9;
+}
+
+/**
+    WRAPPER
+ */
+.wrapper-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: hidden;
+}

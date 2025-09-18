@@ -5,11 +5,11 @@ namespace App\Http\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class HomeController extends AbstractController
+class BlogController extends AbstractController
 {
-    #[Route('/', name: 'home')]
+    #[Route(path: '/blog', name: 'blog.index')]
     public function index(): Response
     {
-        return $this->render('home/index.html.twig');
+        return $this->render('blog/index.html.twig');
     }
 }

@@ -1,10 +1,32 @@
-import './bootstrap.js';
-/*
- * Welcome to your app's main JavaScript file!
- *
- * This file will be included onto the page via the importmap() Twig function,
- * which should already be in your base.html.twig.
- */
-import './styles/app.css';
+import './css/app.scss';
 
-console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
+import * as Turbo from "@hotwired/turbo"
+import {disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
+import {throttle} from "./helpers/Timer.js";
+
+document.addEventListener('turbo:load', () => {
+    // Reset all scrollbar
+    clearAllBodyScrollLocks()
+
+    // Rebind click event for the hamburger button (Mobile scree only)
+    initBtnHamburger();
+})
+
+/**
+ * Toggle the menu
+ */
+function initBtnHamburger() {
+    const btnHamburger = document.querySelector('#js-hamburger')
+    const navBar = document.querySelector('.header__nav');
+    if (btnHamburger) {
+        let isOpen = false;
+        btnHamburger.addEventListener('click', throttle(() => {
+            document.querySelector('#main-header').classList.toggle('open-menu');
+            isOpen ? enableBodyScroll(navBar) : disableBodyScroll(navBar);
+            isOpen = !isOpen;
+        }, 500))
+    }
+}
+
+// Start Turbo
+Turbo.start();

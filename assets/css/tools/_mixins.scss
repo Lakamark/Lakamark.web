@@ -1,0 +1,66 @@
+@use "functions";
+
+/*
+    Responsive breakpoints
+*/
+@mixin b-up($size) {
+    $size: functions.unit($size);
+    @media (min-width: $size * 1px) {
+        @content;
+    }
+}
+
+@mixin b-down($size) {
+    $size: functions.unit($size);
+    @media (max-width: $size * 1px) {
+        @content;
+    }
+}
+
+@mixin b-between($minSize, $maxSize) {
+    $minSize: functions.unit($minSize);
+    $maxSize: functions.unit($maxSize);
+    @media (min-width: $minSize * 1px) and (max-width: $maxSize * 1px) {
+        @content;
+    }
+}
+
+/*
+    Container
+*/
+@mixin container($width, $padding) {
+    width: 100%;
+    padding-left: $padding;
+    padding-right: $padding;
+
+    @include b-up($width + 2 * $padding) {
+        padding-left: calc(50vw - #{$width / 2});
+        padding-right: calc(50vv - #{$width / 2});
+    }
+}
+
+/**
+    Dark mode
+*/
+
+@mixin night() {
+    @if (&) {
+        @media (prefers-color-scheme: dark) {
+            body:not([class~='day-theme']) & {
+                @content;
+            }
+        }
+        .night-theme & {
+            @content;
+        }
+    } @else {
+        @media (prefers-color-scheme: dark) {
+            body:not([class~='day-theme']) {
+                @content;
+            }
+            .night-theme {
+                @content;
+            }
+        }
+    }
+}

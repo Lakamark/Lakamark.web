@@ -27,6 +27,12 @@ services:
     App\Http\Controller\:
         resource: '../src/Http/Controller'
         tags: ['controller.service_arguments']
+
     App\Foundation\Mailing\MailerBuilder:
         arguments:
             $dkimKey: '%dkim_key%'
+
+    App\Http\Twig\ViteAssetExtension:
+      arguments:
+        $env: '%kernel.environment%'
+        $assetPath: '%kernel.project_dir%/public/assets'

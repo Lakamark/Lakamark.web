@@ -1,0 +1,29 @@
+@use '../tools/mixins';
+
+:root {
+  --footer-logo-color: #000000;
+  --footer-border-color: #EBEBEB;
+}
+
+@include mixins.night {
+  --footer-logo-color: #FFFFFF;
+  --footer-border-color: #001D3D;
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  border-top: 3px solid var(--footer-border-color);
+}
+
+.footer__header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 120px;
+    height: 120px;
+    fill: var(--footer-logo-color);
+  }
+}
