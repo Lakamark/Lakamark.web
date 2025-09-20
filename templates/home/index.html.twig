@@ -9,5 +9,132 @@
 {% block body %}
     <div class="container">
         <h1 class="h1">Homepage</h1>
+        <section class="home-section">
+            <h2 class="h2">Last Posts</h2>
+            <carousel-slider style="--items: 3;">
+                <article class="carousel__slider card">
+                    <div class="card__body">
+                        <img src="https://picsum.photos/200" alt="Thumbnail" class="card__image">
+                        <h3 class="h3">Article</h3>
+                        <div class="card__info">
+                            <span class="tag">Art</span>
+                            <span class="tag">Laka Mark</span>
+                        </div>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Blanditiis cumque, cupiditate distinctio dolore dolorem doloremque enim eveniet exercitationem facilis fuga incidunt iure molestiae non perferendis rerum, sunt temporibus vitae voluptatum!</p>
+                        <div class="card__footer">
+                            <a href="#" class="btn">
+                                <span class="card__link" aria-hidden="true"></span>
+                                Learn more
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                <article class="carousel__slider card">
+                    <div class="card__body">
+                        <img src="https://picsum.photos/200" alt="Thumbnail" class="card__image">
+                        <h3 class="h3">Article</h3>
+                        <div class="card__info">
+                            <span class="tag">Art</span>
+                            <span class="tag">Laka Mark</span>
+                        </div>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Blanditiis cumque, cupiditate distinctio dolore dolorem doloremque enim eveniet exercitationem facilis fuga incidunt iure molestiae non perferendis rerum, sunt temporibus vitae voluptatum!</p>
+                        <div class="card__footer">
+                            <a href="#" class="btn">
+                                <span class="card__link" aria-hidden="true"></span>
+                                Learn more
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                <article class="carousel__slider card">
+                    <div class="card__body">
+                        <img src="https://picsum.photos/200" alt="Thumbnail" class="card__image">
+                        <h3 class="h3">Article</h3>
+                        <div class="card__info">
+                            <span class="tag">Art</span>
+                            <span class="tag">Laka Mark</span>
+                        </div>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Blanditiis cumque, cupiditate distinctio dolore dolorem doloremque enim eveniet exercitationem facilis fuga incidunt iure molestiae non perferendis rerum, sunt temporibus vitae voluptatum!</p>
+                        <div class="card__footer">
+                            <a href="#" class="btn">
+                                <span class="card__link" aria-hidden="true"></span>
+                                Learn more
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            </carousel-slider>
+            <!--
+            <div class="carousel" data-slider>
+                <div class="carousel__sliders" data-slider-wrapper>
+                    <article class="carousel__slider card">
+                        <div class="card__body">
+                            <img src="https://picsum.photos/200" alt="Thumbnail" class="card__image">
+                            <h3 class="h3">Article</h3>
+                            <div class="card__info">
+                                <span class="tag">Art</span>
+                                <span class="tag">Laka Mark</span>
+                            </div>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Blanditiis cumque, cupiditate distinctio dolore dolorem doloremque enim eveniet exercitationem facilis fuga incidunt iure molestiae non perferendis rerum, sunt temporibus vitae voluptatum!</p>
+                            <div class="card__footer">
+                                <a href="#" class="btn">
+                                    <span class="card__link" aria-hidden="true"></span>
+                                    Learn more
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="carousel__slider card">
+                        <div class="card__body">
+                            <img src="https://picsum.photos/200" alt="Thumbnail" class="card__image">
+                            <h3 class="h3">Article</h3>
+                            <div class="card__info">
+                                <span class="tag">Art</span>
+                                <span class="tag">Laka Mark</span>
+                            </div>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Blanditiis cumque, cupiditate distinctio dolore dolorem doloremque enim eveniet exercitationem facilis fuga incidunt iure molestiae non perferendis rerum, sunt temporibus vitae voluptatum!</p>
+                            <div class="card__footer">
+                                <a href="#" class="btn">
+                                    <span class="card__link" aria-hidden="true"></span>
+                                    Learn more
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="carousel__slider card">
+                        <div class="card__body">
+                            <img src="https://picsum.photos/200" alt="Thumbnail" class="card__image">
+                            <h3 class="h3">Article</h3>
+                            <div class="card__info">
+                                <span class="tag">Art</span>
+                                <span class="tag">Laka Mark</span>
+                            </div>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Blanditiis cumque, cupiditate distinctio dolore dolorem doloremque enim eveniet exercitationem facilis fuga incidunt iure molestiae non perferendis rerum, sunt temporibus vitae voluptatum!</p>
+                            <div class="card__footer">
+                                <a href="#" class="btn">
+                                    <span class="card__link" aria-hidden="true"></span>
+                                    Learn more
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                <button class="carrousel__controls carousel__next__slide" data-slider-next>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path
+                                d="M13.1717 12.0007L8.22192 7.05093L9.63614 5.63672L16.0001 12.0007L9.63614 18.3646L8.22192 16.9504L13.1717 12.0007Z">
+                        </path>
+                    </svg>
+                </button>
+                <button class="carrousel__controls carousel__prev__slide" data-slider-prev>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path
+                                d="M13.1717 12.0007L8.22192 7.05093L9.63614 5.63672L16.0001 12.0007L9.63614 18.3646L8.22192 16.9504L13.1717 12.0007Z">
+                        </path>
+                    </svg>
+                </button >
+            </div>
+            -->
+        </section>
     </div>
 {% endblock %}

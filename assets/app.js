@@ -1,7 +1,8 @@
 import './css/app.scss';
+import "./elements/index.js";
 
 import * as Turbo from "@hotwired/turbo"
-import {disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
+import {clearAllBodyScrollLocks, disableBodyScroll, enableBodyScroll} from 'body-scroll-lock'
 import {throttle} from "./helpers/Timer.js";
 
 document.addEventListener('turbo:load', () => {
@@ -10,6 +11,7 @@ document.addEventListener('turbo:load', () => {
 
     // Rebind click event for the hamburger button (Mobile scree only)
     initBtnHamburger();
+
 })
 
 /**
