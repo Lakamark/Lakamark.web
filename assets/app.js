@@ -1,16 +1,21 @@
 import './css/app.scss';
-import "./elements/index.js";
 
 import * as Turbo from "@hotwired/turbo"
 import {clearAllBodyScrollLocks, disableBodyScroll, enableBodyScroll} from 'body-scroll-lock'
 import {throttle} from "./helpers/Timer.js";
-
+import Carousel from "./elements/carousel.js";
 document.addEventListener('turbo:load', () => {
     // Reset all scrollbar
     clearAllBodyScrollLocks()
 
     // Rebind click event for the hamburger button (Mobile scree only)
     initBtnHamburger();
+
+    new Carousel(document.querySelector('#carousel'), {
+        slidesToScroll: 3,
+        slidesPerView: 3,
+    })
+
 
 })
 
