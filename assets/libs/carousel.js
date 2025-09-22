@@ -15,6 +15,7 @@ class Carousel {
      * @param {boolean} [options.loop=false] Enable the looping behavior when you attempt the end slide
      * @param {boolean} [options.pagination=false] Enable the pagination behavior
      * @param {boolean} [options.pagination=true] Enable the navigation behavior
+     * @param {boolean} [options.infinite=false] Enable the infinite scrolling behavior
      */
     constructor (element, options = {}) {
         this.element = element
@@ -24,11 +25,19 @@ class Carousel {
             loop: false,
             pagination: false,
             navigation: true,
+            infinite: false,
         }, options)
+
+        // We return a fatal error if you activate the loop and the infinite options' carousel.
+        if (this.options.loop && this.options.infinite) {
+            throw new Error("You can't enable the loop option and the infinite option in the carousel.");
+        }
+
         let children = [].slice.call(element.children)
         this.isMobile = false
         this.curentItem = 0
         this.moveCallbacks = []
+        this.offset = 0
 
         // Create the carousel components in the DOM
         this.root = this.createDivWithClass('carousel')
@@ -39,9 +48,27 @@ class Carousel {
         this.items = children.map((child) => {
             let item = this.createDivWithClass('carousel__item')
             item.appendChild(child)
-            this.container.appendChild(item)
             return item
         })
+
+        // Check if the infinite option is enabled
+        if (this.options.infinite) {
+            this.offset = this.options.slidesVisible + this.options.slidesToScroll
+
+            // If the carousel has not enough element. The offset is bigger than children elements
+            if (this.offset > children.length) {
+                console.error("Your are not enough children in the carousel", element)
+            }
+
+            // Rebuild the items array
+            this.items = [
+                ...this.items.slice(this.items.length - this.offset).map(item => item.cloneNode(true)),
+                ...this.items,
+                ...this.items.slice(0, this.offset).map(item => item.cloneNode(true))
+            ]
+            this.goToItem(this.offset, false)
+        }
+        this.items.forEach(item => this.container.appendChild(item))
         this.setStyles()
 
         // If the navigation option is enabled
@@ -53,7 +80,7 @@ class Carousel {
         if (this.options.pagination === true) {
             this.createPagination()
         }
-        this.moveCallbacks.forEach(cb => cb(0))
+        this.moveCallbacks.forEach(cb => cb(this.curentItem))
 
         // Events
         this.onWindowResize()
@@ -65,6 +92,10 @@ class Carousel {
                 this.prev()
             }
         })
+
+        if (this.options.infinite) {
+            this.container.addEventListener('transitionend', this.resetInfinite.bind(this))
+        }
     }
 
     /**
@@ -120,14 +151,15 @@ class Carousel {
         this.root.appendChild(pagination)
 
         // Create a button for each item
-        for (let i = 0; i < this.items.length; i = i + this.options.slidesToScroll) {
+        for (let i = 0; i < (this.items.length - 2 * this.offset); i = i + this.options.slidesToScroll) {
             let button = this.createDivWithClass('carousel__pagination__button')
-            button.addEventListener('click', () => this.goToItem(i))
+            button.addEventListener('click', () => this.goToItem(i + this.offset))
             pagination.appendChild(button)
             buttons.push(button)
         }
         this.onMove(index => {
-            let activeButton = buttons[Math.floor(index / this.options.slidesToScroll)];
+            let count = this.items.length - 2 * this.offset;
+            let activeButton = buttons[Math.floor(((index - this.offset) % count) / this.options.slidesToScroll)];
             if (activeButton) {
                 buttons.forEach((button) => button.classList.remove('carousel__pagination__button--active'))
                 activeButton.classList.add('carousel__pagination__button--active')
@@ -153,8 +185,9 @@ class Carousel {
      * To move the carousel to the target index item
      *
      * @param {Number} index
+     * @param {boolean} [animation=true]
      */
-    goToItem(index) {
+    goToItem(index, animation = true) {
         if (index < 0 ) {
             if (this.options.loop) {
                 index = this.items.length - this.slidesVisible
@@ -172,9 +205,34 @@ class Carousel {
             }
         }
         let translateX = index * -100 / this.items.length
+
+        // Disabled transform animations
+        if (animation === false) {
+            this.container.style.transition = 'none'
+        }
+
         this.container.style.transform = `translate3d(${translateX}%, 0, 0)`
+        this.container.offsetHeight // Force repaint
+
+        if (animation === false) {
+            this.container.style.transition = ''
+        }
+
         this.curentItem = index
         this.moveCallbacks.forEach(cb => cb(index))
+    }
+
+    /**
+     * Move the container to stimulate an infinite slice loop animation
+     */
+    resetInfinite() {
+        if (this.curentItem <=this.options.slidesToScroll) {
+            // Move left
+            this.goToItem(this.curentItem + (this.items.length - 2 * this.offset), false)
+        } else if(this.curentItem >= this.items.length - this.offset) {
+            // Move right
+            this.goToItem(this.curentItem - (this.items.length - 2 * this.offset), false)
+        }
     }
 
     /**
@@ -234,7 +292,7 @@ document.addEventListener("DOMContentLoaded", function() {
     new Carousel(document.querySelector('#carousel'), {
         slidesVisible: 3,
         slidesToScroll: 2,
-        loop: false,
-        pagination: true
+        infinite: true,
+        pagination: true,
     });
 })
