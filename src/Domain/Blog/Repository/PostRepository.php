@@ -15,4 +15,13 @@ class PostRepository extends AbstractRepository
     {
         parent::__construct($registry, Post::class);
     }
+
+    public function find5posts(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->orderBy('p.createdAt', 'DESC')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
+    }
 }

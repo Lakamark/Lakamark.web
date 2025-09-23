@@ -8,11 +8,12 @@ Spotlight items
   transform: translate3d(0, -1px, 0);
   border: 3px solid var(--card-bg-border);
   border-radius: 10px;
+  padding: 16px;
 }
 
 .spotlight__title {
   font-size: 25px;
-  color: #FFF;
+  color: var(--text-color);
   font-weight: bold;
   margin-bottom: 25px;
 }
@@ -20,13 +21,21 @@ Spotlight items
 .spotlight__content {
   display: flex;
   flex-direction: column;
-  padding: 16px;
+}
+
+.spotlight__image {
+  display: flex;
+  width: 100%;
+  min-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  border: 3px solid var(--card-bg-border);
 }
 
 .spotlight__item img {
-  max-width: 100%;
-  display: block;
-  border-radius: 3px;
+  min-width: 100%;
+  display: flex;
+  border-radius: 4px;
 }
 
 /**
@@ -48,26 +57,29 @@ Carousel
 }
 
 .carousel__item {
-  float: left!important;
+  float: left;
+  opacity: 20%;
+  transition: .5s;
 }
 
 .carousel__next, .carousel__prev {
   position: absolute;
   width: 40px;
   height: 40px;
-  background: #FFF;
+  background: var(--card-bg-color);
   background-size:  20px 20px;
+  color: var(--text-color);
+  border: 3px solid var(--card-bg-border);
   border-radius: 50%;
   top: 50%;
-  margin-top: -20px;
-  right: -20px;
-  box-shadow: 0 15px 35px #3232321a,0 5px 15px #0000001a;
+  margin-top: -10px;
+  right: -10px;
   cursor: pointer;
   transition: transform 0.3s, opacity 0.3s;
 }
 
 .carousel__prev {
-  left: -20px;
+  left: -10px;
 }
 
 .carousel__next:hover, .carousel__prev:hover {
@@ -104,6 +116,10 @@ Carousel
 
 .carousel__pagination__button--active, .carousel__pagination__button:hover {
   transform: scale(1.4);
+}
+
+.carousel__slide--active {
+  opacity: 1;
 }
 
 @media screen and (min-width: 880px) {

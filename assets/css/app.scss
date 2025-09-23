@@ -7,6 +7,7 @@
 @use "modules/footer";
 @use "modules/card";
 @use "modules/carousel";
+@use "pages/homepage";
 
 // Global CSS Variables
 :root {
@@ -27,6 +28,7 @@
   --white: #FFFFFF;
   --hr-color: #EBEBEB;
   --day-theme-bg: #FFFFFF;
+  --section-color: #EBEBEB;
 }
 
 // Night theme
@@ -45,6 +47,7 @@
   --medium-grey: #B8B4B4;
   --white: #FFFFFF;
   --hr-color: #192641;
+  --section-color: #a8b4d0;
 }
 
 // Generic styles

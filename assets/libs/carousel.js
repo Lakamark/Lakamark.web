@@ -1,4 +1,4 @@
-class Carousel {
+export class Carousel {
 
     /**
      * This callback type is called `moveCallback` and is displayed as a global symbol.
@@ -105,6 +105,10 @@ class Carousel {
         let ratio = this.items.length / this.slidesVisible
         this.container.style.width = (ratio * 100) + '%'
         this.items.forEach(item => item.style.width = ((100 / this.slidesVisible) / ratio) + '%')
+
+        // If you switch the device, we should update the UI
+        // Because, the slidesVisible change depend on the device and options configuration
+        this.updateUI(this.items)
     }
 
     /**
@@ -219,7 +223,40 @@ class Carousel {
         }
 
         this.curentItem = index
+        this.updateUI(this.items);
         this.moveCallbacks.forEach(cb => cb(index))
+    }
+
+    /**
+     * Update the UI when the carousel is moving
+     * You can write your own CSS properties
+     * when the class carousel__slide--active was added in the DOM
+     * This is a toggle class when the current items and the index match
+     *
+     * example :
+     * unactive element state:
+     * <div class="carousel__item">
+     *     Your content
+     * </div>
+     *
+     * active element state:
+     * <div class="carousel__item carousel__slide--active">
+     *     Your content
+     * </div>
+     *
+     * @param {Array<HTMLElement>} items
+     */
+    updateUI(items) {
+        items.forEach((slide, id) => {
+            if (
+                id >= this.curentItem
+                && id < this.curentItem + this.slidesVisible
+            ) {
+                slide.classList.add('carousel__slide--active')
+            } else {
+                slide.classList.remove('carousel__slide--active')
+            }
+        })
     }
 
     /**
@@ -286,13 +323,3 @@ class Carousel {
         return this.isMobile ? 1 : this.options.slidesVisible
     }
 }
-
-
-document.addEventListener("DOMContentLoaded", function() {
-    new Carousel(document.querySelector('#carousel'), {
-        slidesVisible: 3,
-        slidesToScroll: 2,
-        infinite: true,
-        pagination: true,
-    });
-})
