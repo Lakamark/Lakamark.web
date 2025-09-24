@@ -1,0 +1,115 @@
+@use "sass:color";
+@use "../tools/mixins";
+@use "../tools/functions";
+
+:root {
+  --btn-color-default: #000000;
+  --btn-color-primary: #007bff;
+  --btn-color-secondary: #424242;
+  --btn-color-success: #0D5F00;
+  --btn-color-warning: #D3A200;
+  --btn-color-danger: #B60000;
+}
+
+@include mixins.night {
+  --btn-color-default: #A8B4D0;
+  --btn-color-primary: #0079FF;
+  --btn-color-secondary: #B8B4B4;
+  --btn-color-success: #0D5F00;
+  --btn-color-warning: #FFC300;
+  --btn-color-danger: #B60000;
+}
+
+// Add a variant color when on the hover state
+$primary-color-hover: functions.LightnessColor(#007bff);
+$secondary-color-hover: functions.LightnessColor(#424242);
+$success-color-hover: functions.LightnessColor(#0D5F00);
+$warning-color-hover: functions.LightnessColor(#FFC300);
+$danger-color-hover: functions.LightnessColor(#B60000);
+
+/**
+Generic button styles
+ */
+.btn {
+  display: inline-flex;
+  padding: 4px 8px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  font-weight: bold;
+  outline: none;
+  background-color: var(--background-page);
+  border-top: 2px solid var(--background-page);
+  border-right: 2px solid var(--background-page);
+  border-left: 2px solid var(--background-page);
+  border-bottom: 5px solid var(--background-page);
+}
+
+.btn-lg {
+  padding: 16px;
+  font-size: 18px;
+}
+
+.btn-full {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.btn:hover {
+  transition: color .3s, border-color .3s;
+}
+
+/**
+  Variant buttons
+ */
+.btn-primary {
+  border-color: var(--btn-color-primary);
+  color: var(--btn-color-primary);
+
+  &:hover {
+    color: #{$primary-color-hover};
+    border-color: #{$primary-color-hover};
+  }
+}
+
+.btn-secondary {
+  border-color: var(--btn-color-secondary);
+  color: var(--btn-color-secondary);
+
+  &:hover {
+    color: #{$secondary-color-hover};
+    border-color: #{$secondary-color-hover};
+  }
+}
+
+.btn-success {
+  border-color: var(--btn-color-success);
+  color: var(--btn-color-success);
+
+  &:hover {
+    color: #{$success-color-hover};
+    border-color: #{$success-color-hover};
+  }
+}
+
+.btn-warning {
+  border-color: var(--btn-color-warning);
+  color: var(--btn-color-warning);
+
+  &:hover {
+    color: #{$warning-color-hover};
+    border-color: #{$warning-color-hover};
+  }
+}
+
+.btn-danger {
+  border-color: var(--btn-color-danger);
+  color: var(--btn-color-danger);
+
+  &:hover {
+    color: #{$danger-color-hover};
+    border-color: #{$danger-color-hover};
+  }
+}
