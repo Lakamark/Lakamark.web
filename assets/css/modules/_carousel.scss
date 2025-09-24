@@ -12,7 +12,7 @@ Spotlight items
 }
 
 .spotlight__title {
-  font-size: 25px;
+  font-size: 32px;
   color: var(--text-color);
   font-weight: bold;
   margin-bottom: 25px;
@@ -36,6 +36,10 @@ Spotlight items
   min-width: 100%;
   display: flex;
   border-radius: 4px;
+}
+
+.spotlight__description {
+  font-size: 20px;
 }
 
 /**

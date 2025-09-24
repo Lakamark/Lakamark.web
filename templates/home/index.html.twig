@@ -17,7 +17,7 @@
                 <h2 class="h2">Last Posts</h2>
                 <a href="{{ path('blog.index') }}" title="Blog section">See more posts</a>
             </div>
-            <spotlight-component class="homepage-carousel" slidesvisibles="2" infinite="true">
+            <spotlight-component class="homepage-carousel" slidesvisibles="1" infinite="true">
                 {% for post in posts %}
                     <div class="spotlight__item">
                         <div class="spotlight__image">
@@ -25,7 +25,7 @@
                         </div>
                         <div class="spotlight__content">
                             <div class="spotlight__title">
-                                {{ post.title }}
+                                <h3>{{ post.title }}</h3>
                             </div>
                             <div class="spotlight__description">
                                 lorem ipsum dolor sit amet, consectetuer adipiscing elit
@@ -47,7 +47,7 @@
                 <h2 class="h2">Last Projects</h2>
                 <a href="#" title="See more projects...">See more projects</a>
             </div>
-            <spotlight-component class="homepage-carousel" slidesvisibles="2" infinite="true">
+            <spotlight-component class="homepage-carousel" slidesvisibles="1" infinite="true">
                 <div class="spotlight__item">
                     <div class="spotlight__image">
                         <img src="https://picsum.photos/700/300" alt="Thumbnail">
@@ -141,5 +141,5 @@
             </div>
         </div>
     </section>
-    <!-- End of the Envent section -->
+    <!-- End of the Event section -->
 {% endblock %}
