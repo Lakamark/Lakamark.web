@@ -4,6 +4,7 @@ namespace App\Domain\Blog\Repository;
 
 use App\Domain\Blog\Entity\Post;
 use App\Foundation\Orm\AbstractRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -21,6 +22,17 @@ class PostRepository extends AbstractRepository
         return $this->createQueryBuilder('p')
             ->orderBy('p.createdAt', 'DESC')
             ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
+    }
+
+   
+    public function findAllPost()
+    {
+        return $this->createQueryBuilder('p')
+            ->select('p')
+            ->orderBy('p.createdAt', 'DESC')
+            ->where('p.isOnline = :true')
             ->getQuery()
             ->getResult();
     }

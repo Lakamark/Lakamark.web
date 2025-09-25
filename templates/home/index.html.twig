@@ -23,18 +23,16 @@
                         <div class="spotlight__image">
                             <img src="https://picsum.photos/700/300" alt="Thumbnail">
                         </div>
-                        <div class="spotlight__content">
+                        <div class="spotlight__content stacked-content">
                             <div class="spotlight__title">
                                 <h3>{{ post.title }}</h3>
                             </div>
                             <div class="spotlight__description">
-                                lorem ipsum dolor sit amet, consectetuer adipiscing elit
+                                {{ excerpt(post.content) }}
                             </div>
                             <div class="spotlight__footer">
-                                <a href="#" class="btn btn-primary" title="Learn more about the article: {{ post.title
-                                }}">Learn
-                                    more..
-                                    .</a>
+                                <a href="{{ path('blog.show', {slug: post.slug}) }}" class="btn btn-primary"
+                                   title="Learn more about the article: {{ post.title }}">Learn more...</a>
                             </div>
                         </div>
                     </div>

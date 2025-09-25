@@ -36,3 +36,8 @@ services:
       arguments:
         $env: '%kernel.environment%'
         $assetPath: '%kernel.project_dir%/public/assets'
+
+    Knp\Bundle\PaginatorBundle\Helper\Processor: ~
+
+    App\Helper\Paginator\PaginatorInterface:
+        class: App\Helper\Paginator\KnpPaginatorDecorator

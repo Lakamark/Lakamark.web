@@ -6,4 +6,33 @@
     <div class="container">
         <h1 class="h1">Blog.</h1>
     </div>
+    <div class="listing-page-container container">
+        <div class="grid-3">
+            {% for post in posts %}
+                <article class="card" data-post-id="{{ post.id }}">
+                    <!-- Uncommented this ligne when the thumbnail system will be ready
+                    <div class="card__image"></div>
+                    -->
+                    <div class="card__body stacked-content">
+                        <h2 class="h2">{{ post.title }}</h2>
+                        <div class="card__info">
+                            <div class="card_tags">Category Name</div>
+                            <div class="card__author">
+                                {{ post.author.username }}
+                            </div>
+                        </div>
+                        <p>{{ excerpt(post.content, 350) }}</p>
+                    </div>
+                    <div class="card__footer j-end">
+                        <a href="{{ path('blog.show', {slug: post.slug}) }}" class="btn btn-primary" title="{{ post
+                        .title }}">
+                            <span class="card__link" aria-hidden="true"></span>
+                            Learn more...
+                        </a>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    </div>
+    {{ knp_pagination_render(posts) }}
 {% endblock %}

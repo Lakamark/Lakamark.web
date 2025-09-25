@@ -9,7 +9,10 @@
 @use "modules/form";
 @use "modules/button";
 @use "modules/carousel";
+@use "modules/pagination";
 @use "pages/homepage";
+@use "pages/listing";
+@use "pages/single";
 
 // Global CSS Variables
 :root {

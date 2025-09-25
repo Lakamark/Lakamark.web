@@ -75,4 +75,20 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: var(--gap);
+
+    @include mixins.b-down(980) {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+.stacked-content {
+    --gap-content: 2;
+    display: grid!important;
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+    gap: calc(var(--gap-content) * var(--spacing));
+
+    & > * {
+        min-width: 0;
+    }
 }

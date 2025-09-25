@@ -1,0 +1,36 @@
+@use "card";
+@use "../tools/functions";
+
+.pagination {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: calc(2 * var(--spacing)) 0;
+  padding: calc(2 * var(--spacing)) 0;
+}
+
+.pagination .current,
+.pagination .page,
+.pagination .next,
+.pagination .first,
+.pagination .last,
+.previous {
+  @extend %card;
+  font-weight: bold;
+  white-space: nowrap;
+  margin: calc(.5 * var(--spacing));
+  transition: all .3s ease-in-out;
+
+  &:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+  }
+}
+
+.pagination .current {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}

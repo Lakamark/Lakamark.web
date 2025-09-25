@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title post.title %}
+
+{% block body %}
+    <section class="single-page">
+        <div class="single-page-title">
+            <h1 class="h1">{{ post.title }}</h1>
+        </div>
+        <div class="single-page-user-avatar">
+            <img src="https://picsum.photos/80/80" alt="Avatar Author" class="user__avatar__image">
+            <div class="single-page-division"></div>
+        </div>
+        <div class="single-page-body">
+            <div class="narrow-container">
+                <div class="single-page-info">
+                    <span class="single-page-tag-left">Author: {{ post.author.username }}</span>
+                    <span class="single-page-tag-right">Published At: --/--/--</span>
+                </div>
+                {{ post.content }}
+            </div>
+        </div>
+    </section>
+    <section class="single-page-comment-section">
+        <div class="narrow-container">
+            <h3 class="h3">Comments</h3>
+            <p>Here comments</p>
+        </div>
+    </section>
+{% endblock %}
+

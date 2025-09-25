@@ -13,6 +13,7 @@
         "preact": "^10.26.9"
     },
     "devDependencies": {
+        "@hotwired/stimulus": "^3.0.0",
         "@preact/preset-vite": "^2.10.2",
         "sass-embedded": "^1.89.2",
         "vite": "^7.0.4",
