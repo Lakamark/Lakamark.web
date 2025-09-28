@@ -41,3 +41,7 @@ services:
 
     App\Helper\Paginator\PaginatorInterface:
         class: App\Helper\Paginator\KnpPaginatorDecorator
+
+    App\Domain\Captcha\Puzzle\PuzzleGenerator:
+        arguments:
+            $imagePath: '%kernel.project_dir%/public/images/puzzles'
