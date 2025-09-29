@@ -6,8 +6,9 @@ use App\Domain\Auth\Authenticator;
 use App\Domain\Auth\Entity\User;
 use App\Domain\Auth\Event\BeforeUserRegisterEvent;
 use App\Domain\Auth\Event\UserRegisteredEvent;
-use App\Form\RegistrationFormType;
+use App\Domain\Captcha\CaptchaChallengeInterface;
 use App\Foundation\Security\TokenGeneratorService;
+use App\Http\Form\RegistrationFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
@@ -29,6 +30,7 @@ class RegistrationController extends AbstractController
         EventDispatcherInterface $dispatcher,
         UserAuthenticatorInterface $userAuthenticator,
         Authenticator $authenticator,
+        CaptchaChallengeInterface $captchaChallenge,
     ): Response {
         // The current user is already logging we will redirect to the homepage
         $alreadyLoggedIn = $this->getUser();
@@ -38,8 +40,13 @@ class RegistrationController extends AbstractController
 
         $user = new User();
         $isOwner = (bool) $request->get('oauth');
+
+        // We need to disable some fixtures for test environment (like the captcha)
+        $env = $this->getParameter('kernel.environment');
         $rootErrors = [];
-        $form = $this->createForm(RegistrationFormType::class, $user);
+        $form = $this->createForm(RegistrationFormType::class, $user, [
+            'with_captcha_puzzle' => 'test' !== $env,
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -70,6 +77,7 @@ class RegistrationController extends AbstractController
 
                 return $userAuthenticator->authenticateUser($user, $authenticator, $request);
             }
+
             return $this->redirectToRoute('app_login');
         } elseif ($form->isSubmitted()) {
             /** @var FormError $error */
@@ -84,6 +92,7 @@ class RegistrationController extends AbstractController
             'registrationForm' => $form->createView(),
             'errors' => $rootErrors,
             'oauth_signup' => $request->get('oauth'),
+            'captchaChallenge' => $captchaChallenge->generateKey(),
         ]);
     }
 

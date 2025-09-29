@@ -2,11 +2,11 @@
 
 namespace App\Domain\Captcha;
 
-interface ChallengeInterface
+interface CaptchaChallengeInterface
 {
     public function generateKey(): string;
 
     public function verify(string $key, string $answer): bool;
 
-    public function getSolution(string $challengeKey): mixed;
+    public function getSolution(string $Key): mixed;
 }

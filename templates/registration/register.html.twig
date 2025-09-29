@@ -19,7 +19,16 @@
             label: 'Password'
         }) }}
 
-        <button type="submit" class="btn btn-lg btn-full btn-primary">Register</button>
+        <puzzle-captcha
+                width="350"
+                height="200"
+                piece-width="80"
+                piece-height="50"
+                src="{{ path('captcha', {challenge: captchaChallenge}) }}"
+        >
+            <input type="text">
+        </puzzle-captcha>
+
         {{ form_end(registrationForm) }}
     </div>
 {% endblock %}

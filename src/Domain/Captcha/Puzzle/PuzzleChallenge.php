@@ -2,70 +2,73 @@
 
 namespace App\Domain\Captcha\Puzzle;
 
-use App\Domain\Captcha\ChallengeInterface;
+use App\Domain\Captcha\CaptchaChallengeInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-class PuzzleChallenge implements ChallengeInterface
+class PuzzleChallenge implements CaptchaChallengeInterface
 {
     public const WIDTH = 350;
     public const HEIGHT = 200;
     public const PIECE_WIDTH = 80;
     public const PIECE_HEIGHT = 50;
     private const SESSION_KEY = 'PUZZLE_CAPTCHA';
-    private const ERROR_MARGE = 5;
+    private const PRECISION = 5;
 
     public function __construct(
         private readonly RequestStack $requestStack,
     ) {
     }
 
+    /**
+     * To generate the challenge key and to store in the session.
+     */
     public function generateKey(): string
     {
         $session = $this->getSession();
         $now = time();
         $x = mt_rand(0, self::WIDTH - self::PIECE_WIDTH);
         $y = mt_rand(0, self::HEIGHT - self::PIECE_HEIGHT);
+        $puzzles = $session->get(self::SESSION_KEY, []);
+        $puzzles[] = ['key' => $now, 'solution' => [$x, $y]];
+        $session->set(self::SESSION_KEY, array_slice($puzzles, -10));
 
-        // Save the session puzzles
-        $puzzle = $session->get(self::SESSION_KEY, []);
-        $puzzle[] = ['key' => $now, 'solution' => [$x, $y]];
-        $session->set(self::SESSION_KEY, array_slice($puzzle, -10));
-
-        // Return the key
         return $now;
     }
 
+    /**
+     * To very if the user answer match with the expected answer.
+     */
     public function verify(string $key, string $answer): bool
     {
-        // Expected solution
+        // The expected answer
         $expected = $this->getSolution($key);
 
-        // If the challenge key is invalid
+        // If the key is invalid we can check the captcha.
         if (!$expected) {
             return false;
         }
 
-        // Delete the session the puzzle challenge
+        // Delete the puzzle from the session.
+        // To avoid the user can submit many times the same puzzle challenge.
         $session = $this->getSession();
         $puzzles = $session->get(self::SESSION_KEY);
-        $session->set(self::SESSION_KEY, array_filter($puzzles, fn ($puzzle) => $puzzle['key'] !== intval($key)));
+        $session->set(self::SESSION_KEY, array_filter($puzzles, fn (array $puzzle) => $puzzle['key'] !== intval($key)));
 
         // The user answer
         $got = $this->stringToPosition($answer);
 
-        return abs($expected[0] - $got[0]) <= self::ERROR_MARGE
-            && abs($expected[1] - $got[1]) <= self::ERROR_MARGE;
+        return abs($expected[0] - $got[0]) <= self::PRECISION && abs($expected[1] - $got[1]) <= self::PRECISION;
     }
 
     /**
      * @return int[]|null
      */
-    public function getSolution(string $challengeKey): ?array
+    public function getSolution(string $Key): ?array
     {
         $puzzles = $this->getSession()->get(self::SESSION_KEY, []);
         foreach ($puzzles as $puzzle) {
-            if ($puzzle['key'] !== intval($challengeKey)) {
+            if ($puzzle['key'] !== intval($Key)) {
                 continue;
             }
 
@@ -76,16 +79,15 @@ class PuzzleChallenge implements ChallengeInterface
     }
 
     /**
-     * Return an array position (x,y) from a string.
-     * from 100-100 to [100,100].
+     * To convert a string value to an array.
+     * From '100-100' to [100, 100].
+     * Is easier to pass the value to a custom constraint validator.
      *
      * @return int[]
      */
     private function stringToPosition(string $s): array
     {
         $parts = explode('-', $s, 2);
-
-        // If the integer array is more thant 2 values. We can't generate (x, y) positions
         if (2 !== count($parts)) {
             return [-1, -1];
         }
@@ -93,6 +95,11 @@ class PuzzleChallenge implements ChallengeInterface
         return [intval($parts[0]), intval($parts[1])];
     }
 
+    /**
+     * We can't use dependency injection for SessionInterface in Symfony.
+     * We use the RequestStack class to get the session.
+     * We can work with the session to storage some key in the current session.
+     */
     private function getSession(): SessionInterface
     {
         return $this->requestStack->getSession();
