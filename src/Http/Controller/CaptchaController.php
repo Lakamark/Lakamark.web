@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class CaptchaController extends AbstractController
 {
-    #[Route(path: '/captcha', name: 'captcha', methods: ['GET'])]
+    #[Route(path: '/captcha', name: 'captcha')]
     public function captcha(Request $request, CaptchaGeneratorInterface $captchaGenerator,
     ): Response {
         

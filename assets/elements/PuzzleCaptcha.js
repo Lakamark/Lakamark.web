@@ -25,7 +25,7 @@ export default class PuzzleCaptcha  extends HTMLElement {
         this.style.setProperty('--image', `url('${background}')`);
 
         // Select the hidden input
-        const input = this.querySelector('input');
+        const input = this.querySelector('.captcha-answer');
 
         // Create the puzzle element
         const piece = document.createElement("div");
