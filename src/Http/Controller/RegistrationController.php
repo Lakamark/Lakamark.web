@@ -6,7 +6,6 @@ use App\Domain\Auth\Authenticator;
 use App\Domain\Auth\Entity\User;
 use App\Domain\Auth\Event\BeforeUserRegisterEvent;
 use App\Domain\Auth\Event\UserRegisteredEvent;
-use App\Domain\Captcha\CaptchaChallengeInterface;
 use App\Foundation\Security\TokenGeneratorService;
 use App\Http\Form\RegistrationFormType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,7 +29,6 @@ class RegistrationController extends AbstractController
         EventDispatcherInterface $dispatcher,
         UserAuthenticatorInterface $userAuthenticator,
         Authenticator $authenticator,
-        CaptchaChallengeInterface $captchaChallenge,
     ): Response {
         // The current user is already logging we will redirect to the homepage
         $alreadyLoggedIn = $this->getUser();
@@ -92,7 +90,6 @@ class RegistrationController extends AbstractController
             'registrationForm' => $form->createView(),
             'errors' => $rootErrors,
             'oauth_signup' => $request->get('oauth'),
-            'captchaChallenge' => $captchaChallenge->generateKey(),
         ]);
     }
 
