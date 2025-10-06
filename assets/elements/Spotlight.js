@@ -19,7 +19,7 @@ export default class Spotlight extends HTMLElement {
 
     connectedCallback() {
         // Build the spotlight HTML structure component
-        this.classList.toggle('spotlight');
+        this.classList.add('spotlight');
         this.innerHTML = `
         <div class="spotlight__bar">
             <input type="text" id="spotlightSearch">
@@ -45,6 +45,7 @@ export default class Spotlight extends HTMLElement {
             this.suggestions.appendChild(item.element)
             return item;
         }).filter(i => i !== null);
+
 
         // Listen the shortcut event
         window.addEventListener('keydown', this.shortcutHandler)
