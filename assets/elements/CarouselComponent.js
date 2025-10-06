@@ -1,7 +1,7 @@
 import {Carousel} from "../libs/carousel.js"
 import {removeKey} from "../helpers/ObjectHelper.js";
 
-export default class Spotlight  extends HTMLElement {
+export default class CarouselComponent extends HTMLElement {
 
     constructor() {
         super();

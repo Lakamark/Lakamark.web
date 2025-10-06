@@ -1,7 +1,7 @@
 /**
 Spotlight items
  */
-.spotlight__item {
+.carousel__component__item {
   margin: 40px 10px;
   background-color: var(--card-bg-color);
   transition: transform 0.3s;
@@ -11,19 +11,19 @@ Spotlight items
   padding: 16px;
 }
 
-.spotlight__title {
+.carousel__component__title {
   font-size: 32px;
   color: var(--text-color);
   font-weight: bold;
   margin-bottom: 25px;
 }
 
-.spotlight__content {
+.carousel__component__content {
   display: flex;
   flex-direction: column;
 }
 
-.spotlight__image {
+.carousel__component__image {
   display: flex;
   width: 100%;
   min-width: 100%;
@@ -32,14 +32,19 @@ Spotlight items
   border: 3px solid var(--card-bg-border);
 }
 
-.spotlight__item img {
+.carousel__component__item img {
   min-width: 100%;
   display: flex;
   border-radius: 4px;
 }
 
-.spotlight__description {
+.carousel__component__description {
   font-size: 20px;
+}
+
+.carousel__component__footer {
+  display: flex;
+  justify-content: flex-end;
 }
 
 /**
@@ -64,6 +69,7 @@ Carousel
   float: left;
   opacity: 20%;
   transition: .5s;
+  min-height: 100%;
 }
 
 .carousel__next, .carousel__prev {
