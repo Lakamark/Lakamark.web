@@ -1,0 +1,86 @@
+@use '../tools/mixins';
+
+:root {
+  --overlay-bg: rgb(151, 151, 151, 0.8);
+  --spotlight-bg: #FFFFFF;
+  --spotlight-border: rgb(151, 151, 151);
+  --spotlight-mark-color: var(--accent-color);
+  --spotlight-hover-bg: rgb(151, 151, 151, 0.5);
+}
+
+@include mixins.night {
+  --overlay-bg: rgb(19, 28, 50, 0.8);
+  --spotlight-bg: #050A11;
+  --spotlight-border: rgb(19, 28, 50);
+  --spotlight-mark-color: var(--accent-color);
+  --spotlight-hover-bg: rgb(19, 28, 50, 0.5);
+}
+
+.spotlight {
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  background-color: var(--overlay-bg);
+  z-index: 5; // To ensure wrap under contents
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spotlight.active {
+  opacity: 1;
+  pointer-events: auto;
+  transition: .3s;
+}
+
+.spotlight__bar {
+  position: relative;
+  width: 350px;
+  background-color: var(--spotlight-bg);
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.spotlight__bar input {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--spotlight-bg);
+  border: 3px solid var(--spotlight-border);
+  border-radius: 3px;
+  color: var(--text-color);
+  outline: none;
+}
+
+.spotlight input:focus {
+  border-color: var(--accent-color);
+  transition: all .3s;
+}
+
+.spotlight__suggestions {
+  position: absolute;
+  top: 100%;
+  background-color: var(--spotlight-bg);
+  left: 0;
+  right: 0;
+  margin: -5px 0 0 0;
+  padding: 5px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.spotlight__suggestions a {
+  display: block;
+  text-decoration: none;
+  padding: 10px 15px;
+}
+
+.spotlight__suggestions li.active a,
+.spotlight__suggestions a:hover {
+  background-color: var(--spotlight-hover-bg);
+}
+
+.spotlight__suggestions mark {
+  background-color: var(--spotlight-mark-color);
+  color: #FFFFFF;
+}
