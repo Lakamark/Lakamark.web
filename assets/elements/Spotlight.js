@@ -73,6 +73,9 @@ export default class Spotlight extends HTMLElement {
         }
     }
 
+    /**
+     * To optimize the search behavior with a fuzzy matching library
+     */
     onInputHandler() {
         const search = this.input.value.trim()
 
