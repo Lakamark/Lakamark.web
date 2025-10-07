@@ -1,0 +1,31 @@
+{% extends 'dashboard_base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <h1 class="h1">Dashboard Posts</h1>
+        <p>Mange posts for the blog</p>
+
+        <div class="pd-3 table-responsive">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Online?</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in rows %}
+                    <tr>
+                        <td>{{ row.id }}</td>
+                        <td>{{ row.title }}</td>
+                        <td>{{ row.online }}</td>
+                        <td></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

@@ -44,7 +44,7 @@ export default defineConfig({
             },
             input: {
                 app: resolve(__dirname, 'assets/app.js'),
-                admin: resolve(__dirname, 'assets/admin.js'),
+                dashboard: resolve(__dirname, 'assets/dashboard.js'),
             }
         }
     }
