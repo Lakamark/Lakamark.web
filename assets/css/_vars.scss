@@ -1,0 +1,46 @@
+/**
+Here is the global variables CSS.
+You can edit to apply changes on all web components
+*/
+
+@use "tools/mixins";
+
+:root {
+  --gap: 20px;
+  --spacing: 8px;
+  --background-page: #FFFFFF;
+  --text-color: #000000;
+  --accent-color: #0063D0;
+  --darker-blue: #000814;
+  --medium-blue: #00122D;
+  --night: #050A11;
+  --yellow: #D3A200;
+  --green: #0D5F00;
+  --read: #B60000;
+  --back: #000000;
+  --darker-grey: #424242;
+  --medium-grey: #EBEBEB;
+  --white: #FFFFFF;
+  --hr-color: #EBEBEB;
+  --day-theme-bg: #FFFFFF;
+  --section-color: #EBEBEB;
+}
+
+// Night theme
+@include mixins.night {
+  --background-page: #050A11;
+  --text-color: #a8b4d0;
+  --accent-color: #0079FF;
+  --darker-blue: #00183B;
+  --medium-blue: #00122D;
+  --night: #050A11;
+  --yellow: #FFC300;
+  --green: #168B03;
+  --read: #FA0101;
+  --back: #000000;
+  --darker-grey: #424242;
+  --medium-grey: #B8B4B4;
+  --white: #FFFFFF;
+  --hr-color: #192641;
+  --section-color: #a8b4d0;
+}

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
     <title>{% block title "Laka Mark" %} - Laka Mark</title>
     <meta charset="UTF-8">
@@ -18,7 +18,9 @@
     {% endblock %}
 </head>
 <body>
-<!--  TODO Create a main svg file with all icon and link ids icon to the main svg file. -->
+<!--
+    TODO Create a svg sprite file with all icons and link ids icon to this sprite file.
+-->
 <svg style="display: none">
     <symbol id="logo" viewBox="0 0 32 32">
         <path d="M16 32C7.17576 32 0 24.8024 0 15.9514C0 11.2827 2.03636 6.90577 5.52727 3.89058C6.01212 3.50152 6.69091 3.50152 7.07879 3.98784C7.46667 4.47416 7.46667 5.15501 6.98182 5.54407C3.97576 8.17021 2.2303 11.9635 2.2303 15.9514C2.2303 23.538 8.43636 29.7629 16 29.7629C23.5636 29.7629 29.7697 23.538 29.7697 15.9514C29.7697 8.36474 23.5636 2.23708 16 2.23708C14.1576 2.23708 12.4121 2.62614 10.7636 3.30699C10.1818 3.50152 9.50303 3.30699 9.30909 2.7234C9.11515 2.13982 9.30909 1.45897 9.89091 1.26444C11.8303 0.389058 13.8667 0 16 0C24.8242 0 32 7.19757 32 16.0486C32 24.8997 24.8242 32 16 32Z"></path>
@@ -97,70 +99,56 @@
         <path d="M5.83338 10.8333L15.4917 10.8333L13.575 12.7417C13.4973 12.8194 13.4357 12.9116 13.3937 13.0131C13.3516 13.1146 13.33 13.2234 13.33 13.3333C13.33 13.4432 13.3516 13.552 13.3937 13.6535C13.4357 13.755 13.4973 13.8473 13.575 13.925C13.6527 14.0027 13.745 14.0643 13.8465 14.1064C13.948 14.1484 14.0568 14.1701 14.1667 14.1701C14.2766 14.1701 14.3854 14.1484 14.4869 14.1064C14.5884 14.0643 14.6807 14.0027 14.7584 13.925L18.0917 10.5917C18.1676 10.5124 18.227 10.4189 18.2667 10.3167C18.3501 10.1138 18.3501 9.88621 18.2667 9.68332C18.227 9.58103 18.1676 9.48758 18.0917 9.40832L14.7584 6.07499C14.6809 5.99688 14.5887 5.93489 14.4872 5.89258C14.3856 5.85027 14.2767 5.82849 14.1667 5.82849C14.0567 5.82849 13.9478 5.85027 13.8462 5.89258C13.7447 5.93489 13.6525 5.99688 13.575 6.07499C13.4969 6.15246 13.4349 6.24463 13.3926 6.34618C13.3503 6.44773 13.3285 6.55665 13.3285 6.66666C13.3285 6.77667 13.3503 6.88559 13.3926 6.98714C13.4349 7.08869 13.4969 7.18085 13.575 7.25832L15.4917 9.16666L5.83338 9.16666C5.61237 9.16666 5.4004 9.25446 5.24412 9.41074C5.08784 9.56702 5.00005 9.77898 5.00005 9.99999C5.00005 10.221 5.08784 10.433 5.24412 10.5892C5.4004 10.7455 5.61237 10.8333 5.83338 10.8333ZM2.50005 16.6667C2.72106 16.6667 2.93302 16.5789 3.0893 16.4226C3.24558 16.2663 3.33338 16.0543 3.33338 15.8333L3.33338 4.16666C3.33338 3.94564 3.24558 3.73368 3.0893 3.5774C2.93302 3.42112 2.72106 3.33332 2.50004 3.33332C2.27903 3.33332 2.06707 3.42112 1.91079 3.5774C1.75451 3.73368 1.66671 3.94564 1.66671 4.16666L1.66671 15.8333C1.66671 16.0543 1.75451 16.2663 1.91079 16.4226C2.06707 16.5789 2.27903 16.6667 2.50005 16.6667V16.6667Z"></path>
     </symbol>
 </svg>
-
-<header class="main-header">
-    <nav class="main-header__navigation">
-        <button class="main-header__sidebar-toggle" id="js-toggle-menu">
-            <svg class="toggle-icon-menu">
-                <use href="#icon-menu"></use>
-            </svg>
-            <svg class="toggle-icon-close">
-                <use href="#icon-close"></use>
-            </svg>
-        </button>
-
-        <ul>
-            <li class="main-header__logo">
-                <a href="#">
-                    <!--
-                    <svg>
-                        <use href="#logo"></use>
-                    </svg>
-                    -->
-                    logo here...
-                </a>
-            </li>
-        </ul>
-
-        <a href="#">
-            <span>Welcome, admin</span>
-            <svg>
-                <use href="#icon-user"></use>
-            </svg>
-        </a>
-    </nav>
-</header>
-
-<section class="main">
-    <div class="overlay"></div>
-
-    <div class="sidebar">
-        <button class="sidebar__collapse" id="js-sidebar-collapse">
-            <svg>
-                <use href="#icon-collapse"></use>
-            </svg>
-            <span>Collapse menu</span>
-        </button>
-
-        <nav class="sidebar__nav">
-            {% include 'partials/dashboard_header.html.twig' %}
+<!-- end -->
+<div class="wrapper-page">
+    <header class="dashboard__header">
+        <nav class="dashboard__header__nav">
+            <button class="dashboard__header__nav__toggle" id="js-main-header-toggler">
+                <svg class="toggle-icon-menu">
+                    <use href="#icon-menu"></use>
+                </svg>
+                <svg class="toggle-icon-close">
+                    <use href="#icon-close"></use>
+                </svg>
+            </button>
+            <a href="{{ path('home') }}" class="dashboard__header__brand" title="Return to the home page">
+                <svg viewBox="0 0 865 696" class="dashboard__header__brand__logo">
+                    <path d="M551.71 0c-89.07 0-163.04 65.87-175.79 151.45a35 35 0 0 0-22.34.31C340.96 66.03 266.93 0 177.75 0 79.74 0 0 79.74 0 177.75S79.74 355.5 177.75 355.5 355.5 275.76 355.5 177.75v-.34c1.76-1.81 4.88-4.21 9.25-4.39a13.8 13.8 0 0 1 9.26 3.39l-.03 1.34c0 98.01 79.74 177.75 177.75 177.75s177.75-79.74 177.75-177.75S649.72 0 551.71 0M177.75 332.41c-85.28 0-154.66-69.38-154.66-154.66S92.46 23.08 177.75 23.08s154.66 69.38 154.66 154.66S263.03 332.4 177.75 332.4zm373.96 0c-85.28 0-154.66-69.38-154.66-154.66S466.43 23.08 551.71 23.08s154.66 69.38 154.66 154.66S636.99 332.4 551.71 332.4z"></path>
+                    <path d="M219.3 136.2h-83.1v83.1h83.1zm415.51 83.1a41.55 41.55 0 1 0 0-83.1 41.55 41.55 0 0 0 0 83.1m-98.96 208.21.08-.09.51-.61a229 229 0 0 0 10.07-13.07l.16-.22q1.2-1.71 2.16-3.11l.29-.43 1.64-2.48.96-1.52-19.79-12.2-.54.85-.14.21a176 176 0 0 1-12 16.07 226 226 0 0 1-15.63 17.02c-19.91 19.57-50.25 42.23-90.78 52.86a180 180 0 0 1-13.1 2.95q-5.68 1.03-11.61 1.75l-2.52.29-.39.03-.82.08c-3.66.38-7.36.7-11.17.86-103.15 4.19-163.57-76.57-166.09-80.01l-12.5 9.16-6.25 4.58a149 149 0 0 0 6.25 7.85c19.14 22.69 77.91 81.83 170.52 81.83a212 212 0 0 0 19.86-.91l1.59-.18q4.6-.44 9.06-1.07l.8-.13q4.71-.69 9.27-1.55l65.28 65.29a73.6 73.6 0 0 0 52.23 21.6c18.91 0 37.83-7.2 52.24-21.6 28.8-28.8 28.8-75.67 0-104.47zm23.3 127.77a50.84 50.84 0 0 1-71.82 0l-55.66-55.66c39.12-12.85 68.53-35.3 88.53-55.12l38.95 38.95a50.85 50.85 0 0 1 0 71.82z"></path>
+                </svg>
+            </a>
+            <a href="#" class="dashboard__header__nav__user" title="Go to your settings">
+                <span>Welcome, admin</span>
+                <svg>
+                    <use href="#icon-user"></use>
+                </svg>
+            </a>
         </nav>
-
-        <div class="sidebar__theme-switcher" id="js-sidebar-switcher">
-            <svg class="sidebar__theme-switcher__sun">
-                <use href="#icon-sun"></use>
-            </svg>
-
-            <svg class="sidebar__theme-switcher__moon">
-                <use href="#icon-moon"></use>
-            </svg>
+    </header>
+    <div class="dashboard__main">
+        <div class="dashboard__overlay"></div>
+        <div class="dashboard__sidebar">
+            <button class="dashboard__sidebar__toggle" id="js-sidebar-collapse">
+                <svg>
+                    <use href="#icon-collapse"></use>
+                </svg>
+                <span>Collapse menu</span>
+            </button>
+            {% include '/partials/dashboard_header.html.twig' %}
+            <div class="dashboard__sidebar__theme__switcher" id="js-theme-switcher">
+                <svg class="dashboard__sidebar__theme__sun">
+                    <use href="#icon-sun"></use>
+                </svg>
+                <svg class="dashboard__sidebar__theme__switcher__moon">
+                    <use href="#icon-moon"></use>
+                </svg>
+            </div>
         </div>
-    </div>
-    <div class="main-content">
-        <div class="main-content__container">
+        <main class="dashboard__main__container">
             {% block body %}{% endblock %}
-        </div>
+        </main>
     </div>
-</section>
+</div>
+<spotlight-bar target=".dashboard__sidebar__items a"></spotlight-bar>
 </body>
 </html>

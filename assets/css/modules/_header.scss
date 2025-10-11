@@ -5,12 +5,14 @@
     --header-logo-color: #000000;
     --header-border-color: var(--medium-grey);
     --dropdown-menu-color: var(--medium-grey);
+    --dashboard-header-color: #EBEBEB;
 }
 
 @include mixins.night {
     --header-logo-color: #FFFFFF;
     --header-border-color: var(--medium-blue);
     --dropdown-menu-color: var(--night);
+    --dashboard-header-color: #13161D;
 }
 
 .header {
@@ -185,5 +187,87 @@ Mobile devise
 
     .open-menu .header__nav {
         transform: translateX(0);
+    }
+}
+
+/**
+===============================================
+    Dashboard Main header
+===============================================
+*/
+.dashboard__header {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--dashboard-header-color);
+    height: 60px;
+    justify-content: center;
+    padding: 1rem 1.5rem;
+}
+
+.dashboard__header .dashboard__header__nav,
+.dashboard__header .dashboard__sidebar__items,
+.dashboard__header a {
+    display: flex;
+    align-items: center;
+}
+
+.dashboard__header .dashboard__sidebar__items {
+    gap: 2rem;
+}
+
+.dashboard__header .dashboard__header__nav {
+ justify-content: space-between;
+    align-items: center;
+}
+
+.dashboard__header .dashboard__header__nav svg {
+    fill: var(--header-logo-color);
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.dashboard__header .toggle-icon-close,
+.dashboard__header .dashboard__header__brand,
+.dashboard__header a span,
+body.sidebar-open .toggle-icon-menu {
+    display: none;
+}
+
+body.sidebar-open .toggle-icon-close {
+    display: block;
+}
+
+.dashboard__header__nav__toggle {
+    appearance: none;
+    border: none;
+    background: transparent;
+}
+
+// Display some element only on largest devices
+@include mixins.b-up(600) {
+    .dashboard__header .dashboard__header__nav__toggle {
+        display: none;
+    }
+
+    .dashboard__header .dashboard__header__brand {
+        display: block;
+    }
+
+    .dashboard__header a {
+        gap: 1rem;
+    }
+
+
+    .dashboard__header a span {
+        display: inline-block;
+        font-size: 81.25%;
+    }
+
+    .dashboard__header__brand__logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem!important;
+        height: 2.5rem!important;
     }
 }

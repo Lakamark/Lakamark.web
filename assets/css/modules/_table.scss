@@ -14,28 +14,29 @@
   width: 100%;
   border-spacing: 0;
   border-collapse: collapse;
+  border: 1px solid var(--striped-bg-table);
+  border-radius: 10px;
 }
 
 .table th,
 .table td {
-  padding: functions.spacing(2);
+  padding: 8px 16px;
   white-space: nowrap;
 }
 
 .table th {
-  border-left: 1px solid var(--striped-bg-table);
-  border-right: 1px solid var(--striped-bg-table);
-  border-top: 1px solid var(--striped-bg-table);
+  border-bottom: 5px solid var(--striped-bg-table);
 }
 
 .table td {
-  border-left: 1px solid var(--striped-bg-table);
-  border-right: 1px solid var(--striped-bg-table);
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--striped-bg-table);
 }
 
-
+.table tr:hover,
 .table-striped tr:nth-child(even) {
   background-color: var(--striped-bg-table);
+  transition: background-color .3s;
 }
 
 .table thead {
@@ -49,6 +50,7 @@
     padding: 0!important;
     overflow-x: auto;
     width: 100%;
+    border: 1px solid var(--striped-bg-table);
   }
 
   .table-responsive .table {

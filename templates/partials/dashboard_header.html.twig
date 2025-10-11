@@ -1,76 +1,46 @@
-<ul>
-    <li class="menu-heading"><span>Manage</span></li>
-    <li>
-        <a href="#" class="active">
-            <svg>
-                <use href="#icon-dashboard"></use>
-            </svg>
-            <span>Dashboard</span>
-        </a>
-    </li>
-    <li>
-        <a href="#">
-            <svg>
-                <use href="#icon-appearance"></use>
-            </svg>
-            <span>Appearance</span>
-        </a>
-    </li>
-    <li>
-        <a href="#">
-            <svg>
-                <use :href="#icon-plugins"></use>
-            </svg>
-            <span>Plugins</span>
-        </a>
-    </li>
-    <li>
-        <a href="#">
-            <svg>
-                <use href="#icon-users"></use>
-            </svg>
-            <span>Users</span>
-        </a>
-    </li>
-    <li>
-        <a href="#">
-            <svg>
-                <use href="#icon-settings"></use>
-            </svg>
-            <span>Settings</span>
-        </a>
-    </li>
-    <li class="menu-heading"><span>Content</span></li>
-    <li>
-        <a href="#">
-            <svg>
-                <use href="#icon-posts"></use>
-            </svg>
-            <span>Posts</span>
-        </a>
-    </li>
-    <li>
-        <a href="#">
-            <svg>
-                <use href="#icon-media"></use>
-            </svg>
-            <span>Media</span>
-        </a>
-    </li>
-    <li>
-        <a href="#">
-            <svg>
-                <use href="#icon-pages"></use>
-            </svg>
-            <span>Pages</span>
-        </a>
-    </li>
-    <li>
-        <a href="#">
-            <svg>
-                <use href="#icon-comments"></use>
-            </svg>
-            <span>Comments</span>
-        </a>
-    </li>
-</ul>
+<nav class="dashboard__sidebar__nav" role="navigation">
+    <ul class="dashboard__sidebar__items">
+        <li class="dashboard__sidebar__item__category">Manage</li>
+        <li class="dashboard__sidebar__item">
+            <a href="#">
+                <svg>
+                    <use href="#icon-dashboard"></use>
+                </svg>
+                <span>Dashboard</span>
+            </a>
+        </li>
+        <li class="dashboard__sidebar__item">
+            <a href="{{ path('dashboard.posts.index') }}" title="Posts"
+               class="item-active-link">
+                <svg>
+                    <use href="#icon-posts"></use>
+                </svg>
+                <span>Posts</span>
+            </a>
+        </li>
+        <li class="dashboard__sidebar__item">
+            <a href="#" title="Projects">
+                <svg>
+                    <use href="#icon-posts"></use>
+                </svg>
+                <span>Projects</span>
+            </a>
+        </li>
+        <li class="dashboard__sidebar__item">
+            <a href="#" title="Events">
+                <svg>
+                    <use href="#icon-posts"></use>
+                </svg>
+                <span>Events</span>
+            </a>
+        </li>
+        <li class="dashboard__sidebar__item">
+            <a href="#" title="Users" class="dashboard__sidebar__item">
+                <svg>
+                    <use href="#icon-users"></use>
+                </svg>
+                <span>Users</span>
+            </a>
+        </li>
+    </ul>
+</nav>
