@@ -7,3 +7,4 @@ Welcome to the official repository of my website!
 * **Documentation**
   * [About the project](doc/about.md)
   * [Structure Project](doc/structure.md)
+  * [Accessibility Fixtures](doc/accessibility.md) (New)
