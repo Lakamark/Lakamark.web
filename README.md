@@ -1,5 +1,5 @@
 <p style="text-align: center">
-<img src="github_banner_project.png" alt="Github banner project lakamark.web" width="742" height="215">
+<img src="github_assets/github_banner_project.png" alt="Github banner project lakamark.web" width="742" height="215">
 </p>
 
 ## Welcome to the official repository!

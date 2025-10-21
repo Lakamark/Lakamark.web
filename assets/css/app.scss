@@ -1,0 +1,31 @@
+@use "vars";
+@use "tools/reset";
+@use "tools/functions";
+@use "tools/mixins";
+@use "tools/layout";
+@use "tools/typography";
+@use "tools/utils";
+
+/*
+  Generic styles
+*/
+body {
+  background-color: var(--background-page-color);
+  color: var(--text-color);
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  word-wrap: break-word;
+}
+
+/*
+  If the user enable light theme we force to apply white bg page
+ */
+body.day-theme {
+  background-color: var(--background-page-day-theme);
+}
+
+::selection {
+  background-color: var(--accent-color);
+  color: #FFFFFF;
+}

@@ -1,0 +1,29 @@
+/**
+Here is the global CSS Variable for all application.
+Be carful! If you wan modify a value they globally changed on the website!
+
+Hint:
+It is recommended to change the local variables in a specific css file.
+*/
+@use "tools/mixins";
+
+:root {
+  --spacing: 8px;
+  --gap: 20px;
+  --background-page-color: #EDEDED;
+  --background-page-day-theme: #EDEDED;
+  --text-color: #000000;
+  --border-color: #C0C0C0;
+  --primary-color: #1C3C7D;
+  --secondary-color: #ADBBEB;
+  --accent-color: #0077FF;
+}
+
+@include mixins.night {
+  --background-page-color: #121212;
+  --text-color: #FFFFFF;
+  --border-color: #2E2E2E;
+  --primary-color: #82A2E3;
+  --secondary-color: #142252;
+  --accent-color: #0077FF;
+}

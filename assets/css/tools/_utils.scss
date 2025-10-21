@@ -1,0 +1,72 @@
+@use "functions";
+@use "mixins";
+
+@for $i from 0 through 5 {
+  body {
+    // Padding positions
+    .pd-#{$i} { padding: functions.spacing($i); }
+    .pd-t#{$i} { padding-top: functions.spacing($i); }
+    .pd-b#{$i} { padding-bottom: functions.spacing($i); }
+    .pd-x#{$i} { padding-left: functions.spacing($i); padding-right: functions.spacing($i); }
+    .pd-y#{$i} { padding-top: functions.spacing($i); padding-bottom: functions.spacing($i); }
+
+    // Margin positions
+    .mg-#{$i} { margin: functions.spacing($i); }
+    .mg-t#{$i} { margin-top: functions.spacing($i); }
+    .mg-b#{$i} { margin-bottom: functions.spacing($i); }
+    .mg-x#{$i} { margin-left: functions.spacing($i); margin-right: functions.spacing($i); }
+    .mg-y#{$i} { margin-top: functions.spacing($i); margin-bottom: functions.spacing($i); }
+  }
+}
+
+// Show some contents only on the mobile device
+.mobile-display {
+  @include mixins.b-up(900) {
+    display: none;
+  }
+}
+
+// Hide some contents on the mobile device
+.mobile-hidden {
+  @include mixins.b-down(900) {
+    display: none;
+  }
+}
+
+// positions
+.relative-position {
+  position: relative!important;
+}
+
+.absolute-position {
+  position: absolute;
+}
+
+// Display blocks
+
+.d-flex {
+  display: flex!important;
+}
+
+.d-inline {
+  display: inline;
+}
+
+// Flex
+.flex-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  & > * {
+    max-width: 0;
+  }
+}
+
+.f-stretch {
+  align-items: stretch;
+}
+
+.j-end {
+  justify-content: flex-end;
+}

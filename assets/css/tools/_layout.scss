@@ -1,0 +1,108 @@
+@use "functions";
+@use "mixins";
+
+:root {
+  --container-padding: 20px;
+  --container-width: calc(100vw - var(--container-padding) * 2);
+  --dashboard-sidebar-color: #e2e2e2;
+  --dashboard-sidebar-width: 250px;
+  --dashboard-overlay-color: rgba(66, 66, 66, 0.73);
+  --negative-width: calc(var(--dashboard-sidebar-width) * -1);
+  --dashboard-hover-color: #7190FF;
+  --theme-switcher-indicator-pos: .25rem;
+  --teme-switrcher-sun-icon: #FFD371;
+  --teme-switrcher-moon-icon: #7190FF;
+}
+
+@media screen and (min-width: 980px) {
+  :root {
+    --container-padding: 30px;
+  }
+}
+
+@media screen and (min-width: 1300px) {
+  :root {
+    --container-padding: 20px;
+    --container-width: 1300px;
+  }
+}
+
+@include mixins.night {
+  --dashboard-sidebar-color: #202430;
+  --dashboard-overlay-color: rgba(5, 10, 17, 0.68);
+  --theme-switcher-indicator-pos: 3.25rem;
+}
+
+/**
+    CONTAINER
+*/
+%container,
+.container {
+  box-sizing: border-box;
+  width: 100%;
+  padding-left: calc(50% - var(--container-width) / 2);
+  padding-right: calc(50% - var(--container-width) / 2);
+}
+
+%spacing-container,
+.spacing-container {
+  margin-left: auto;
+  margin-right: auto;
+  width: var(--container-width);
+}
+
+%narrow-container,
+.narrow-container {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ratio-container {
+  width: 100%;
+  aspect-ratio:  16/9;
+}
+
+/**
+    WRAPPER
+ */
+.wrapper-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+}
+
+/**
+    GRID
+ */
+.grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: var(--gap);
+}
+
+.grid-3 {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap);
+
+  @include mixins.b-down(980) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+.stacked-content {
+  --gap-content: 2;
+  display: grid!important;
+  grid-template-columns: 1fr;
+  align-items: flex-start;
+  gap: calc(var(--gap-content) * var(--spacing));
+
+  & > * {
+    min-width: 0;
+  }
+}
