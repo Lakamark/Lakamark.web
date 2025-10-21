@@ -13,9 +13,7 @@ document.addEventListener('turbo:load', () => {
     initBtnHamburger();
 })
 
-/**
- * Toggle the menu
- */
+
 function initBtnHamburger() {
     const btnHamburger = document.querySelector('#js-hamburger')
     const navBar = document.querySelector('.header__nav');
