@@ -13,17 +13,27 @@ It is recommended to change the local variables in a specific css file.
   --background-page-color: #EDEDED;
   --background-page-day-theme: #EDEDED;
   --text-color: #000000;
+  --text-muted-color: #595959;
   --border-color: #C0C0C0;
   --primary-color: #1C3C7D;
   --secondary-color: #ADBBEB;
-  --accent-color: #0077FF;
+  --accent-color: #0054B5;
+  --success-color: #015E12;
+  --warning-color: #66500D;
+  --danger-color: #9E0000;
+  --info-color: #305599;
 }
 
 @include mixins.night {
   --background-page-color: #121212;
   --text-color: #FFFFFF;
+  --text-muted-color: #A2A2A2;
   --border-color: #2E2E2E;
   --primary-color: #82A2E3;
-  --secondary-color: #142252;
-  --accent-color: #0077FF;
+  --secondary-color: #96A8E6;
+  --accent-color: #4EA1FF;
+  --success-color: #4EB261;
+  --warning-color: #FFD900;
+  --danger-color: #E49D9D;
+  --info-color: #75A5FF;
 }

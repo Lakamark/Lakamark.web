@@ -20,7 +20,7 @@ function initBtnHamburger() {
     if (btnHamburger) {
         let isOpen = false;
         btnHamburger.addEventListener('click', throttle(() => {
-            document.querySelector('#main-header').classList.toggle('open-menu');
+            document.querySelector('#main-header').classList.toggle('visible--menu');
             isOpen ? enableBodyScroll(navBar) : disableBodyScroll(navBar);
             isOpen = !isOpen;
         }, 500))
