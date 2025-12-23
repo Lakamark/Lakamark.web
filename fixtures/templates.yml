@@ -1,0 +1,7 @@
+App\Domain\Auth\Entity\User:
+  user (template):
+    email: johndo<current()>\@lakamark.com
+    username: johnDo<current()>
+    password: <hashedPassword(@self, '0000')>
+    createdAt: <date_create()>
+    confirmAt: <date_create()>

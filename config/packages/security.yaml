@@ -19,6 +19,9 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            entry_point: App\Http\Security\AuthenticationEntryPoint
+            custom_authenticator:
+                - App\Domain\Auth\Authenticator
             form_login:
                 login_path: app_login
                 check_path: app_login

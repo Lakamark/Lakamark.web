@@ -32,4 +32,18 @@ class UserRepository extends AbstractRepository implements PasswordUpgraderInter
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
     }
+
+    /**
+     * To find a user during the authentication process.
+     */
+    public function findByUsernameForAuth(string $username): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->where('LOWER(u.username) = :username')
+            ->orWhere('LOWER(u.email) = :username')
+            ->setMaxResults(1)
+            ->setParameter('username', mb_strtolower($username))
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }
