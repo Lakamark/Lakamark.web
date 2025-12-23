@@ -1509,6 +1509,26 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *     generate_final_classes?: bool, // Default: true
  *     generate_final_entities?: bool, // Default: false
  * }
+ * @psalm-type NelmioAliceConfig = array{
+ *     locale?: scalar|null, // Default locale for the Faker Generator // Default: "en_US"
+ *     seed?: scalar|null, // Value used make sure Faker generates data consistently across runs, set to null to disable. // Default: 1
+ *     functions_blacklist?: list<scalar|null>,
+ *     loading_limit?: int, // Alice may do some recursion to resolve certain values. This parameter defines a limit which will stop the resolution once reached. // Default: 5
+ *     max_unique_values_retry?: int, // Maximum number of time Alice can try to generate a unique value before stopping and failing. // Default: 150
+ * }
+ * @psalm-type FidryAliceDataFixturesConfig = array{
+ *     default_purge_mode?: scalar|null, // Default: "delete"
+ *     db_drivers?: array{ // The list of enabled drivers.
+ *         doctrine_orm?: bool|null, // Default: null
+ *         doctrine_mongodb_odm?: bool|null, // Default: null
+ *         doctrine_phpcr_odm?: bool|null, // Default: null
+ *         eloquent_orm?: bool|null, // Default: null
+ *     },
+ * }
+ * @psalm-type HautelookAliceConfig = array{
+ *     fixtures_path?: list<scalar|null>,
+ *     root_dirs?: list<scalar|null>,
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -1538,6 +1558,9 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
  *         maker?: MakerConfig,
+ *         nelmio_alice?: NelmioAliceConfig,
+ *         fidry_alice_data_fixtures?: FidryAliceDataFixturesConfig,
+ *         hautelook_alice?: HautelookAliceConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -1567,6 +1590,9 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         twig_extra?: TwigExtraConfig,
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
+ *         nelmio_alice?: NelmioAliceConfig,
+ *         fidry_alice_data_fixtures?: FidryAliceDataFixturesConfig,
+ *         hautelook_alice?: HautelookAliceConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,
