@@ -42,16 +42,14 @@ class AuthenticatorTest extends TestCase
         $this->userRepository = $this->getMockBuilder(UserRepository::class)
         ->disableOriginalConstructor()
         ->getMock();
-        $urlGenerator = $this->getMockBuilder(UrlGeneratorInterface::class)
-            ->getMock();
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $urlMatcher = $this->createMock(UrlMatcherInterface::class);
-        $urlMatcher->expects($this->any())->method('match')->willReturn([]);
+        $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
+        $eventDispatcher = $this->createStub(EventDispatcherInterface::class);
+        $this->createStub(UrlMatcherInterface::class)->method('match')->willReturn([]);
         $this->authenticator = new Authenticator(
             $this->userRepository,
             $urlGenerator,
             $eventDispatcher,
-            $this->createMock(UrlMatcherInterface::class)
+            $this->createStub(UrlMatcherInterface::class)
         );
     }
 

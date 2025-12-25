@@ -26,4 +26,19 @@ class LoginControllerTest extends WebTestCase
         $this->client->submit($form);
         $this->expectedFormErrors(0);
     }
+
+    public function testFailLogin(): void
+    {
+        /** @var User $user */
+        ['user1' => $user] = $this->loadFixtures(['users']);
+        $crawler = $this->client->request('GET', self::LOGIN_PATH);
+        $form = $crawler->selectButton(self::LOGIN_BUTTON)->form();
+        $form->setValues([
+            '_username' => $user->getUsername(),
+            '_password' => '1234567890',
+        ]);
+        $this->client->submit($form);
+        $this->assertResponseRedirects(self::LOGIN_PATH);
+        $this->client->followRedirect();
+    }
 }
