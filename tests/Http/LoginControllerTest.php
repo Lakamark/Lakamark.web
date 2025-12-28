@@ -4,7 +4,7 @@ namespace App\Tests\Http;
 
 use App\Domain\Auth\Entity\User;
 use App\Tests\FixturesLoaderTrait;
-use App\Tests\WebTestCase;
+use App\Tests\TestCases\WebTestCase;
 
 class LoginControllerTest extends WebTestCase
 {
@@ -40,5 +40,30 @@ class LoginControllerTest extends WebTestCase
         $this->client->submit($form);
         $this->assertResponseRedirects(self::LOGIN_PATH);
         $this->client->followRedirect();
+    }
+
+    public function testBrutForceLoginAttempts(): void
+    {
+        ['user1' => $user] = $this->loadFixtures(['users']);
+        $crawler = $this->client->request('GET', self::LOGIN_PATH);
+        for ($i = 0; $i < 3; ++$i) {
+            $form = $crawler->selectButton(self::LOGIN_BUTTON)->form();
+            $form->setValues([
+                '_username' => $user->getUsername(),
+                '_password' => '1234567890',
+            ]);
+            $this->client->submit($form);
+            $this->assertResponseRedirects(self::LOGIN_PATH);
+            $this->client->followRedirect();
+
+            $form = $crawler->selectButton(self::LOGIN_BUTTON)->form();
+            $form->setValues([
+                '_username' => $user->getUsername(),
+                '_password' => '0000',
+            ]);
+            $this->client->submit($form);
+            $this->assertResponseRedirects(self::LOGIN_PATH);
+            $this->client->followRedirect();
+        }
     }
 }

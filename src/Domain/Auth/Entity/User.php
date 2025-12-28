@@ -55,6 +55,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
     private int $registerTimerDuration = 0;
 
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $locked_at = null;
+
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['default' => null])]
+    private ?string $lastLoginIp = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -216,6 +222,46 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRegisterTimerDuration(int $registerTimerDuration): static
     {
         $this->registerTimerDuration = $registerTimerDuration;
+
+        return $this;
+    }
+
+    public function getLockedAt(): ?\DateTimeImmutable
+    {
+        return $this->locked_at;
+    }
+
+    public function setLockedAt(\DateTimeImmutable $locked_at): static
+    {
+        $this->locked_at = $locked_at;
+
+        return $this;
+    }
+
+    /**
+     * Check if the looked_at field is empty in the database.
+     */
+    public function isLocked(): bool
+    {
+        return null !== $this->locked_at;
+    }
+
+    /**
+     * Check if the current user to be able to log in.
+     */
+    public function beAbleToLogin(): bool
+    {
+        return !$this->isLocked() && null !== $this->getConfirmToken();
+    }
+
+    public function getLastLoginIp(): ?string
+    {
+        return $this->lastLoginIp;
+    }
+
+    public function setLastLoginIp(?string $lastLoginIp): User
+    {
+        $this->lastLoginIp = $lastLoginIp;
 
         return $this;
     }

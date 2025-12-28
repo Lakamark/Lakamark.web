@@ -3,7 +3,7 @@
 namespace App\Domain\Auth;
 
 use App\Domain\Auth\Entity\User;
-use App\Domain\Auth\Exception\BadPasswordCredentialsException;
+use App\Domain\Auth\Event\BadPasswordLoginEvent;
 use App\Domain\Auth\Repository\UserRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -97,8 +97,11 @@ class Authenticator extends AbstractLoginFormAuthenticator
 
         // We dispatch en event BadCredentialException.
         // Subscribers can catch it later.
-        if ($user instanceof User && $exception instanceof BadCredentialsException) {
-            $this->eventDispatcher->dispatch(new BadPasswordCredentialsException($user));
+        if (
+            $user instanceof User
+            && $exception instanceof BadCredentialsException
+        ) {
+            $this->eventDispatcher->dispatch(new BadPasswordLoginEvent($user));
         }
 
         return parent::onAuthenticationFailure($request, $exception);

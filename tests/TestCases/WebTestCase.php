@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests;
+namespace App\Tests\TestCases;
 
 use App\Domain\Auth\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;

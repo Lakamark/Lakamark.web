@@ -15,27 +15,16 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
+use Symfony\Component\VarDumper\Cloner\Stub;
 
 class AuthenticatorTest extends TestCase
 {
     private UserRepository|MockObject $userRepository;
 
+    private Stub|EventDispatcherInterface $dispatcher;
+
     private Authenticator $authenticator;
 
-    // TODO They are Mock issues notices to fix. The test successful pass.
-    /*
-     * Notice message:
-     * App\Tests\Domain\Auth\AuthenticatorTest::testAuthenticateHasRightParameters
-     * * No expectations were configured for the mock object for Symfony\Component\Routing\Generator\UrlGeneratorInterface.
-     * Consider refactoring your test code to use a test stub instead.
-     * The #[AllowMockObjectsWithoutExpectations] attribute can be used to opt out of this check.
-     *
-     * We should Mock this object:
-     * Symfony\Component\Routing\Generator\UrlGeneratorInterface.
-     * Psr\EventDispatcher\EventDispatcherInterface.
-     * Symfony\Component\Routing\Matcher\UrlMatcherInterface.
-     * Symfony\Component\Routing\Matcher\UrlMatcherInterface.
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -43,12 +32,12 @@ class AuthenticatorTest extends TestCase
         ->disableOriginalConstructor()
         ->getMock();
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
-        $eventDispatcher = $this->createStub(EventDispatcherInterface::class);
+        $this->dispatcher = $this->createStub(EventDispatcherInterface::class);
         $this->createStub(UrlMatcherInterface::class)->method('match')->willReturn([]);
         $this->authenticator = new Authenticator(
             $this->userRepository,
             $urlGenerator,
-            $eventDispatcher,
+            $this->dispatcher,
             $this->createStub(UrlMatcherInterface::class)
         );
     }
