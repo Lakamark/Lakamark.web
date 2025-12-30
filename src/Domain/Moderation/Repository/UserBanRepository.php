@@ -33,4 +33,19 @@ class UserBanRepository extends AbstractRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    /**
+     * Find expired bands according to today date.
+     */
+    public function findExpiredNotEnded(\DateTimeImmutable $now): array
+    {
+        return $this->createQueryBuilder('b')
+            ->andWhere('b.endedAt IS NULL')
+            ->andWhere('b.expiresAt IS NOT NULL')
+            ->andWhere('b.expiresAt <= :now')
+            ->setParameter('now', $now)
+            ->orderBy('b.expiresAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

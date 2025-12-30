@@ -4,7 +4,6 @@ namespace App\Tests\TestCases;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 abstract class EventTestCase extends KernelTestCase
@@ -24,11 +23,10 @@ abstract class EventTestCase extends KernelTestCase
     protected function expectSubscribedEventTo(string $subscriberClass, string $expectedEventName): void
     {
         self::bootKernel();
-        /** @var EventDispatcherInterface $dispatcher */
-        $dispatcher = new EventDispatcher();
-        $subscribers = $dispatcher->getListeners($expectedEventName);
 
-        $subscribers = array_map(fn ($subscriber) => $subscriber[0]::class, $subscribers);
-        $this->assertContains($subscriberClass, $subscribers);
+        $subscriber = self::getContainer()->get($subscriberClass);
+        $events = $subscriber::getSubscribedEvents();
+
+        $this->assertArrayHasKey($expectedEventName, $events);
     }
 }
