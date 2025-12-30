@@ -2,7 +2,8 @@
 
 namespace App\Domain\Auth\Subscriber;
 
-use App\Domain\Auth\Event\UserBannedEvent;
+use App\Domain\Moderation\Event\UserBannedEvent;
+use App\Domain\Moderation\Event\UserUnbannedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 readonly class UserBannedSubscriber implements EventSubscriberInterface
@@ -15,11 +16,15 @@ readonly class UserBannedSubscriber implements EventSubscriberInterface
     {
         return [
             UserBannedEvent::class => 'onUserBanned',
+            UserUnbannedEvent::class => 'onUserUnBanned',
         ];
     }
 
     public function onUserBanned(UserBannedEvent $event): void
     {
-        // Add the logic notify, revoke api token etc.
+    }
+
+    public function onUserUnBanned(UserUnbannedEvent $event): void
+    {
     }
 }

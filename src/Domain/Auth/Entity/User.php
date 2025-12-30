@@ -231,7 +231,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->locked_at;
     }
 
-    public function setLockedAt(\DateTimeImmutable $locked_at): static
+    public function setLockedAt(?\DateTimeImmutable $locked_at): static
     {
         $this->locked_at = $locked_at;
 

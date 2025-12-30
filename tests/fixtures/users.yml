@@ -10,3 +10,6 @@ App\Domain\Auth\Entity\User:
     username: UnconfirmedUser
     email: unconfirmed@dummy.com
     confirm_token: myconfirmationtoken
+  banned_user_1 (extends user):
+    username: 'UserBanned'
+    email: userbanned\@lakamark.xyz
