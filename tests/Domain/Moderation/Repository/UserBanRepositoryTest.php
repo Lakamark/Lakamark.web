@@ -15,7 +15,7 @@ class UserBanRepositoryTest extends RepositoryTestCase
 
     protected string $repositoryClass = UserBanRepository::class;
 
-    public function testFindBan(): void
+    public function testFindBanAndCreateIt(): void
     {
         /** @var User $user */
         ['banned_user_1' => $user] = $this->loadFixtures(['users']);

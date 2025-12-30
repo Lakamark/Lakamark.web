@@ -6,6 +6,7 @@ use App\Domain\Auth\Entity\User;
 use App\Domain\Moderation\Entity\UserBan;
 use App\Domain\Moderation\Enum\BanReasonEnum;
 use App\Domain\Moderation\Event\BanUserEvent;
+use App\Domain\Moderation\Event\UnbanUserEvent;
 use App\Domain\Moderation\Exception\InvalidDateArgumentException;
 use App\Domain\Moderation\Repository\UserBanRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,12 +15,15 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 readonly class ModerationService
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
+        private EntityManagerInterface $em,
         private EventDispatcherInterface $dispatcher,
         private UserBanRepository $repository,
     ) {
     }
 
+    /**
+     * Ban an user.
+     */
     public function banUser(
         User $user,
         BanReasonEnum $reason,
@@ -50,9 +54,28 @@ readonly class ModerationService
         ;
 
         // We persist the new ban records to the entityManager
-        $this->entityManager->persist($newBan);
-        $this->entityManager->flush();
+        $this->em->persist($newBan);
+        $this->em->flush();
 
         $this->dispatcher->dispatch(new BanUserEvent($user, $now));
+    }
+
+    /**
+     * To unban a user.
+     */
+    public function unbanUser(User $user, ?\DateTimeImmutable $now = null): void
+    {
+        $now ??= new \DateTimeImmutable();
+        $ban = $this->repository->findActiveBanFor($user, $now);
+
+        if (null === $ban) {
+            return;
+        }
+
+        $ban->endManually($now);
+
+        $this->em->flush();
+
+        $this->dispatcher->dispatch(new UnbanUserEvent($user, $ban));
     }
 }

@@ -115,26 +115,17 @@ class UserBan
         return $this;
     }
 
-    /**
-     * To check if a ban on a user is activated or not.
-     */
-    public function isActive(\DateTimeImmutable $now): bool
+    public function endManually(\DateTimeImmutable $now): void
     {
-        if (null !== $this->endedAt) {
-            return false;
-        }
-
-        // permanently ban
-        if (null === $this->expiresAt) {
-            return true;
-        }
-
-        // temporary still valid
-        return $this->expiresAt > $now;
+        $this->setEndedAt($now);
     }
 
-    public function end(?\DateTimeImmutable $now = null): void
+    public function endByExpiration(): void
     {
-        $this->endedAt = $now ?? new \DateTimeImmutable();
+        if (null === $this->getExpiresAt()) {
+            throw new \LogicException('Permanent ban cannot expire.');
+        }
+
+        $this->setEndedAt($this->expiresAt);
     }
 }

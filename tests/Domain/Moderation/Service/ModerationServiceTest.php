@@ -6,6 +6,7 @@ use App\Domain\Auth\Entity\User;
 use App\Domain\Moderation\Entity\UserBan;
 use App\Domain\Moderation\Enum\BanReasonEnum;
 use App\Domain\Moderation\Event\BanUserEvent;
+use App\Domain\Moderation\Event\UnbanUserEvent;
 use App\Domain\Moderation\Repository\UserBanRepository;
 use App\Domain\Moderation\Service\ModerationService;
 use App\Tests\FixturesLoaderTrait;
@@ -69,5 +70,39 @@ class ModerationServiceTest extends TestCase
         $dispatcher->expects($this->never())->method('dispatch');
 
         $service->banUser($user, BanReasonEnum::BOT, $now);
+    }
+
+    public function testUnbanAnUserFlush(): void
+    {
+        $user = new User();
+        $now = new \DateTimeImmutable();
+
+        // Stimulate a ban will be ended sooner.
+        $ban = (new UserBan())
+            ->setUser($user)
+            ->setExpiresAt($now->modify('+1 day'))
+            ->setEndedAt(null)
+        ;
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $repository = $this->createStub(UserBanRepository::class);
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        // Stimulate a banned user we want to unban.
+        $repository->method('findActiveBanFor')
+            ->with($user, $now)
+            ->willReturn($ban);
+
+        $em->expects($this->once())->method('flush');
+
+        $dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with($this->isInstanceOf(UnbanUserEvent::class));
+
+        $service = new ModerationService($em, $dispatcher, $repository);
+
+        $service->unbanUser($user, $now);
+
+        $this->assertSame($now, $ban->getEndedAt());
     }
 }
