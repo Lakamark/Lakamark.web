@@ -128,4 +128,12 @@ class UserBan
 
         $this->setEndedAt($this->expiresAt);
     }
+
+    /**
+     * Check if a ban is active or is unactive.
+     */
+    public function isActive(): bool
+    {
+        return null === $this->endedAt;
+    }
 }
