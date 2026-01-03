@@ -8,7 +8,7 @@ use App\Domain\Moderation\Repository\UserBanRepository;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class BannedUserChecker implements UserCheckerInterface
+readonly class BannedUserChecker implements UserCheckerInterface
 {
     public function __construct(
         private UserBanRepository $repository,

@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+services:
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true      # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
+    bind:
+      $rootProjectDir: '%kernel.project_dir%'
+
+  App\Domain\Subscription\Gateway\FakeSubscriptionGateway:
+    arguments:
+      $active: true
+  
+  App\Domain\Subscription\Gateway\SubscriptionGatewayInterface:
+    alias: App\Domain\Subscription\Gateway\FakeSubscriptionGateway
