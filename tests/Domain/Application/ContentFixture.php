@@ -1,17 +1,20 @@
 <?php
 
-namespace App\Domain\Application\Contract;
+namespace App\Tests\Domain\Application;
 
+use App\Domain\Application\Contract\ReadableContentInterface;
 use App\Domain\Application\Enum\AccessLevelEnum;
 use App\Domain\Application\Enum\ContentStatusEnum;
 use App\Domain\Auth\Entity\User;
 
 /**
- * Use this class to generate stub.
- * If you don't need some to validate the result return in your tests.
- * e.g. $content = new contentStub(AccessLevelEnum::PREMIUM_MEMBER_ONLY, ContentStatusEnum::PUBLISHED, $author).
+ * Test helper used to create Content instances
+ * in specific access scenarios (public, private, premium).
+ *
+ * This class is ONLY used in tests and must not be
+ * registered as a Symfony service.
  */
-readonly class contentStub implements ReadableContentInterface
+final readonly class ContentFixture implements ReadableContentInterface
 {
     public function __construct(
         private AccessLevelEnum $accessLevel,

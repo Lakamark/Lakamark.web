@@ -3,10 +3,13 @@
 namespace App\Domain\Subscription\Gateway;
 
 use App\Domain\Auth\Entity\User;
+use App\Domain\Subscription\Contract\SubscriptionGatewayInterface;
 
 /**
- * When will implement the subscription,
- *  we will change by definitive SubscriptionGateway class later.
+ * Null subscription gateway used in production as a placeholder.
+ *
+ * This is a temporary implementation until the real subscription
+ * system is ready.
  */
 class NullSubscriptionGateway implements SubscriptionGatewayInterface
 {

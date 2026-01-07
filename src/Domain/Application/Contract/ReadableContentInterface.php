@@ -9,12 +9,12 @@ use App\Domain\Auth\Entity\User;
 interface ReadableContentInterface
 {
     /**
-     * If the visibility content.
+     * To get acceptability level for a content.
      */
     public function getAccessLevel(): AccessLevelEnum;
 
     /**
-     * If the content is draft, private or published.
+     * Get the current status.
      */
     public function getStatus(): ContentStatusEnum;
 

@@ -2,12 +2,12 @@
 
 namespace App\Tests\Domain\Application\Security;
 
-use App\Domain\Application\Contract\contentStub;
 use App\Domain\Application\Enum\AccessLevelEnum;
 use App\Domain\Application\Enum\ContentStatusEnum;
 use App\Domain\Application\Security\ContentAccessPolicy;
 use App\Domain\Auth\Entity\User;
-use App\Domain\Subscription\Gateway\FakeSubscriptionGateway;
+use App\Tests\Domain\Application\ContentFixture;
+use App\Tests\Domain\Subscription\Gateway\FakeSubscriptionGateway;
 use PHPUnit\Framework\TestCase;
 
 class ContentAccessPolicyTest extends TestCase
@@ -17,7 +17,7 @@ class ContentAccessPolicyTest extends TestCase
         $policy = new ContentAccessPolicy(new FakeSubscriptionGateway(true));
 
         $author = new User();
-        $content = new contentStub(AccessLevelEnum::PUBLIC, ContentStatusEnum::DRAFT, $author);
+        $content = new ContentFixture(AccessLevelEnum::PUBLIC, ContentStatusEnum::DRAFT, $author);
 
         $this->assertFalse($policy->canRead($content, null));
         $this->assertTrue($policy->canRead($content, $author));
@@ -28,7 +28,7 @@ class ContentAccessPolicyTest extends TestCase
     {
         $author = new User();
         $viewer = new User();
-        $content = new contentStub(
+        $content = new ContentFixture(
             AccessLevelEnum::PREMIUM_MEMBER_ONLY,
             ContentStatusEnum::PUBLISHED,
             $author
@@ -43,7 +43,7 @@ class ContentAccessPolicyTest extends TestCase
     {
         $policy = new ContentAccessPolicy(new FakeSubscriptionGateway(true));
         $author = new User();
-        $content = new contentStub(
+        $content = new ContentFixture(
             AccessLevelEnum::PRIVATE,
             ContentStatusEnum::PUBLISHED,
             $author
