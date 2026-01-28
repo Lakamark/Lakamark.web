@@ -1,0 +1,12 @@
+include:
+  - templates.yml
+
+App\Domain\Auth\Entity\User:
+  user{1..10} (extends user):
+  editor (extends user):
+    username: editor
+    email: editor\@lakamark.com
+  admin (extends user):
+    username: Lakamark
+    email: lakamark@lakamark.com
+    roles: ['ROLE_USER', 'ROLE_ADMIN']
