@@ -25,6 +25,16 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
+    # User Checkers for the auth
+    App\Domain\Auth\Security\BannedUserChecker:
+        tags:
+            - { name: security.user_checker.main, priority: 30 }
+
+
+    App\Domain\Auth\Security\TooManyLoginAttemptsUserChecker:
+        tags:
+            - { name: security.user_checker.main, priority: 20 }
+
     App\Http\Controller\:
         resource: '../src/Http/controller'
         tags: ['controller.service_arguments']
