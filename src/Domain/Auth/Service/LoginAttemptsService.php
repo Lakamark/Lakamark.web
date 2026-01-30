@@ -13,13 +13,13 @@ use Doctrine\ORM\EntityManagerInterface;
  */
 class LoginAttemptsService
 {
+    public const int MAX_LOGIN_ATTEMPTS = 3;
+
     public function __construct(
         private readonly LoginAttemptRepository $loginAttemptRepository,
         private readonly EntityManagerInterface $em,
     ) {
     }
-
-    public const int MAX_LOGIN_ATTEMPTS = 3;
 
     /**
      * Each time the user fail to be authenticated.
