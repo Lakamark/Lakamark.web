@@ -2,9 +2,10 @@
 
 namespace App\Domain\Auth\Service;
 
+use App\Domain\Auth\Entity\LoginAttempt;
 use App\Domain\Auth\Entity\User;
+use App\Domain\Auth\Repository\LoginAttemptRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Tracks failed login attempts and determines when a user has reached
@@ -13,6 +14,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class LoginAttemptsService
 {
     public function __construct(
+        private readonly LoginAttemptRepository $loginAttemptRepository,
         private readonly EntityManagerInterface $em,
     ) {
     }
@@ -28,13 +30,15 @@ class LoginAttemptsService
      */
     public function increment(User $user): void
     {
-        // TODO: Implement onLoginFailure() method.
+        $userAttempt = (new LoginAttempt())->setUser($user);
+        $this->em->persist($userAttempt);
+        $this->em->flush();
     }
 
     public function onLoginSuccess(User $user, ?string $ip): void
     {
         // reset attempt
-        // TODO: Create the LoginAttempts entity with the repository!
+        $this->loginAttemptRepository->resetAttemptsFor($user);
 
         // Update audit fields
         if (null !== $ip && $ip !== $user->getLastLoginIp()) {
@@ -54,13 +58,10 @@ class LoginAttemptsService
      * We compare the current attempts for a specific user with the const
      * MAX_LOGIN_ATTEMPTS defined in this service.
      */
-    public function hasReachedAttemptFor(UserInterface $user): bool
+    public function hasReachedAttemptFor(User $user): bool
     {
-        if (!$user instanceof User) {
-            return false;
-        }
+        $attempts = $this->loginAttemptRepository->countRecentAttemptsFor($user, minutes: 30);
 
-        // TODO query loginAttempts repository
-        return false;
+        return $attempts >= self::MAX_LOGIN_ATTEMPTS;
     }
 }
