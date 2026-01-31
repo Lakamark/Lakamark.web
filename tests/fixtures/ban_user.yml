@@ -1,0 +1,9 @@
+include:
+  - ../../fixtures/templates.yml
+
+App\Domain\Moderation\Entity\UserBan:
+  ban_for_user_banned_1:
+    user: '@banned_user_1'
+    banReason: !php/const App\Domain\Moderation\Enum\BanReason::BOT
+    details: 'spam'
+    createdAt: <date_create()>
