@@ -130,7 +130,7 @@ class UserBan
         }
 
         // createdAt is defined in the pass like before endedAt
-        if ($now < $this->getExpiresAt()) {
+        if (null !== $this->getCreatedAt() && $now < $this->getCreatedAt()) {
             throw new \LogicException('endedAt cannot be before createdAt.');
         }
 
