@@ -20,6 +20,7 @@ class LoginAttemptRepository extends AbstractRepository
     public function countRecentAttemptsFor(User $user, int $minutes): int
     {
         $cutoff = new \DateTimeImmutable("-{$minutes} minutes");
+
         return $this->createQueryBuilder('la')
             ->select('COUNT(la.id) as attempt')
             ->where('la.user = :user')
