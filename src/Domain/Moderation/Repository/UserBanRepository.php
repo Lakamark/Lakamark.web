@@ -4,6 +4,7 @@ namespace App\Domain\Moderation\Repository;
 
 use App\Domain\Auth\Entity\User;
 use App\Domain\Moderation\Entity\UserBan;
+use App\Domain\Moderation\Enum\BanReason;
 use App\Foundation\Orm\AbstractRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -42,7 +43,7 @@ class UserBanRepository extends AbstractRepository
     /**
      * Bans that are expired but not ended (needs a job/process to close them).
      *
-     * @return list<UserBan>
+     * @return UserBan[]
      */
     public function findExpiredNotEnded(\DateTimeImmutable $now): array
     {
@@ -51,6 +52,23 @@ class UserBanRepository extends AbstractRepository
             ->andWhere('b.expiresAt IS NOT NULL')
             ->andWhere('b.expiresAt <= :now')
             ->setParameter('now', $now)
+            ->orderBy('b.expiresAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return UserBan[]
+     */
+    public function findExpiredClosableBans(\DateTimeImmutable $now): array
+    {
+        return $this->createQueryBuilder('b')
+            ->andWhere('b.endedAt IS NULL')
+            ->andWhere('b.expiresAt IS NOT NULL')
+            ->andWhere('b.expiresAt <= :now')
+            ->andWhere('b.banReason != :bot')
+            ->setParameter('now', $now)
+            ->setParameter('bot', BanReason::BOT)
             ->orderBy('b.expiresAt', 'ASC')
             ->getQuery()
             ->getResult();
