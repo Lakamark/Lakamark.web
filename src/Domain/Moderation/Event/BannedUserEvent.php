@@ -3,12 +3,13 @@
 namespace App\Domain\Moderation\Event;
 
 use App\Domain\Auth\Entity\User;
+use App\Domain\Moderation\Entity\UserBan;
 
 readonly class BannedUserEvent
 {
     public function __construct(
         private User $user,
-        private \DateTimeImmutable $now,
+        private UserBan $ban,
     ) {
     }
 
@@ -17,8 +18,8 @@ readonly class BannedUserEvent
         return $this->user;
     }
 
-    public function getNow(): \DateTimeImmutable
+    public function getBan(): UserBan
     {
-        return $this->now;
+        return $this->ban;
     }
 }
