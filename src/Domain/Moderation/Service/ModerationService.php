@@ -70,11 +70,11 @@ final readonly class ModerationService
      *
      * @throws CannotUnbanBotUserException
      */
-    public function unbanUser(User $user, \DateTimeImmutable $now): void
+    public function unbanUser(User $user, \DateTimeImmutable $now): bool
     {
         $ban = $this->userBanRepository->findActiveBanFor($user, $now);
         if (!$ban) {
-            return;
+            return false;
         }
 
         // Business rule: do not allow unbanning BOT bans
@@ -88,6 +88,8 @@ final readonly class ModerationService
         $this->em->flush();
 
         $this->dispatcher->dispatch(new UnbannedUserEvent($user, $now));
+
+        return true;
     }
 
     public function closeExpiredBans(\DateTimeImmutable $now): int
