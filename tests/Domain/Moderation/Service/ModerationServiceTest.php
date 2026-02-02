@@ -73,7 +73,59 @@ class ModerationServiceTest extends TestCase
         $this->expectException(CannotUnbanBotUserException::class);
         $service->unbanUser($user, $now);
 
-        // Optionnel: on s’assure que endedAt n'a pas bougé
+        // Ensure the EndedAt didnt changed.
         $this->assertNull($ban->getEndedAt());
+    }
+
+    public function testCloseExpiredBansEndsAllExpiredBansAndFlushesOnce(): void
+    {
+        $now = new \DateTimeImmutable('2026-02-02 12:00:00');
+
+        $ban = $this->createMock(UserBan::class);
+        $ban2 = $this->createMock(UserBan::class);
+
+        $ban->expects($this->once())->method('endByExpiration');
+        $ban2->expects($this->once())->method('endByExpiration');
+
+        $repo = $this->createMock(UserBanRepository::class);
+        $repo->expects($this->once())
+            ->method('findExpiredOpenBans')
+            ->with($now)
+            ->willReturn([$ban, $ban2]);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::once())->method('flush');
+
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher
+            ->expects($this->exactly(2))
+            ->method('dispatch');
+
+        $service = new ModerationService($em, $dispatcher, $repo);
+
+        $count = $service->closeExpiredBans($now);
+        $this->assertSame(2, $count);
+    }
+
+    public function testCloseExpiredBansDoesNotFlushWhenNothingToClose(): void
+    {
+        $now = new \DateTimeImmutable('2026-02-02 12:00:00');
+        $repo = $this->createMock(UserBanRepository::class);
+        $repo->expects(self::once())
+            ->method('findExpiredOpenBans')
+            ->with($now)
+            ->willReturn([]);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::never())->method('flush');
+
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher->expects(self::never())->method('dispatch');
+
+        $service = new ModerationService($em, $dispatcher, $repo);
+
+        $count = $service->closeExpiredBans($now);
+
+        $this->assertSame(0, $count);
     }
 }

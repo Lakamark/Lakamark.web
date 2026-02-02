@@ -25,6 +25,9 @@ class UserBanRepository extends AbstractRepository
         return $this->findActiveBanFor($user, $now);
     }
 
+    /**
+     * Find history bans from a user.
+     */
     public function findActiveBanFor(User $user, \DateTimeImmutable $now): ?UserBan
     {
         return $this->createQueryBuilder('b')
@@ -37,5 +40,19 @@ class UserBanRepository extends AbstractRepository
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    /**
+     * Find all expired open bans.
+     */
+    public function findExpiredOpenBans(\DateTimeImmutable $now): array
+    {
+        return $this->createQueryBuilder('b')
+            ->andWhere('b.endedAt IS NULL')
+            ->andWhere('b.expiresAt IS NOT NULL')
+            ->andWhere('b.expiresAt <= :now')
+            ->setParameter('now', $now)
+            ->getQuery()
+            ->getResult();
     }
 }

@@ -103,4 +103,54 @@ class UserBanRepositoryTest extends RepositoryTestCase
         $this->assertNotNull($ban);
         $this->assertSame(BanReason::SPAM, $ban->getBanReason());
     }
+
+    /**
+     * @throws \DateMalformedStringException
+     */
+    public function UserBanRepositoryExpiredTest(): void
+    {
+        $now = new \DateTimeImmutable('2026-02-02 12:00:00');
+
+        /** @var User $user1 */
+        $user1 = $this->loadFixtures(['users']);
+        /** @var User $user2 */
+        $user2 = $this->loadFixtures(['users']);
+
+        $expiredOpen = (new UserBan())
+            ->setUser($user1)
+            ->setBanReason(BanReason::SPAM)
+            ->setCreatedAt($now->modify('-2 hours'))
+            ->setExpiresAt($now->modify('-1 hour'));
+
+        $notExpired = (new UserBan())
+            ->setUser($user2)
+            ->setBanReason(BanReason::TERMS_VIOLATION)
+            ->setCreatedAt($now->modify('-1 days'))
+            ->setExpiresAt($now->modify('+1 hour'));
+
+        $permanent = (new UserBan())
+            ->setUser($user2)
+            ->setBanReason(BanReason::BOT)
+            ->setCreatedAt($now->modify('-10 days'))
+            ->setExpiresAt(null);
+
+        $expiredEnded = (new UserBan())
+            ->setUser($user2)
+            ->setBanReason(BanReason::SPAM)
+            ->setCreatedAt($now->modify('-5 days'))
+            ->setExpiresAt($now->modify('-2 hours'))
+            ->setEndedAt($now->modify('-2 hours'));
+
+        $this->em->persist($expiredOpen);
+        $this->em->persist($notExpired);
+        $this->em->persist($permanent);
+        $this->em->persist($expiredEnded);
+        $this->em->flush();
+        $this->em->clear();
+
+        $result = $this->repositoryClass->findExpiredOpenBans($now);
+
+        $this->assertCount(1, $result);
+        $this->assertSame($user1->getId(), $result[0]->getId());
+    }
 }

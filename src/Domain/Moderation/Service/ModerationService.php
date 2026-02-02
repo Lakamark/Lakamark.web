@@ -8,6 +8,7 @@ use App\Domain\Moderation\Enum\BanReason;
 use App\Domain\Moderation\Event\BannedUserEvent;
 use App\Domain\Moderation\Event\UnbannedUserEvent;
 use App\Domain\Moderation\Exception\CannotUnbanBotUserException;
+use App\Domain\Moderation\Exception\InvalidDateArgumentException;
 use App\Domain\Moderation\Repository\UserBanRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -28,7 +29,7 @@ final readonly class ModerationService
      * - Allowed for all users (including BOT)
      * - No-op if an active ban already exists
      *
-     * @throws \InvalidArgumentException When expiresAt is in the past (or equals now)
+     * @throws InvalidDateArgumentException When expiresAt is in the past (or equals now)
      */
     public function banUser(
         User $user,
@@ -44,7 +45,7 @@ final readonly class ModerationService
 
         // Optional guard: prevents "instant-expired" bans
         if (null !== $expiresAt && $expiresAt <= $now) {
-            throw new \InvalidArgumentException('expiresAt must be in the future.');
+            throw new InvalidDateArgumentException('expiresAt must be in the future.');
         }
 
         $ban = (new UserBan())
@@ -87,5 +88,23 @@ final readonly class ModerationService
         $this->em->flush();
 
         $this->dispatcher->dispatch(new UnbannedUserEvent($user, $now));
+    }
+
+    public function closeExpiredBans(\DateTimeImmutable $now): int
+    {
+        $bans = $this->userBanRepository->findExpiredOpenBans($now);
+
+        /** @var UserBan $ban */
+        foreach ($bans as $ban) {
+            $ban->endByExpiration();
+
+            $this->dispatcher->dispatch(new UnbannedUserEvent($ban->getUser(), $now));
+        }
+
+        if ([] !== $bans) {
+            $this->em->flush();
+        }
+
+        return count($bans);
     }
 }

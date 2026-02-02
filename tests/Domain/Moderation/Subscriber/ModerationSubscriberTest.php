@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Domain\Subscriber;
+namespace App\Tests\Domain\Moderation\Subscriber;
 
 use App\Domain\Moderation\Event\BannedUserEvent;
 use App\Domain\Moderation\Event\UnbannedUserEvent;
