@@ -2,8 +2,8 @@
 
 namespace App\Domain\Application\Contract;
 
-use App\Domain\Application\Enum\AccessLevelEnum;
-use App\Domain\Application\Enum\ContentStatusEnum;
+use App\Domain\Application\Enum\AccessLevel;
+use App\Domain\Application\Enum\ContentStatus;
 use App\Domain\Auth\Entity\User;
 
 interface ReadableContentInterface
@@ -11,12 +11,12 @@ interface ReadableContentInterface
     /**
      * To get acceptability level for a content.
      */
-    public function getAccessLevel(): AccessLevelEnum;
+    public function getAccessLevel(): AccessLevel;
 
     /**
      * Get the current status.
      */
-    public function getStatus(): ContentStatusEnum;
+    public function getStatus(): ContentStatus;
 
     /**
      * Get the owner content.

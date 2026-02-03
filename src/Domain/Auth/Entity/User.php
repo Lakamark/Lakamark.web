@@ -2,7 +2,10 @@
 
 namespace App\Domain\Auth\Entity;
 
+use App\Domain\Application\Entity\Content;
 use App\Domain\Auth\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -56,6 +59,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['default' => null])]
     private ?string $lastLoginIp = null;
+
+    #[ORM\OneToMany(targetEntity: Content::class, mappedBy: 'author', orphanRemoval: false)]
+    private Collection $contents;
+
+    public function __construct()
+    {
+        $this->contents = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -230,6 +241,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastLoginIp(?string $lastLoginIp): static
     {
         $this->lastLoginIp = $lastLoginIp;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Content>
+     */
+    public function getContents(): Collection
+    {
+        return $this->contents;
+    }
+
+    public function addContent(Content $content): static
+    {
+        if (!$this->contents->contains($content)) {
+            $this->contents->add($content);
+            $content->setAuthor($this);
+        }
 
         return $this;
     }

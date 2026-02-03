@@ -5,3 +5,16 @@ App\Domain\Auth\Entity\User:
     password: <hashedPassword(@self, '0000')>
     createdAt: <date_create()>
     confirmAt: <date_create()>
+
+App\Domain\Blog\Entity\Post:
+  post (template):
+    title: <sentence(5, true)>
+    slug: <slug()>
+    content: <text(1500)>
+    excerpt: <text(250)>
+    status: <enumStatus("published")>
+    accessLevel: <accessLevel("public")>
+    created_at: <date_create()>
+    updated_at: <date_create()>
+    published_at: <date_create()>
+    author: '@user1'

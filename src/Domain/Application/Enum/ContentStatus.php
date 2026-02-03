@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Application\Enum;
 
-enum ContentStatusEnum: string
+enum ContentStatus: string
 {
     case DRAFT = 'draft';
     case PUBLISHED = 'published';
