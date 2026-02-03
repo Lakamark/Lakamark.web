@@ -13,7 +13,7 @@ use App\Domain\Moderation\Repository\UserBanRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
-final readonly class ModerationService
+readonly class ModerationService
 {
     public function __construct(
         private EntityManagerInterface $em,
@@ -108,5 +108,10 @@ final readonly class ModerationService
         }
 
         return count($bans);
+    }
+
+    public function isUserBanned(User $user, \DateTimeImmutable $now): bool
+    {
+        return null !== $this->userBanRepository->findActiveBanFor($user, $now);
     }
 }

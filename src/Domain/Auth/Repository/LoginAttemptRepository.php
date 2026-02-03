@@ -17,18 +17,20 @@ class LoginAttemptRepository extends AbstractRepository
         parent::__construct($registry, LoginAttempt::class);
     }
 
-    public function countRecentAttemptsFor(User $user, int $minutes): int
+    /**
+     * @throws \DateMalformedStringException
+     */
+    public function countRecentAttemptsFor(User $user, int $minutes, \DateTimeImmutable $now): int
     {
-        $cutoff = new \DateTimeImmutable("-{$minutes} minutes");
+        $cutoff = $now->modify("-{$minutes} minutes");
 
-        return $this->createQueryBuilder('la')
-            ->select('COUNT(la.id) as attempt')
-            ->where('la.user = :user')
-            ->andWhere('la.createdAt >= :date')
-            ->setParameter('date', $cutoff)
+        return (int) $this->createQueryBuilder('a')
+            ->select('COUNT(a.id)')
+            ->where('a.user = :user')
+            ->andWhere('a.createdAt >= :cutoff')
             ->setParameter('user', $user)
+            ->setParameter('cutoff', $cutoff)
             ->getQuery()
-            ->setMaxResults(1)
             ->getSingleScalarResult();
     }
 

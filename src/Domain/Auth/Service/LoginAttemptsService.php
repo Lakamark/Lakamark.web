@@ -6,6 +6,7 @@ use App\Domain\Auth\Entity\LoginAttempt;
 use App\Domain\Auth\Entity\User;
 use App\Domain\Auth\Repository\LoginAttemptRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Clock\ClockInterface;
 
 /**
  * Tracks failed login attempts and determines when a user has reached
@@ -14,10 +15,12 @@ use Doctrine\ORM\EntityManagerInterface;
 class LoginAttemptsService
 {
     public const int MAX_LOGIN_ATTEMPTS = 3;
+    private const int WINDOW_MINUTES = 30;
 
     public function __construct(
         private readonly LoginAttemptRepository $loginAttemptRepository,
         private readonly EntityManagerInterface $em,
+        private readonly ClockInterface $clock,
     ) {
     }
 
@@ -30,7 +33,9 @@ class LoginAttemptsService
      */
     public function increment(User $user): void
     {
-        $userAttempt = (new LoginAttempt())->setUser($user);
+        $userAttempt = (new LoginAttempt())
+            ->setUser($user)
+            ->setCreatedAt($this->clock->now());
         $this->em->persist($userAttempt);
         $this->em->flush();
     }
@@ -58,9 +63,14 @@ class LoginAttemptsService
      * We compare the current attempts for a specific user with the const
      * MAX_LOGIN_ATTEMPTS defined in this service.
      */
-    public function hasReachedAttemptFor(User $user): bool
+    public function hasTooManyAttempts(User $user): bool
     {
-        $attempts = $this->loginAttemptRepository->countRecentAttemptsFor($user, minutes: 30);
+        $attempts = $this
+            ->loginAttemptRepository->countRecentAttemptsFor(
+                $user,
+                minutes: self::WINDOW_MINUTES,
+                now: $this->clock->now()
+            );
 
         return $attempts >= self::MAX_LOGIN_ATTEMPTS;
     }

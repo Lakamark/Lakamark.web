@@ -21,7 +21,7 @@ security:
             lazy: true
             provider: app_user_provider
             entry_point: App\Http\Security\AuthenticationEntryPoint
-            user_checker: security.user_checker.chain.main
+            user_checker: App\Domain\Auth\Security\CompositeUserChecker
             access_denied_handler: App\Http\Security\AccessDeniedHandler
             custom_authenticator:
                 - App\Domain\Auth\Authenticator

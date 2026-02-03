@@ -4,7 +4,7 @@ namespace App\Domain\Auth\Exception;
 
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 
-class TooManyLoginAttemptsException extends CustomUserMessageAuthenticationException
+class TooManyAttemptsException extends CustomUserMessageAuthenticationException
 {
     public function __construct(
         string $message = 'The account has been locked. You exceeded the maximum number of failed login attempts.',
