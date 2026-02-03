@@ -43,7 +43,7 @@ class SeedCommand extends AbstractCommand
         $app = $this->getApplication();
 
         // To ensure we are on a dev environment.
-        if (!$this->checkEnv($io, 'app:db:seed')) {
+        if (!$this->checkEnv($io, $input)) {
             return Command::FAILURE;
         }
 

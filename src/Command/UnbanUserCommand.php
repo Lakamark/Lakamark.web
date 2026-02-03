@@ -41,7 +41,7 @@ class UnbanUserCommand extends AbstractCommand
     {
         $io = new SymfonyStyle($input, $output);
 
-        if (!$this->checkEnv($io, 'app:moderation:unban')) {
+        if (!$this->checkEnv($io, $input)) {
             return Command::FAILURE;
         }
 
