@@ -6,6 +6,7 @@ use App\Domain\Application\Contract\ReadableContentInterface;
 use App\Domain\Application\Enum\AccessLevel;
 use App\Domain\Application\Enum\ContentStatus;
 use App\Domain\Application\Exception\ContentLogicException;
+use App\Domain\Application\Exception\DoubleSetException;
 use App\Domain\Application\Repository\ContentRepository;
 use App\Domain\Auth\Entity\User;
 use App\Domain\Blog\Entity\Post;
@@ -60,7 +61,7 @@ abstract class Content implements ReadableContentInterface
     private AccessLevel $accessLevel = AccessLevel::PUBLIC;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    private \DateTimeImmutable $createdAt;
+    private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(name: 'published_at', type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $publishedAt = null;
@@ -164,13 +165,21 @@ abstract class Content implements ReadableContentInterface
         return $this;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }
 
+    /**
+     * createdAt is immutable and can only be set once.
+     *
+     * @throws DoubleSetException
+     */
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
+        if (null !== $this->createdAt) {
+            throw DoubleSetException::for('createdAt');
+        }
         $this->createdAt = $createdAt;
 
         return $this;

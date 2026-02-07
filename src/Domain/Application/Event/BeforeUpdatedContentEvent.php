@@ -19,8 +19,9 @@ readonly class BeforeUpdatedContentEvent
 
     /*
      * You can set timestamps in the subscriber (edit updatedAt field)
-     * Later we will use VicheUploaderBundle
-     * If the
+     * Later we will use VitchUploaderBundle
+     * If the timestamp doesn't change,
+     * the bundle won't detect update events.
      */
     public function getNow(): \DateTimeImmutable
     {
