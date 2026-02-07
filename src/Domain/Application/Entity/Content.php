@@ -13,16 +13,26 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ContentRepository::class)]
-#[ORM\Table(name: 'content')]
-#[ORM\UniqueConstraint(name: 'uniq_content_slug', columns: ['slug'])]
-#[ORM\Index(name: 'idx_content_status', columns: ['status'])]
-#[ORM\Index(name: 'idx_content_access_level', columns: ['access_level'])]
-#[ORM\Index(name: 'idx_content_created_at', columns: ['created_at'])]
-#[ORM\Index(name: 'idx_content_feed', columns: ['status', 'access_level', 'created_at'])]
+#[ORM\Table(
+    name: 'content',
+    indexes: [
+        new ORM\Index(name: 'idx_content_status', columns: ['status']),
+        new ORM\Index(name: 'idx_content_access_level', columns: ['access_level']),
+        new ORM\Index(name: 'idx_content_created_at', columns: ['created_at']),
+        new ORM\Index(name: 'idx_content_feed', columns: ['status', 'access_level', 'created_at']),
+        new ORM\Index(name: 'idx_content_kind_created', columns: ['kind', 'created_at']),
+    ],
+    uniqueConstraints: [
+        new ORM\UniqueConstraint(name: 'uniq_content_slug', columns: ['slug']),
+    ],
+)]
 #[ORM\HasLifecycleCallbacks]
-#[ORM\InheritanceType('SINGLE_TABLE')]
+#[ORM\InheritanceType('JOINED')]
 #[ORM\DiscriminatorColumn(name: 'kind', type: Types::STRING, length: 32)]
-#[ORM\DiscriminatorMap(['post' => Post::class])]
+#[ORM\DiscriminatorMap([
+    'post' => Post::class,
+    // 'project' => Project::class, // Enabled it when you create the entity
+])]
 abstract class Content implements ReadableContentInterface
 {
     #[ORM\Id]
@@ -33,7 +43,7 @@ abstract class Content implements ReadableContentInterface
     #[ORM\Column(type: Types::STRING, length: 255)]
     private string $title;
 
-    #[ORM\Column(type: Types::STRING, length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $slug = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
