@@ -9,6 +9,7 @@ use App\Domain\Application\Exception\ContentLogicException;
 use App\Domain\Application\Repository\ContentRepository;
 use App\Domain\Auth\Entity\User;
 use App\Domain\Blog\Entity\Post;
+use App\Domain\Project\Entity\Project;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -31,7 +32,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\DiscriminatorColumn(name: 'kind', type: Types::STRING, length: 32)]
 #[ORM\DiscriminatorMap([
     'post' => Post::class,
-    // 'project' => Project::class, // Enabled it when you create the entity
+    'project' => Project::class,
 ])]
 abstract class Content implements ReadableContentInterface
 {
