@@ -25,7 +25,7 @@ final readonly class ContentTimestampSubscriber implements EventSubscriberInterf
         $content = $event->getContent();
 
         if (null !== $content->getCreatedAt()) {
-            throw DoubleSetException::for('createdAt');
+            return;
         }
 
         $content->setCreatedAt($event->getNow());

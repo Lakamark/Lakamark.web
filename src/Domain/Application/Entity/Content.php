@@ -2,6 +2,7 @@
 
 namespace App\Domain\Application\Entity;
 
+use App\Domain\Application\ContentWorkflowTrait;
 use App\Domain\Application\Contract\ReadableContentInterface;
 use App\Domain\Application\Enum\AccessLevel;
 use App\Domain\Application\Enum\ContentStatus;
@@ -37,6 +38,8 @@ use Doctrine\ORM\Mapping as ORM;
 ])]
 abstract class Content implements ReadableContentInterface
 {
+    use ContentWorkflowTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::BIGINT)]
@@ -73,12 +76,15 @@ abstract class Content implements ReadableContentInterface
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private User $author;
 
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $archivedAt = null;
+
     #[ORM\PrePersist]
     public function assertCreatedAtIsSet(): void
     {
         // To ensure to define the createdAt
-        if (!isset($this->createdAt)) {
-            throw new ContentLogicException('Content.createdAt must be set before persisting.');
+        if (null === $this->createdAt) {
+            $this->setCreatedAt(new \DateTimeImmutable());
         }
     }
 
@@ -209,6 +215,18 @@ abstract class Content implements ReadableContentInterface
         return $this;
     }
 
+    public function getArchivedAt(): ?\DateTimeImmutable
+    {
+        return $this->archivedAt;
+    }
+
+    public function setArchivedAt(?\DateTimeImmutable $archivedAt): static
+    {
+        $this->archivedAt = $archivedAt;
+
+        return $this;
+    }
+
     public function getAuthor(): User
     {
         return $this->author;
@@ -221,22 +239,25 @@ abstract class Content implements ReadableContentInterface
         return $this;
     }
 
-    public function publish(\DateTimeImmutable $now): void
+    public function isDraft(): bool
     {
-        // If the slug is not define
-        if (null === $this->getSlug() || '' === $this->getSlug()) {
-            throw new ContentLogicException('Content.slug must be set before persisting.');
+        return ContentStatus::DRAFT === $this->status;
+    }
+
+    public function isPublished(): bool
+    {
+        return ContentStatus::PUBLISHED === $this->status;
+    }
+
+    public function isArchived(): bool
+    {
+        return ContentStatus::ARCHIVED === $this->status;
+    }
+
+    private function assertHasSlug(): void
+    {
+        if (null === $this->slug || '' === trim($this->slug)) {
+            throw new ContentLogicException('Content.slug must be set before publishing.');
         }
-
-        if (ContentStatus::PUBLISHED === $this->getStatus()) {
-            if (null == $this->getPublishedAt()) {
-                $this->setPublishedAt($now);
-            }
-
-            return;
-        }
-
-        $this->setStatus(ContentStatus::PUBLISHED);
-        $this->setPublishedAt($now);
     }
 }
