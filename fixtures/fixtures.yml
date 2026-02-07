@@ -11,5 +11,11 @@ App\Domain\Auth\Entity\User:
     email: lakamark@lakamark.com
     roles: ['ROLE_USER', 'ROLE_ADMIN']
 
+App\Domain\Application\Entity\Category:
+  category{1..10} (extends category):
+
 App\Domain\Blog\Entity\Post:
   post{1..50} (extends post):
+
+App\Domain\Project\Entity\Project:
+  project{1..50} (extends project):
