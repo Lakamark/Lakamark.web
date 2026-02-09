@@ -6,6 +6,12 @@
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    app.assets.public_base_path: '/assets'
+    app.vite.dev_server_origin: 'https://localhost:3000' # option simple (voir note plus bas)
+    app.vite.manifest_path: '%kernel.project_dir%/public/assets/.vite/manifest.json'
+    app.vite.manifest_cache_key: 'vite_manifest'
+    app.vite.custom_elements_polyfill_url: 'https://unpkg.com/@ungap/custom-elements@1.3.0/min.js'
 
 services:
     # default configuration for services in *this* file
@@ -38,3 +44,16 @@ services:
     App\Http\Controller\:
         resource: '../src/Http/controller'
         tags: ['controller.service_arguments']
+
+    # Asset Bridge Configuration
+    App\Foundation\Bridge\ManifestReader:
+        arguments:
+            $cacheKey: '%app.vite.manifest_cache_key%'
+            $manifestPath: '%app.vite.manifest_path%'
+
+    App\Foundation\Bridge\SafariNoChromeDecider: ~
+
+    App\Foundation\Bridge\AssetBridge:
+        arguments:
+            $customElementsPolyfillUrl: '%app.vite.custom_elements_polyfill_url%'
+

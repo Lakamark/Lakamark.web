@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+services:
+  App\Foundation\Bridge\Contract\AssetResolverInterface:
+    alias: App\Foundation\Bridge\Resolver\DevAssetResolver
+
+  App\Foundation\Bridge\Resolver\DevAssetResolver:
+    arguments:
+      $devServerOrigin: '%app.vite.dev_server_origin%'
