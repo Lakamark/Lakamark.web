@@ -5,4 +5,4 @@ services:
 
   App\Foundation\Bridge\Resolver\DevAssetResolver:
     arguments:
-      $devServerOrigin: '%app.vite.dev_server_origin%'
+      $devServerOrigin: 'https://localhost:3000'

@@ -1,0 +1,6 @@
+# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+services:
+  App\Foundation\Bridge\Resolver\NullAssetResolver: ~
+
+  App\Foundation\Bridge\Contract\AssetResolverInterface:
+    alias: App\Foundation\Bridge\Resolver\NullAssetResolver

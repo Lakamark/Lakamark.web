@@ -16,6 +16,7 @@
 # Envrinoement gorbage
 .idea
 config/reference.php
+/node_modules/
 
 ###> friendsofphp/php-cs-fixer ###
 /.php-cs-fixer.php
