@@ -9,8 +9,9 @@ class EntryMapperTest extends TestCase
 {
     public function testMapLogicalEntryToAssetPath(): void
     {
-        $mapper = new SimpleEntryMapper('assets');
-        $this->assertSame('assets/app.js', $mapper->map('app'));
-        $this->assertSame('assets/admin.js', $mapper->map('admin'));
+        $mapper = new SimpleEntryMapper();
+        $this->assertSame('app.js', $mapper->map('assets/app.js'));
+        $this->assertSame('app.js', $mapper->map('/assets/app.js'));
+        $this->assertSame('app.js', $mapper->map('app.js'));
     }
 }

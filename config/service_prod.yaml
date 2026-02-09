@@ -1,5 +1,0 @@
-# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
-# Prod
-services:
-  App\Foundation\Bridge\Contract\AssetResolverInterface:
-    alias: App\Foundation\Bridge\Resolver\ProdAssetResolver

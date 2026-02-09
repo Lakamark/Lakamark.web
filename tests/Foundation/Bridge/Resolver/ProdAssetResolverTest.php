@@ -28,8 +28,7 @@ class ProdAssetResolverTest extends TestCase
                 'css' => ['assets/app-AAA.css'],
             ],
         ]);
-
-        $resolver = new ProdAssetResolver($reader, $entryMapper, '');
+        $resolver = new ProdAssetResolver('', $reader, $entryMapper);
 
         $this->assertSame('/assets/app-AAA.js', $resolver->resolveJs('app'));
         $this->assertSame('/assets/app-AAA.css', $resolver->resolveCss('app'));

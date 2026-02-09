@@ -17,19 +17,33 @@ readonly class ManifestReader
     /** @return array<string, mixed>
      * @throws InvalidArgumentException
      */
-    public function read(): mixed
+    public function read(): array
     {
-        return $this->cache->get($this->cacheKey, function () {
-            if (!is_file($this->manifestPath)) {
+        $path = $this->manifestPath;
+
+        // Generate the build version,
+        // Avoid to clear the cache when you deploy a new version.
+        $version = is_file($path) ? (string) filemtime($path) : '0';
+        $key = $this->cacheKey.'.'.$version;
+
+        return $this->cache->get($key, function () use ($path) {
+            if (!is_file($path)) {
                 return [];
             }
 
-            $json = file_get_contents($this->manifestPath);
+            $json = file_get_contents($path);
             if (false === $json || '' === $json) {
                 return [];
             }
 
-            return json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+            try {
+                /** @var array<string, mixed> $data */
+                $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+
+                return is_array($data) ? $data : [];
+            } catch (\JsonException) {
+                return [];
+            }
         });
     }
 }

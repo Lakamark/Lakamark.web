@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+# Prod
+parameters:
+  app.assets.public_base_path: '/assets'
+  app.vite.manifest_path: '%kernel.project_dir%/public/assets/.vite/manifest.json'
+  app.vite.manifest_cache_key: 'vite_manifest'
+
+services:
+  App\Foundation\Bridge\Contract\AssetResolverInterface:
+    alias: App\Foundation\Bridge\Resolver\ProdAssetResolver
+
+  App\Foundation\Bridge\Resolver\ProdAssetResolver:
+    arguments:
+      $publicBase: '%app.assets.public_base_path%'
+      $manifestReader: '@App\Foundation\Bridge\ManifestReader'
+      $entryMapper: '@App\Foundation\Bridge\Contract\EntryMapperInterface'
+
+  App\Foundation\Bridge\ManifestReader:
+    arguments:
+      $cache: '@cache.app'
+      $cacheKey: '%app.vite.manifest_cache_key%'
+      $manifestPath: '%app.vite.manifest_path%'

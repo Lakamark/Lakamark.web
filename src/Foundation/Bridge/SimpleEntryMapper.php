@@ -6,9 +6,8 @@ use App\Foundation\Bridge\Contract\EntryMapperInterface;
 
 readonly class SimpleEntryMapper implements EntryMapperInterface
 {
-    public function __construct(
-        private string $baseDir = 'assets',
-    ) {
+    public function __construct()
+    {
     }
 
     public function map(string $entry): string
@@ -19,6 +18,18 @@ readonly class SimpleEntryMapper implements EntryMapperInterface
             throw new \InvalidArgumentException('Entry name cannot be empty.');
         }
 
-        return sprintf('%s/%s.js', trim($this->baseDir, '/'), $entry);
+        // Accept: "app" -> "app.js"
+        if (!str_contains($entry, '.')) {
+            $entry .= '.js';
+        }
+
+        // If you define "assets/app.js" or "/assets/app.js",
+        // We remove the prefix.
+        $entry = ltrim($entry, '/');
+        if (str_starts_with($entry, 'assets/')) {
+            $entry = substr($entry, 7);
+        }
+
+        return $entry;
     }
 }

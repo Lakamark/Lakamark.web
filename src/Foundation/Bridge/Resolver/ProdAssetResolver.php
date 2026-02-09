@@ -10,6 +10,7 @@ use Psr\Cache\InvalidArgumentException;
 final readonly class ProdAssetResolver implements AssetResolverInterface
 {
     public function __construct(
+        private string $publicBase,
         private ManifestReader $manifestReader,
         private EntryMapperInterface $entryMapper,
     ) {
@@ -76,6 +77,6 @@ final readonly class ProdAssetResolver implements AssetResolverInterface
 
     private function join(string $path): string
     {
-        return '/'.ltrim($path, '/');
+        return rtrim($this->publicBase, '/').'/'.ltrim($path, '/');
     }
 }
