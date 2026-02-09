@@ -21,8 +21,9 @@ readonly class ManifestReader
     {
         $path = $this->manifestPath;
 
-        // Generate the build version,
-        // Avoid to clear the cache when you deploy a new version.
+        // IMPORTANT:
+        // The cache key is versioned by filemtime to avoid a production-only bug
+        // where an empty Vite manifest would be cached forever.
         $version = is_file($path) ? (string) filemtime($path) : '0';
         $key = $this->cacheKey.'.'.$version;
 
