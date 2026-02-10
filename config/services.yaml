@@ -40,3 +40,10 @@ services:
 
     App\Foundation\Bridge\Contract\EntryMapperInterface:
         class:  App\Foundation\Bridge\SimpleEntryMapper
+
+    App\Foundation\Captcha\CaptchaRegistry:
+        arguments:
+            $challenges:
+                puzzle: 'App\Foundation\Captcha\Puzzle\PuzzleCaptchaChallenge'
+            $generators:
+                puzzle: 'App\Foundation\Captcha\Puzzle\PuzzleGenerator'
