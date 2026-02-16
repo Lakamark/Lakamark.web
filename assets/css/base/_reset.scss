@@ -1,0 +1,101 @@
+/**
+ * Reset 2.0
+ *
+ * Inspired by Eric Meyer's reset:
+ * https://meyerweb.com/eric/tools/css/reset/
+ *
+ * This reset is intentionally minimal and modern:
+ * it avoids breaking default typography and accessibility.
+ */
+
+/* Box sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Remove default margins */
+body,
+h1, h2, h3, h4, h5, h6,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
+/* Base body defaults */
+body {
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeSpeed; /* Optional */
+}
+
+/* Better on mobile browsers (dynamic viewport height) */
+@supports (height: 100dvh) {
+  body {
+    min-height: 100dvh;
+  }
+}
+
+/* Remove list styles only when explicitly requested */
+ul[role='list'],
+ol[role='list'] {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Responsive media */
+img,
+picture {
+  max-width: 100%;
+  display: block;
+}
+
+/* Form controls inherit typography */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* Button baseline (keep accessibility) */
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+/* Links */
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.3s;
+}
+
+/* Keep keyboard focus visible */
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}

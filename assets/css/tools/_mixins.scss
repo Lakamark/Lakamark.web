@@ -1,0 +1,69 @@
+@use "sass:math";
+@use "functions";
+@use "breakpoints";
+
+/**
+ * Container mixin.
+ *
+ * Creates a full-width container with horizontal padding.
+ * When the viewport becomes large enough,
+ * padding is adjusted to visually center the content
+ * while keeping full-width behavior.
+ *
+ * @param {number} $width   - Maximum content width (e.g. 1200px)
+ * @param {number} $padding - Horizontal padding (e.g. 16px)
+ */
+@mixin container($width, $padding) {
+  $width: functions.to-px($width);
+  $padding: functions.to-px($padding);
+
+  width: 100%;
+  padding-inline: $padding;
+
+  // When viewport >= (content width + padding * 2)
+  // adjust padding to center the content
+  @include breakpoints.up($width + 2 * $padding) {
+    padding-inline: calc(50vw - #{math.div($width, 2)});
+  }
+}
+
+
+/**
+ * Night theme mixin.
+ *
+ * Applies styles when:
+ * - `.night-theme` class is present (forced dark mode)
+ * - OR the system prefers dark mode and `.day-theme` is not applied
+ *
+ * Works both inside a selector (`&`) and at root level.
+ */
+@mixin night() {
+  @if (&) {
+
+    // Forced dark mode via class
+    .night-theme & {
+      @content;
+    }
+
+    // Automatic dark mode (if not explicitly forced to day)
+    @media (prefers-color-scheme: dark) {
+      body:not(.day-theme):not(.night-theme) & {
+        @content;
+      }
+    }
+
+  } @else {
+
+    // Forced dark mode via class
+    .night-theme {
+      @content;
+    }
+
+    // Automatic dark mode (if not explicitly forced to day)
+    @media (prefers-color-scheme: dark) {
+      body:not(.day-theme):not(.night-theme) {
+        @content;
+      }
+    }
+  }
+}

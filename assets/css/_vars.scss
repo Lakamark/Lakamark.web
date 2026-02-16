@@ -1,0 +1,62 @@
+/**
+Here is the global CSS Variable for all application.
+Be carful! If you wan modify a value they globally changed on the website!
+
+Hint:
+It is recommended to change the local variables in a specific css file.
+*/
+@use "tools/mixins";
+
+:root {
+  --spacing: 8px;
+  --gap: 20px;
+  --spacing-none: 0px;
+  --spacing-xxs: 8px;
+  --spacing-xs: 16px;
+  --spacing-sm: 24px;
+  --spacing-md: 32px;
+  --spacing-lg: 40px;
+  --spacing-xl: 48px;
+  --radius-none: 0px;
+  --radius-xs: 5px;
+  --radius-sm: 10px;
+  --radius-full: 50px;
+  --background-page-color: #EDEDED;
+  --background-page-day-theme: #EDEDED;
+  --text-color: #000000;
+  --text-muted-color: #595959;
+  --border-color: #C0C0C0;
+  --primary-color: #1C3C7D;
+  --secondary-color: #ADBBEB;
+  --accent-color: #0054B5;
+  --success-color: #015E12;
+  --warning-color: #66500D;
+  --danger-color: #9E0000;
+  --info-color: #305599;
+  --btn-label-primary: #000E3F;
+  --btn-label-secondary: #162648;
+  --btn-label-danger: #FFFFFF;
+  --btn-label-success: #DFFFE5;
+  --btn-label-ghost: #000000;
+  --card-background-color: #FFFFFF;
+}
+
+@include mixins.night {
+  --background-page-color: #121212;
+  --text-color: #FFFFFF;
+  --text-muted-color: #A2A2A2;
+  --border-color: #A2A2A2;
+  --primary-color: #82A2E3;
+  --secondary-color: #142252;
+  --accent-color: #4EA1FF;
+  --success-color: #4EB261;
+  --warning-color: #FFD900;
+  --danger-color: #E49D9D;
+  --info-color: #75A5FF;
+  --btn-label-primary: #000E3F;
+  --btn-label-secondary: #FFFFFF;
+  --btn-label-danger: #2D0000;
+  --btn-label-success: #000000;
+  --btn-label-ghost: #FFFFFF;
+  --card-background-color: #121212;
+}

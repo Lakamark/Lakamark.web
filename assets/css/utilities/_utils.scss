@@ -1,0 +1,122 @@
+@use "../tools/functions";
+@use "../tools/breakpoints";
+
+/**
+ * Utility classes
+ * Keep specificity low: do not nest under `body`.
+ */
+
+$util-spacing-max: 5 !default;
+
+// Spacing utilities (padding / margin)
+@for $i from 0 through $util-spacing-max {
+  // Padding
+  .pd-#{$i}   { padding: functions.spacing($i); }
+  .pd-t#{$i}  { padding-top: functions.spacing($i); }
+  .pd-b#{$i}  { padding-bottom: functions.spacing($i); }
+  .pd-x#{$i}  { padding-inline: functions.spacing($i); }
+  .pd-y#{$i}  { padding-block: functions.spacing($i); }
+
+  // Margin
+  .mg-#{$i}   { margin: functions.spacing($i); }
+  .mg-t#{$i}  { margin-top: functions.spacing($i); }
+  .mg-b#{$i}  { margin-bottom: functions.spacing($i); }
+  .mg-x#{$i}  { margin-inline: functions.spacing($i); }
+  .mg-y#{$i}  { margin-block: functions.spacing($i); }
+}
+
+/**
+ * Responsive visibility helpers
+ * - mobile-display: visible on mobile, hidden above 900px
+ * - mobile-hidden: hidden on mobile, visible above 900px
+ */
+.mobile-display {
+  @include breakpoints.up(900px) {
+    display: none;
+  }
+}
+
+.mobile-hidden {
+  @include breakpoints.down(900px) {
+    display: none!important;
+  }
+}
+
+/**
+ * Position helpers
+ */
+.pos-relative {
+  position: relative!important;
+}
+
+.pos-absolute {
+  position: absolute!important;
+}
+
+/**
+ * Display helpers
+ */
+.d-flex   {
+  display: flex !important;
+}
+
+.d-inline {
+  display: inline !important;
+}
+
+.d-grid {
+  display: grid !important;
+}
+
+.d-block {
+  display: block !important;
+}
+
+.d-none {
+  display: none !important;
+}
+
+/**
+ * Flex helpers
+ */
+.flex-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  // Allow children to shrink properly without overflow issues
+  & > * {
+    min-width: 0;
+  }
+}
+
+.f-stretch {
+  align-items: stretch;
+}
+.j-end {
+  justify-content: flex-end;
+}
+
+/**
+ * Stacked content (vertical flow with CSS variable gap)
+ */
+.stacked-content {
+  --gap-content: 2;
+
+  display: grid !important;
+  grid-template-columns: 1fr;
+  align-content: flex-start;
+  gap: calc(var(--gap-content) * var(--spacing));
+
+  & > * {
+    min-width: 0;
+  }
+}
+
+
+/**
+ * Overflow helpers
+ */
+.overflow-hidden {
+  overflow: hidden;
+}

@@ -1,0 +1,156 @@
+@use "sass:map";
+@use "sass:meta";
+@use "sass:math";
+
+/**
+ * Breakpoints (mobile-first).
+ * You can override this map in another file before importing this module.
+ */
+$breakpoints: (
+        xs: 0px,
+        sm: 480px,
+        md: 768px,
+        lg: 1024px,
+        xl: 1280px,
+        2xl: 1536px,
+) !default;
+
+/**
+ * Small epsilon used to prevent overlapping between
+ * `up()` and `down()` media queries.
+ * Example:
+ * up(md)   => min-width: 768px
+ * down(md) => max-width: 767.98px
+ */
+$bp-epsilon: 0.02px !default;
+
+
+/**
+ * Convert a numeric value to px if unitless.
+ * Leaves values untouched if they already have a unit (px, rem, em, etc.).
+ */
+@function to-px($value) {
+  @if meta.type-of($value) != "number" {
+    @error "to-px() expects a number, got: #{meta.type-of($value)}";
+  }
+
+  @if math.is-unitless($value) {
+    @return $value * 1px;
+  }
+
+  @return $value;
+}
+
+
+/**
+ * Retrieve a breakpoint value from the map.
+ */
+@function bp($key) {
+  @if map.has-key($breakpoints, $key) {
+    @return map.get($breakpoints, $key);
+  }
+
+  @error "Unknown breakpoint '#{$key}'. Available: #{map.keys($breakpoints)}";
+}
+
+
+/**
+ * Resolve a breakpoint value.
+ * Accepts:
+ * - a breakpoint key (e.g. md)
+ * - a numeric value (e.g. 900 or 900px)
+ */
+@function resolve-bp($value) {
+  @if meta.type-of($value) == "string" {
+    @return bp($value);
+  }
+
+  @return to-px($value);
+}
+
+
+/**
+ * Media query: min-width
+ * Examples:
+ * - up(md)
+ * - up(900)
+ * - up(900px)
+ */
+@mixin up($value) {
+  @media (min-width: resolve-bp($value)) {
+    @content;
+  }
+}
+
+
+/**
+ * Media query: max-width
+ * Subtracts a small epsilon to prevent overlap with up().
+ */
+@mixin down($value) {
+  @media (max-width: calc(#{resolve-bp($value)} - #{$bp-epsilon})) {
+    @content;
+  }
+}
+
+
+/**
+ * Media query: between two breakpoints.
+ * Examples:
+ * - between(sm, lg)
+ * - between(480px, 1024px)
+ */
+@mixin between($min, $max) {
+  $minValue: resolve-bp($min);
+  $maxValue: resolve-bp($max);
+
+  @media (min-width: $minValue)
+  and (max-width: calc(#{$maxValue} - #{$bp-epsilon})) {
+    @content;
+  }
+}
+
+
+/**
+ * Get the next breakpoint key in the map.
+ */
+@function _next-bp($key) {
+  $keys: map.keys($breakpoints);
+  $i: 0;
+
+  @each $k in $keys {
+    $i: $i + 1;
+
+    @if $k == $key {
+      @if $i == length($keys) {
+        @return null; // Last breakpoint
+      }
+
+      @return nth($keys, $i + 1);
+    }
+  }
+
+  @return null;
+}
+
+
+/**
+ * Media query: only one breakpoint range.
+ * Example:
+ * - only(md) => between md and the next breakpoint
+ */
+@mixin only($key) {
+  $min: bp($key);
+  $next: _next-bp($key);
+
+  @if $next == null {
+    // Last breakpoint: min-width only
+    @include up($min) {
+      @content;
+    }
+  } @else {
+    @include between($min, bp($next)) {
+      @content;
+    }
+  }
+}

@@ -1,0 +1,113 @@
+@use "../tools/functions";
+@use "../tools/breakpoints";
+@use "../tools/mixins";
+
+/**
+ * Layout variables
+ * Keep layout-related CSS variables in one place.
+ */
+:root {
+  --container-padding: 20px;
+  --container-width: calc(100vw - (var(--container-padding) * 2));
+}
+
+/* Adjust container padding on larger screens */
+@include breakpoints.up(980px) {
+  :root {
+    --container-padding: 30px;
+  }
+}
+
+@include breakpoints.up(1300px) {
+  :root {
+    --container-padding: 20px;
+    --container-width: 1400px;
+  }
+}
+
+/**
+ * Containers
+ *
+ * `.container` uses "fluid centering" with side paddings computed from container width.
+ * `.content` constrains the inner width only.
+ */
+
+%container,
+.container {
+  width: 100%;
+  box-sizing: border-box;
+  padding-inline: calc(50% - (var(--container-width) / 2));
+}
+
+%content,
+.content {
+  width: var(--container-width);
+  margin-inline: auto;
+}
+
+%narrow-container,
+.narrow-container {
+  max-width: 900px;
+  margin-inline: auto;
+}
+
+/* Useful for media blocks */
+.ratio-container {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+/**
+ * Page wrapper
+ */
+.page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+}
+
+@supports (height: 100dvh) {
+  .wrapper-page {
+    min-height: 100dvh;
+  }
+}
+
+/**
+ * Grid
+ */
+.grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--gap, calc(var(--spacing) * 2));
+}
+
+.grid-3 {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gap, calc(var(--spacing) * 2));
+
+  @include breakpoints.down(980px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/**
+ * Stacked content
+ * (could live in utilities too, but it's often layout-related)
+ */
+.stacked-content {
+  --gap-content: 2;
+
+  display: grid !important;
+  grid-template-columns: 1fr;
+  align-items: flex-start;
+  gap: calc(var(--gap-content) * var(--spacing));
+
+  & > * {
+    min-width: 0;
+  }
+}
