@@ -1,27 +1,47 @@
-@use '../base/layout';
-@use '../tools/mixins';
-@use "../tools/functions";
 @use "../tools/breakpoints";
+@use "../tools/functions";
 
 :root {
   --header-height: 80px;
   --logo-size: 40px;
 }
+
+/* Safety */
+html, body {
+  overflow-x: hidden;
+}
+
+/* =========================
+   LAYOUT OFFSET (Desktop)
+   On met la classe sur .page-wrapper via JS
+========================= */
+.page-wrapper.has-fixed-header {
+  padding-top: var(--header-height);
+}
+
+/* =========================
+   BASE LAYOUT (DESKTOP)
+========================= */
+
 .header {
   width: 100%;
   height: var(--header-height);
   display: flex;
-  flex-direction: row;
+  align-items: center;
+
   border-bottom: 1px solid var(--border-color);
+  background-color: var(--background-page-color);
+
+  transition: transform .25s ease, box-shadow .25s ease;
 }
 
 .header__brand {
   display: flex;
-  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
   width: var(--header-height);
   height: var(--header-height);
-  justify-content: center;
-  align-items: center;
 
   a, svg {
     display: flex;
@@ -31,9 +51,7 @@
     justify-content: center;
   }
 
-  svg {
-    fill: var(--text-color);
-  }
+  svg { fill: var(--text-color); }
 
   a:hover svg {
     fill: var(--accent-color);
@@ -41,120 +59,195 @@
   }
 }
 
-.header__brand .header__hamburger {
+.header__hamburger {
   display: none;
 }
 
-// Nav
 .header__nav {
+  flex: 1;
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
   align-items: center;
-  width: 100%;
-  gap: var(--gap);
+  justify-content: space-between;
 
-  a:hover {
-    color: var(--accent-color);
-  }
+  gap: var(--gap);
+  padding-inline: var(--gap);
 }
 
-.header__nav .header__nav__left,
-.header__nav .header__nav__right,
-.header__nav .header__nav__left li,
-.header__nav .header__nav__right li {
+.header__nav__left,
+.header__nav__right {
   display: flex;
-  flex-direction: row;
+  align-items: center;
   gap: var(--gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-// MOBILE VERSION
+.header__nav a:hover {
+  color: var(--accent-color);
+}
+
+/* =========================
+   STATES (HeaderUI) DESKTOP
+========================= */
+
+.header.is-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+
+.header.is-hidden {
+  transform: translateY(-100%);
+  box-shadow: none;
+}
+
+/* ❌ Supprimé: body.has-fixed-header (on n’en veut pas) */
+/*
+body.has-fixed-header {
+  padding-top: var(--header-height);
+}
+*/
+
+/* =========================
+   MOBILE (<980px)
+========================= */
+
 @include breakpoints.down(980) {
+
+  /* Mobile: header toujours fixed (bulletproof) */
   .header {
-    margin: 0;
-    padding: 0;
-    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    width: 100%;
+    height: var(--header-height);
+
+    z-index: 100;
+
+    background: var(--background-page-color);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  }
+
+  /* En mobile, on compense tout le temps (header fixed constant) */
+  .page-wrapper {
+    padding-top: var(--header-height);
   }
 
   .header__brand {
-    display: flex;
-    flex-direction: row;
     width: 100%;
     height: var(--header-height);
-    padding-inline: 10px 10px;
-    justify-content: flex-start;
-    align-items: center;
+    padding-inline: 16px;
 
-    a, svg {
-      display: flex;
-      width: 100%;
-      height: var(--header-height);
-      align-items: center;
-      justify-content: flex-start;
-      padding: 1rem;
-    }
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
-  .header__brand .header__hamburger {
+  .header__brand a,
+  .header__brand svg {
+    width: var(--logo-size);
+    height: var(--logo-size);
+    padding: 0;
+    justify-content: flex-start;
+  }
+
+  .header__hamburger {
     display: flex;
     flex-direction: column;
     gap: functions.spacing(1);
+    background: transparent;
+    border: 0;
+    padding: 0;
   }
 
-  .header__brand .header__hamburger:before,
-  .header__brand .header__hamburger:after,
-  .header__brand .header__hamburger span {
+  .header__hamburger:before,
+  .header__hamburger:after,
+  .header__hamburger span {
     content: "";
     width: 40px;
     height: 5px;
     background-color: var(--text-color);
+    display: block;
   }
 
+  /* Mobile: on neutralise les states desktop */
+  .header.is-hidden {
+    transform: none !important;
+  }
+
+  /* IMPORTANT: ne jamais annuler le fixed en mobile */
+  .header.is-fixed {
+    position: fixed;       /* ✅ garde fixed */
+    top: 0;
+    left: 0;
+    right: 0;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  }
+
+  /* Offcanvas panel */
   .header__nav {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    width: 100%;
+    height: calc(100vh - var(--header-height));
+
+    background-color: var(--background-page-color);
+    z-index: 90;
+
     display: flex;
     flex-direction: column;
-    background-color: var(--background-page-color);
-    justify-content: unset;
-    min-height: 100vh;
-    z-index: 1;
+    justify-content: flex-start;
+
+    padding: 0;
+    gap: 0;
+
     overflow-y: auto;
     overflow-x: hidden;
+
     transform: translateX(-100%);
-    transition: transform .3s;
-    gap: 0;
-  }
-
-  .header__nav .header__nav__left,
-  .header__nav .header__nav__right, {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    gap: 0;
-  }
-
-  .header__nav .header__nav__left li,
-  .header__nav .header__nav__right li {
-    display: flex;
-    width: 100%;
-    height: 50px;
-  }
-
-  .header__nav .header__nav__left li a ,
-  .header__nav .header__nav__right li a {
-    padding: 20px;
-    display: flex;
-    width: 100%;
-    align-items: center;
-
-    &:hover {
-      background-color: var(--accent-color);
-      color: #FFFFFF;
-      transition: background-color .3s;
-      border-bottom: none;
-    }
+    transition: transform .3s ease;
   }
 
   .visible--menu .header__nav {
     transform: translateX(0);
+  }
+
+  .header__nav__left,
+  .header__nav__right {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 0;
+  }
+
+  .header__nav__left li,
+  .header__nav__right li {
+    width: 100%;
+    height: 50px;
+    display: flex;
+  }
+
+  .header__nav__left li a,
+  .header__nav__right li a {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 20px;
+
+    &:hover {
+      background-color: var(--accent-color);
+      color: #fff;
+      transition: background-color .3s;
+      border-bottom: none;
+    }
   }
 }

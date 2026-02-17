@@ -8,6 +8,8 @@
     "build": "vite build"
   },
   "dependencies": {
+    "@hotwired/turbo": "^8.0.23",
+    "body-scroll-lock": "^4.0.0-beta.0",
     "preact": "^10.27.2"
   },
   "devDependencies": {

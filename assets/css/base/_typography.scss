@@ -38,7 +38,6 @@ $typo: (
 
 .text-base {
   @include text-style(base);
-  max-width: 65ch;
   letter-spacing: 0.01em;
 }
 

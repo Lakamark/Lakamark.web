@@ -22,7 +22,9 @@
     <body>
         <div class="page-wrapper">
             {% include '/partials/header.html.twig' %}
-            {% block body %}{% endblock %}
+            <main class="page-content">
+                {% block body %}{% endblock %}
+            </main>
             {% include '/partials/footer.html.twig' %}
         </div>
     </body>
