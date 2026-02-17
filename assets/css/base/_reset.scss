@@ -1,5 +1,5 @@
 /**
- * Reset 2.0
+ * Reset
  *
  * Inspired by Eric Meyer's reset:
  * https://meyerweb.com/eric/tools/css/reset/
@@ -40,6 +40,7 @@ blockquote,
 dl,
 dd {
   margin: 0;
+  padding: 0;
 }
 
 /* Base body defaults */
@@ -47,7 +48,7 @@ body {
   min-height: 100vh;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeSpeed; /* Optional */
+  text-rendering: optimizeSpeed;
 }
 
 /* Better on mobile browsers (dynamic viewport height) */
@@ -58,8 +59,8 @@ body {
 }
 
 /* Remove list styles only when explicitly requested */
-ul[role='list'],
-ol[role='list'] {
+ul,
+ol {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -83,8 +84,11 @@ select {
 /* Button baseline (keep accessibility) */
 button {
   cursor: pointer;
-  background: none;
+  background: transparent;
   border: none;
+  margin: 0;
+  padding: 0;
+  color: unset;
 }
 
 /* Links */
@@ -92,6 +96,12 @@ a {
   text-decoration: none;
   color: inherit;
   transition: color 0.3s;
+}
+
+/* tables */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
 }
 
 /* Keep keyboard focus visible */
