@@ -2,10 +2,13 @@ body {
   background-color: var(--background-page-color);
   color: var(--text-color);
   font-family: "Roboto", sans-serif;
+  font-weight: 400;
   font-size: 16px;
   line-height: 1.6;
   overflow-wrap: break-word;
   -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 
