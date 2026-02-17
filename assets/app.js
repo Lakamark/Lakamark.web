@@ -5,16 +5,24 @@ import {HeaderUI} from "./lib/HeaderUI.js";
 
 let headerInstance = null;
 
-document.addEventListener('turbo:load', () => {
+/**
+ * Re-init header after every Turbo visit
+ */
+function initHeader() {
     headerInstance?.destroy();
-
     headerInstance = new HeaderUI().init();
-});
+}
 
-document.addEventListener('turbo:before-cache', () => {
-    headerInstance.destroy();
+/**
+ * Cleanup before Turbo caches the page
+ */
+function destroyHeader() {
+    headerInstance?.destroy();
     headerInstance = null;
-})
+}
+
+document.addEventListener('turbo:load', initHeader);
+document.addEventListener('turbo:before-cache', destroyHeader);
 
 // start Turbo
 Turbo.start()
