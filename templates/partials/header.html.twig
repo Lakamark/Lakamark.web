@@ -1,0 +1,23 @@
+<header class="header" id="main-header">
+    <div class="header__brand">
+        <a href="{{ path('home') }}" title="Home page">
+            {{ iconRenderer('logo') }}
+        </a>
+        <button class="header__hamburger" id="js-hamburger">
+            <span></span>
+        </button>
+    </div>
+    <nav class="header__nav" id="menuNav">
+        <ul class="header__nav__left">
+            <li><a href="#" title="Get last news about the Laka Mark artist.">Blog</a></li>
+            <li><a href="#" title="My last Projects">Projects</a></li>
+            <li><a href="#" title="Get last update events.">Events</a></li>
+            <li><a href="https://shop.lakamark.com/" title="You can get some awesome products!" target="_blank">Shop</a></li>
+            <li><a href="#" title="You need help for your project?">Contact</a></li>
+        </ul>
+        <ul class="header__nav__right">
+            <li><a href="{{ path('app_login') }}">Login</a></li>
+            <li><a href="#">Signup</a></li>
+        </ul>
+    </nav>
+</header>
