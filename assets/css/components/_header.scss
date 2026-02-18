@@ -13,7 +13,7 @@ html, body {
 
 /* =========================
    LAYOUT OFFSET (Desktop)
-   On met la classe sur .page-wrapper via JS
+   We will set the class on .page-wrapper via JS script.
 ========================= */
 .page-wrapper.has-fixed-header {
   padding-top: var(--header-height);
@@ -106,20 +106,12 @@ html, body {
   box-shadow: none;
 }
 
-/* ❌ Supprimé: body.has-fixed-header (on n’en veut pas) */
-/*
-body.has-fixed-header {
-  padding-top: var(--header-height);
-}
-*/
-
 /* =========================
    MOBILE (<980px)
 ========================= */
 
 @include breakpoints.down(980) {
 
-  /* Mobile: header toujours fixed (bulletproof) */
   .header {
     position: fixed;
     top: 0;
@@ -136,7 +128,6 @@ body.has-fixed-header {
     box-shadow: 0 10px 30px rgba(0,0,0,.25);
   }
 
-  /* En mobile, on compense tout le temps (header fixed constant) */
   .page-wrapper {
     padding-top: var(--header-height);
   }
@@ -183,16 +174,15 @@ body.has-fixed-header {
     transform: none !important;
   }
 
-  /* IMPORTANT: ne jamais annuler le fixed en mobile */
   .header.is-fixed {
-    position: fixed;       /* ✅ garde fixed */
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
     box-shadow: 0 10px 30px rgba(0,0,0,.25);
   }
 
-  /* Offcanvas panel */
+  /* Off canvas panel */
   .header__nav {
     position: fixed;
     top: var(--header-height);
