@@ -47,3 +47,14 @@ services:
                 puzzle: 'App\Foundation\Captcha\Puzzle\PuzzleCaptchaChallenge'
             $generators:
                 puzzle: 'App\Foundation\Captcha\Puzzle\PuzzleGenerator'
+
+
+    App\Foundation\Security\Contract\TokenGeneratorInterface:
+        alias: App\Foundation\Security\TokenGeneratorService
+
+    App\Foundation\Security\Contract\TokenHasherInterface:
+        alias: App\Foundation\Security\TokenHasher
+
+    App\Foundation\Security\TokenHasher:
+        arguments:
+            $secret: '%kernel.secret%'
