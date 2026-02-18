@@ -39,12 +39,16 @@ final class CaptchaService
         return $generator->generate($key);
     }
 
-    public function verify(string $answer): bool
+    public function verify(string $type, string $answer): bool
     {
         $session = $this->getSession();
-        $type = $session->get(self::SESSION_TYPE);
+        $storedType = $session->get(self::SESSION_TYPE);
 
-        if (!is_string($type) || '' === $type) {
+        if (
+            !is_string($storedType)
+            || '' === $storedType
+            || $storedType !== $type
+        ) {
             return false;
         }
 

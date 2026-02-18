@@ -70,7 +70,7 @@ final class CaptchaServiceTest extends TestCase
 
         $service = new CaptchaService($registry, $stack);
 
-        $this->assertFalse($service->verify('answer'));
+        $this->assertFalse($service->verify(self::CAPTCHA_TEST_TYPE, 'answer'));
     }
 
     public function testVerifyIncrementsTriesOnFailure(): void
@@ -97,7 +97,7 @@ final class CaptchaServiceTest extends TestCase
 
         $service = new CaptchaService($registry, $stack);
 
-        $this->assertFalse($service->verify('bad'));
+        $this->assertFalse($service->verify(self::CAPTCHA_TEST_TYPE, 'bad'));
         $this->assertSame(1, $session->get(self::CAPTCHA_TRIES_SESSION));
     }
 
@@ -125,7 +125,7 @@ final class CaptchaServiceTest extends TestCase
 
         $service = new CaptchaService($registry, $stack);
 
-        $this->assertTrue($service->verify('good'));
+        $this->assertTrue($service->verify(self::CAPTCHA_TEST_TYPE, 'good'));
         $this->assertSame(0, $session->get(self::CAPTCHA_TRIES_SESSION));
     }
 
@@ -144,7 +144,7 @@ final class CaptchaServiceTest extends TestCase
         $service = new CaptchaService($registry, $stack);
 
         $this->expectException(CaptchaLockedException::class);
-        $service->verify('anything');
+        $service->verify(self::CAPTCHA_TEST_TYPE, 'anything');
     }
 
     private function createSession(): Session
