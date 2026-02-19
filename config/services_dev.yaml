@@ -6,3 +6,5 @@ services:
   App\Foundation\Bridge\Resolver\DevAssetResolver:
     arguments:
       $devServerOrigin: 'https://localhost:3000'
+
+  App\Foundation\Captcha\Contract\CaptchaSolutionStoreInterface: '@App\Foundation\Captcha\Store\CacheCaptchaSolutionStore'

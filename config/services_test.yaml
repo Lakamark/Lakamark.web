@@ -4,3 +4,5 @@ services:
 
   App\Foundation\Bridge\Contract\AssetResolverInterface:
     alias: App\Foundation\Bridge\Resolver\NullAssetResolver
+
+  App\Foundation\Captcha\Contract\CaptchaSolutionStoreInterface: '@App\Foundation\Captcha\Store\InMemoryCaptchaSolutionStore'

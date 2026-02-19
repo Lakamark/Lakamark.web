@@ -41,12 +41,23 @@ services:
     App\Foundation\Bridge\Contract\EntryMapperInterface:
         class:  App\Foundation\Bridge\SimpleEntryMapper
 
+    App\Foundation\Captcha\Contract\CaptchaSolutionStoreInterface: '@App\Foundation\Captcha\Store\CacheCaptchaSolutionStore'
+
     App\Foundation\Captcha\CaptchaRegistry:
         arguments:
-            $challenges:
-                puzzle: 'App\Foundation\Captcha\Puzzle\PuzzleCaptchaChallenge'
-            $generators:
-                puzzle: 'App\Foundation\Captcha\Puzzle\PuzzleGenerator'
+            $challenges: !tagged_locator { tag: 'app.captcha.challenge', index_by: 'type' }
+            $generators: !tagged_locator { tag: 'app.captcha.generator', index_by: 'type' }
+
+    App\Foundation\Captcha\Puzzle\PuzzleCaptchaChallenge:
+        tags:
+            - { name: 'app.captcha.challenge', type: 'puzzle' }
+
+    App\Foundation\Captcha\Puzzle\PuzzleGenerator:
+        arguments:
+            $rootImage: '%kernel.project_dir%/public/images/puzzles'
+            $imageCount: 5
+        tags:
+            - { name: 'app.captcha.generator', type: 'puzzle' }
 
 
     App\Foundation\Security\Contract\TokenGeneratorInterface:
