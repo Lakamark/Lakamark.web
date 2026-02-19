@@ -20,22 +20,30 @@ final class CaptchaType extends AbstractType
                 'mapped' => false,
                 'constraints' => [
                     new NotBlank(),
-                    new CaptchaValid(type: $options['captcha_type']),
+                    new CaptchaValid(),
                 ],
             ]);
     }
 
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
-        $view->vars['captcha_url'] = $options['captcha_url'] ?? null;
+        $view->vars['captcha_url'] = $options['captcha_url'];
+        $view->vars['captcha_type'] = $options['captcha_type'];
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'captcha_type' => 'puzzle',
+            'captcha_url' => null,
         ]);
 
         $resolver->addAllowedTypes('captcha_type', ['string']);
+        $resolver->addAllowedTypes('captcha_url', ['null', 'string']);
+    }
+
+    public function getBlockPrefix(): string
+    {
+        return 'captcha';
     }
 }

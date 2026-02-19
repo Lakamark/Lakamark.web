@@ -8,12 +8,12 @@ use Symfony\Component\Validator\Constraint;
 final class CaptchaValid extends Constraint
 {
     public function __construct(
-        public readonly string $type = 'puzzle',
-        public readonly string $message = 'Captcha invalide.',
+        public readonly ?string $type = null,
+        public readonly string $message = 'Captcha invalid.',
         public readonly string $lockedMessage = 'The captcha is locked.',
         ?array $groups = null,
         mixed $payload = null,
     ) {
-        parent::__construct([], $groups, $payload);
+        parent::__construct(groups: $groups, payload: $payload);
     }
 }

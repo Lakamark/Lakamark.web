@@ -3,17 +3,18 @@
 namespace App\Foundation\Captcha;
 
 use App\Foundation\Captcha\Contract\CaptchaRegistryInterface;
+use App\Foundation\Captcha\Contract\CaptchaVerifierInterface;
 use App\Foundation\Captcha\Exception\CaptchaLockedException;
 use App\Foundation\Captcha\Exception\CaptchaRunTimeException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-final class CaptchaService
+final class CaptchaService implements CaptchaVerifierInterface
 {
     private const int LIMIT_TRIES = 3;
     private const string SESSION_CURRENT_KEY = 'CAPTCHA_KEY';
-    private const string SESSION_TYPE = 'CAPTCHA_TYPE';
+    private const string CAPTCHA_SESSION_TYPE = 'CAPTCHA_TYPE';
     private const string SESSION_TRIES = 'CAPTCHA_TRIES';
 
     public function __construct(
@@ -33,22 +34,18 @@ final class CaptchaService
 
         // Store in the session
         $session->set(self::SESSION_CURRENT_KEY, $key);
-        $session->set(self::SESSION_TYPE, $type);
+        $session->set(self::CAPTCHA_SESSION_TYPE, $type);
         $session->set(self::SESSION_TRIES, 0);
 
         return $generator->generate($key);
     }
 
-    public function verify(string $type, string $answer): bool
+    public function verify(?string $type, string $answer): bool
     {
         $session = $this->getSession();
-        $storedType = $session->get(self::SESSION_TYPE);
+        $type ??= $session->get(self::CAPTCHA_SESSION_TYPE);
 
-        if (
-            !is_string($storedType)
-            || '' === $storedType
-            || $storedType !== $type
-        ) {
+        if (!is_string($type) || '' === $type) {
             return false;
         }
 

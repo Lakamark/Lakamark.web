@@ -2,7 +2,7 @@
 
 namespace App\Validator;
 
-use App\Foundation\Captcha\CaptchaService;
+use App\Foundation\Captcha\Contract\CaptchaVerifierInterface;
 use App\Foundation\Captcha\Exception\CaptchaLockedException;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -10,7 +10,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 final class CaptchaValidValidator extends ConstraintValidator
 {
     public function __construct(
-        private readonly CaptchaService $captcha,
+        private readonly CaptchaVerifierInterface $captcha,
     ) {
     }
 
