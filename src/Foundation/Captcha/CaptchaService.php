@@ -40,42 +40,65 @@ final class CaptchaService implements CaptchaVerifierInterface
         return $generator->generate($key);
     }
 
-    public function verify(?string $type, string $answer): bool
+    public function verify(?string $type, string $answer, ?string $challenge = null): bool
     {
         $session = $this->getSession();
-        $type ??= $session->get(self::CAPTCHA_SESSION_TYPE);
 
-        if (!is_string($type) || '' === $type) {
+        $sessionType = $session->get(self::CAPTCHA_SESSION_TYPE);
+        if (!is_string($sessionType) || '' === $sessionType) {
             return false;
         }
 
-        $key = $session->get(self::SESSION_CURRENT_KEY);
-
-        if (!is_string($key) || '' === $key) {
+        // Strict type if the constraint define a type,
+        // Should to match with the session
+        if (null !== $type && $type !== $sessionType) {
             return false;
         }
 
-        // If the user extend the max tries we return an exception.
+        $type = $sessionType;
+
+        $key = $this->getKey();
+        if ('' === $key) {
+            return false;
+        }
+
+        // If the submit form a challenge key,
+        // It should to match with the current session.
+        if (null !== $challenge && !hash_equals($key, $challenge)) {
+            return false;
+        }
+
+        // If the user extends maximum allowed tries.
         $tries = (int) $session->get(self::SESSION_TRIES, 0);
         if ($tries >= self::LIMIT_TRIES) {
             throw new CaptchaLockedException();
         }
 
-        $challenge = $this->registry->challenge($type);
+        $challengeService = $this->registry->challenge($type);
 
-        // If the user answer match with the expected solution.
-        // Reset the count index tries in the session.
-        $valid = $challenge->verify($key, $answer);
+        // Valid the captcha
+        $valid = $challengeService->verify($key, $answer);
         if ($valid) {
             $session->set(self::SESSION_TRIES, 0);
+
+            // To remove the challenge from the session (anti-replay)
+            $session->remove(self::SESSION_CURRENT_KEY);
 
             return true;
         }
 
-        // Increment the tries index
         $session->set(self::SESSION_TRIES, $tries + 1);
 
         return false;
+    }
+
+    public function getKey(): string
+    {
+        $session = $this->getSession();
+
+        $key = $session->get(self::SESSION_CURRENT_KEY);
+
+        return is_string($key) ? $key : '';
     }
 
     private function getSession(): SessionInterface

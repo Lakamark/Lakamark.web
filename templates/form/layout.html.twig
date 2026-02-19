@@ -1,0 +1,15 @@
+{% use "bootstrap_4_layout.html.twig" %}
+{% block puzzle_captcha_widget %}
+    <puzzle-captcha
+            width="{{ form.vars.captcha_width }}"
+            height="{{ form.vars.captcha_height }}"
+            piece-width="{{ form.vars.captcha_piece_width }}"
+            piece-height="{{ form.vars.captcha_piece_height }}"
+            src="{{ form.vars.captcha_src }}"
+    >
+        {{ form_widget(form.challenge) }}
+        {{ form_widget(form.answer) }}
+    </puzzle-captcha>
+    {{ form_help(form) }}
+    {{ form_errors(form) }}
+{% endblock %}
