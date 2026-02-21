@@ -1,0 +1,49 @@
+{%- macro alert(message) -%}
+    {%- if format == 'html' -%}
+    <table>
+        <tr>
+            <td>
+                <table>
+                    <tr>
+                        <td>
+                            {{- message -}}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    {%- else -%}
+        {{- message -}}
+    {%- endif -%}
+{% endmacro %}
+
+{%- macro button(title, url) -%}
+    {%- if format == 'html' -%}
+        <table>
+            <tr>
+                <td>
+                    <a href="{{- url -}}" target="_blank" rel="noopener">
+                        {{- title -}}
+                    </a>
+                </td>
+            </tr>
+        </table>
+    {%- else -%}
+        {{~ title }} : {{ url ~}}
+    {%- endif -%}
+{%- endmacro -%}
+
+{% macro section(content) %}
+    {%- if format == 'html' -%}
+        <table>
+            <tr>
+                <td>
+                    {{- constant | raw -}}
+                </td>
+            </tr>
+        </table>
+    {%- else -%}
+        {{~ content ~}}
+    {%- endif -%}
+{% endmacro %}

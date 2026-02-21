@@ -76,6 +76,18 @@ class WebTestCase extends \Symfony\Bundle\FrameworkBundle\Test\WebTestCase
         return $this->client->getRequest()->getSession();
     }
 
+    /**
+     * To count errors form validation.
+     */
+    public function expectedFormErrors(?int $expectedErrors = null): void
+    {
+        if (null === $expectedErrors) {
+            $this->assertTrue($this->client->getCrawler()->filter('.form-error-message')->count() > 0, 'Form errors mismatched.');
+        } else {
+            $this->assertEquals($expectedErrors, $this->client->getCrawler()->filter('.form-error-message')->count(), 'Form errors mismatched.');
+        }
+    }
+
     private function ensureSessionIsAvailable(): void
     {
         $container = self::getContainer();
