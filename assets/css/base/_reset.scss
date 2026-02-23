@@ -79,6 +79,15 @@ picture {
   display: block;
 }
 
+
+/**
+Forms
+*/
+form {
+  display: block;
+  width: 100%;
+}
+
 /* Form controls inherit typography */
 input,
 button,
@@ -114,4 +123,17 @@ table {
 :focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;
+}
+
+/**
+Fileset
+ */
+fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+
+  legend {
+    vertical-align: baseline;
+  }
 }

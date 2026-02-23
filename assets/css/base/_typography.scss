@@ -77,3 +77,22 @@ $typo: (
     line-height: 28px;
   }
 }
+
+/**
+Text align
+*/
+.t-align-center {
+  text-align: center;
+}
+
+.t-align-left {
+  text-align: left;
+}
+
+.t-align-right {
+  text-align: right;
+}
+
+.t-align-justify {
+  text-align: justify;
+}

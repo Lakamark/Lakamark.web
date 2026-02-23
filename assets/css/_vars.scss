@@ -39,6 +39,7 @@ It is recommended to change the local variables in a specific css file.
   --btn-label-success: #DFFFE5;
   --btn-label-ghost: #000000;
   --card-background-color: #FFFFFF;
+  --hero-background-color: #DCDCDC;
 }
 
 @include mixins.night {
@@ -59,4 +60,5 @@ It is recommended to change the local variables in a specific css file.
   --btn-label-success: #000000;
   --btn-label-ghost: #FFFFFF;
   --card-background-color: #121212;
+  --hero-background-color: #0E0E0E;
 }
