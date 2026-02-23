@@ -3,6 +3,7 @@
 namespace App\Tests;
 
 use App\Domain\Auth\Entity\User;
+use App\Kernel;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\BrowserKit\Cookie;
@@ -74,6 +75,17 @@ class WebTestCase extends \Symfony\Bundle\FrameworkBundle\Test\WebTestCase
         $this->client->request('GET', '/');
 
         return $this->client->getRequest()->getSession();
+    }
+
+    /**
+     * Helper to create a kernel for simulate some actions.
+     */
+    protected static function createKernel(array $options = []): Kernel
+    {
+        $env = $options['environment'] ?? 'test';
+        $debug = $options['debug'] ?? true;
+
+        return new Kernel($env, $debug);
     }
 
     /**
