@@ -1,4 +1,5 @@
 import './css/app.scss';
+import './elements/index.js'
 
 import * as Turbo from "@hotwired/turbo"
 import {HeaderUI} from "./lib/HeaderUI.js";

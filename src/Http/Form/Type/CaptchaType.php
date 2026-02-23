@@ -46,6 +46,7 @@ abstract class CaptchaType extends AbstractType
     {
         $resolver->setDefaults([
             'mapped' => false,
+            'label' => false, // To hide the default label (captcha)
         ]);
         parent::configureOptions($resolver);
     }

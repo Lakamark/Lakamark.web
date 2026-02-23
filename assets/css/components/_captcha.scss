@@ -1,0 +1,28 @@
+.captcha {
+  position: relative;
+  margin: 0 auto;
+  width: var(--width);
+  height: var(--height);
+  border: 1px solid var(--border-color);
+  background: var(--image);
+  touch-action: none;
+}
+
+.captcha__piece {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--piece-width);
+  height: var(--piece-height);
+  background: var(--image) top right;
+  border: 1px solid #000;
+  transition: opacity .3s;
+}
+
+.is-moving {
+  border-color: var(--accent-color);
+}
+
+.captcha:not(.captcha-waiting-interaction) .captcha__piece:not(.is-moving) {
+  opacity: .3;
+}
