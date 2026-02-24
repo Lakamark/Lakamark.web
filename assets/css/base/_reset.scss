@@ -94,6 +94,11 @@ button,
 textarea,
 select {
   font: inherit;
+
+  // Disabled the ugly default outline.
+  &:focus {
+    outline: none;
+  }
 }
 
 /* Button baseline (keep accessibility) */

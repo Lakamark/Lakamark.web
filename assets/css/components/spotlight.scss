@@ -1,0 +1,69 @@
+@use "../tools/functions";
+
+.spotlight {
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgb(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spotlight.active {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity .3s;
+}
+
+.spotlight__bar {
+  position: relative;
+  width: 350px;
+  background-color: var(--card-background-color);
+  border-radius: var(--radius-xs);
+  padding: 5px;
+}
+
+.spotlight__bar input {
+  width: 100%;
+  padding: 10px;
+  border-radius: var(--radius-xs);
+  border: 2px solid var(--border-color);
+  background-color: var(--card-background-color);
+  color: var(--text-muted-color);
+
+  &:focus {
+    border-color: var(--accent-color);
+  }
+}
+
+.spotlight__suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--card-background-color);
+  margin: -5px 0 0 0;
+  padding: 5px 15px;
+  border-bottom-left-radius: var(--radius-xs);
+  border-bottom-right-radius: var(--radius-xs);
+}
+
+.spotlight__suggestions a {
+  display: block;
+  padding: 10px 15px;
+}
+
+.spotlight__suggestions li.active a,
+.spotlight__suggestions a:hover {
+  border-radius: var(--radius-xs);
+  background-color: functions.adjustLightness(#595959, -20%);
+}
+
+.spotlight__suggestions mark {
+  background-color: var(--accent-color);
+}
