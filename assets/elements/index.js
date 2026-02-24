@@ -1,11 +1,12 @@
 /**
- * Initialize web comments for the application.
+ * Registers web components intended for the public-facing application only.
  *
- * After you can juste to import this file in your main script.
+ * These components are not used in the dashboard.
  *
- * @example : import './elements/index.js'
+ * Import this file in the public entry point.
  *
- * After that, you have access to web components.
+ * @example
+ * import './elements/index.js';
  */
 import PuzzleCaptcha from "./PuzzleCaptcha.js";
 import Spotlight from "./SpotlightElement/Spotlight.js";
