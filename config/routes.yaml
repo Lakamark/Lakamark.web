@@ -15,7 +15,7 @@ controllers:
 
 dashboard_controllers:
     name_prefix: dashboard_
-    prefix: '%$dashboard_prefix%'
+    prefix: '%dashboard_prefix%'
     resource:
         path: '../src/Http/Dashboard/Controller/'
         namespace: App\Http\Dashboard\Controller
