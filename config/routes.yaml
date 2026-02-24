@@ -13,3 +13,10 @@ controllers:
         namespace: App\Http\Controller
     type: attribute
 
+dashboard_controllers:
+    name_prefix: dashboard_
+    prefix: '%$dashboard_prefix%'
+    resource:
+        path: '../src/Http/Dashboard/Controller/'
+        namespace: App\Http\Dashboard\Controller
+    type: attribute
