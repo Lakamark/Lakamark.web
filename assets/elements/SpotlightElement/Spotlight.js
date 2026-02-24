@@ -1,6 +1,6 @@
 import SpotlightItem from "./SpotlightItem.js";
-import {clearAllBodyScrollLocks, disableBodyScroll, enableBodyScroll} from "body-scroll-lock";
 import {debounce} from "../../helpers/Timer.js";
+import ScrollTrigger from "../../lib/ScrollTrigger.js";
 
 /**
  * Spotlight
@@ -10,6 +10,7 @@ import {debounce} from "../../helpers/Timer.js";
  * @property {SpotlightItem[]} items
  * @property {SpotlightItem[]} matchedItems
  * @property {SpotlightItem} activeItem
+ * @property {boolean} isOpen
  */
 export default class Spotlight extends HTMLElement {
 
@@ -25,9 +26,13 @@ export default class Spotlight extends HTMLElement {
     constructor() {
         super();
         this.shortcutHandler = this.shortcutHandler.bind(this)
+        this.open = this.open.bind(this)
         this.hide = this.hide.bind(this)
         this.onInput = this.onInput.bind(this)
         this.inputShortcutHandler = this.inputShortcutHandler.bind(this)
+
+        this.isOpen = false;
+        this.triggerScroll = new ScrollTrigger('is-scroll-locked')
     }
 
     connectedCallback() {
@@ -38,6 +43,7 @@ export default class Spotlight extends HTMLElement {
             <ul class="spotlight__suggestions">
             </ul>
         </div>`
+
 
         // Select the input
         this.input = this.querySelector('input');
@@ -69,7 +75,6 @@ export default class Spotlight extends HTMLElement {
 
     disconnectedCallback() {
         window.removeEventListener('keydown', this.shortcutHandler)
-        clearAllBodyScrollLocks()
     }
 
     /**
@@ -80,18 +85,29 @@ export default class Spotlight extends HTMLElement {
     shortcutHandler(e) {
         if (e.key === 'k' && e.ctrlKey === true) {
             e.preventDefault()
-            this.classList.add('active')
-            this.input.focus();
-            disableBodyScroll(this)
+            this.isOpen ? this.hide() : this.open()
         }
+    }
+
+    open() {
+        if (this.isOpen) return;
+
+        this.isOpen = true;
+        this.classList.add('active')
+        this.input.focus()
+
+        this.triggerScroll.disable();
     }
 
     /**
      * Remove the active class
      */
     hide() {
+        if (!this.isOpen) return;
+
+        this.isOpen = false
         this.classList.remove('active')
-        enableBodyScroll(this)
+        this.triggerScroll.enable();
     }
 
     /**

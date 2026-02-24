@@ -1,3 +1,8 @@
+html.is-scroll-locked,
+body.is-scroll-locked {
+  overflow: hidden !important;
+}
+
 body {
   background-color: var(--background-page-color);
   color: var(--text-color);
