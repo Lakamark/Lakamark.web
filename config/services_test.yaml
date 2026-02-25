@@ -6,3 +6,6 @@ services:
     alias: App\Foundation\Bridge\Resolver\NullAssetResolver
 
   App\Foundation\Captcha\Contract\CaptchaSolutionStoreInterface: '@App\Foundation\Captcha\Store\InMemoryCaptchaSolutionStore'
+
+  App\Domain\Subscription\Service\SubscriptionService:
+    public: true

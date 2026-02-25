@@ -3,9 +3,9 @@
 namespace App\Tests;
 
 /**
- * @template E
+ * @template E of object
  */
-class RepositoryTestCase extends KernelTestCase
+abstract class RepositoryTestCase extends KernelTestCase
 {
     /**
      * @var E
