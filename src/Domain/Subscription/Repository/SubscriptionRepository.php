@@ -41,4 +41,10 @@ class SubscriptionRepository extends AbstractRepository
 
         return $count > 0;
     }
+
+    public function save(Subscription $subscription): void
+    {
+        $this->getEntityManager()->persist($subscription);
+        $this->getEntityManager()->flush();
+    }
 }
