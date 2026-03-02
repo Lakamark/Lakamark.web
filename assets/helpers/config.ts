@@ -1,4 +1,4 @@
-import {isThemeName } from "../lib/theme";
+import {isThemeName } from "../types/theme_types";
 import {LmkConfig} from "../types/global";
 
 const DEFAULT_CONFIG  = Object.freeze({
@@ -29,4 +29,8 @@ export function getLmkConfigSafe(): Readonly<LmkConfig> {
         });
 
     return cachedConfig;
+}
+
+export function resetLmkConfigCache(): void {
+    cachedConfig = null;
 }

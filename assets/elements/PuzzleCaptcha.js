@@ -1,4 +1,4 @@
-import {clamp, randomNumberBetween} from "../helpers/Maths.js";
+import {clamp, randomNumberBetween} from "../helpers/Maths.ts";
 
 export default class PuzzleCaptcha  extends HTMLElement {
 

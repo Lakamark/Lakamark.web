@@ -9,7 +9,7 @@
     "allowJs": true,
     "checkJs": false,
     "noEmit": true,
-    "types": ["vite/client"]
+    "types": ["vite/client"],
   },
   "include": ["assets"]
 }
