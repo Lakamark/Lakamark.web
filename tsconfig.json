@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": false,
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true,
+    "types": ["vite/client"]
+  },
+  "include": ["assets"]
+}
