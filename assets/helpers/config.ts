@@ -1,33 +1,69 @@
-import {isThemeName } from "../types/theme_types";
-import {LmkConfig} from "../types/global";
+import type { LmkConfig } from "../types/global";
+import { isThemeName } from "../ui/theme/isThemeName";
 
-const DEFAULT_CONFIG  = Object.freeze({
+const DEFAULT_CONFIG: Readonly<LmkConfig> = Object.freeze({
     userId: null,
     roles: [],
     isPremium: false,
     isLogged: false,
-    preferredTheme: null
-})
+    preferredTheme: null,
+});
 
 let cachedConfig: Readonly<LmkConfig> | null = null;
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null;
+}
+
+function readConfigPayloadFromDom(): unknown {
+    const el = document.getElementById("lmk-config");
+    if (!el) return null;
+
+    const json = el.textContent?.trim();
+    if (!json) return null;
+
+    try {
+        return JSON.parse(json);
+    } catch {
+        return null;
+    }
+}
+
+function decodeLmkConfig(raw: unknown): LmkConfig | null {
+    if (!isRecord(raw)) return null;
+
+    const userId = typeof raw.userId === "number" ? raw.userId : null;
+    const roles = Array.isArray(raw.roles)
+        ? raw.roles.map(String)
+        : [];
+    const isPremium = Boolean(raw.isPremium);
+    const isLogged = Boolean(raw.isLogged);
+    const preferredTheme = isThemeName(raw.preferredTheme)
+        ? raw.preferredTheme
+        : null;
+    return {
+        userId,
+        roles,
+        isPremium,
+        isLogged,
+        preferredTheme
+    };
+}
+
 export function getLmkConfigSafe(): Readonly<LmkConfig> {
-    if (cachedConfig) return cachedConfig;
+    // Read from the cach the config.
+    if (cachedConfig) {
+        return cachedConfig;
+    }
 
-    const c = window.LmkConfig;
+    const decoded = decodeLmkConfig(readConfigPayloadFromDom());
+    if (!decoded) {
+        // return the default config,
+        // if we can decod the JSON
+        return DEFAULT_CONFIG;
+    }
 
-    cachedConfig = !c || typeof c !== "object"
-        ? DEFAULT_CONFIG
-        : Object.freeze({
-            userId: typeof c.userId === "number" ? c.userId : null,
-            roles: Array.isArray(c.roles) ? c.roles.map(String) : [],
-            isPremium: Boolean(c.isPremium),
-            isLogged: Boolean(c.isLogged),
-            preferredTheme: isThemeName(c.preferredTheme)
-                ? c.preferredTheme
-                : null,
-        });
-
+    cachedConfig = Object.freeze(decoded);
     return cachedConfig;
 }
 

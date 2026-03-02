@@ -3,9 +3,12 @@ import './elements/index.js'
 
 import * as Turbo from "@hotwired/turbo"
 import {HeaderUI} from "./lib/HeaderUI.js";
+import {ThemeSwitcher} from "./elements/ThemeSwitcher.ts";
+import {getLmkConfigSafe, resetLmkConfigCache} from "./helpers/config.ts";
 
 
 let headerInstance = null;
+let theme = null;
 
 /**
  * Re-init header after every Turbo visit
@@ -25,14 +28,33 @@ function destroyHeader() {
 
 document.addEventListener('turbo:load', () => {
     // If window.LmkConfig can change between pages, do this first:
+    resetLmkConfigCache();
+
     initHeader()
+
+    theme?.destroy();
+    theme = new ThemeSwitcher({
+        toggleSelector: ".theme-toggle",
+        defaultTheme: "night-theme",
+        storageKey: "lakamark.theme",
+        getInitialTheme: () => getLmkConfigSafe().preferredTheme,
+        eventType: "click",
+        usePointerEvents: false,
+        useViewTransition: true,
+        disabledSelector: "modal.is-open"
+    }).init();
 
 
 
 });
 document.addEventListener('turbo:before-cache', () => {
     destroyHeader()
-    // reset the lmk config
+
+    // delete the ThemeSwitcher Instance
+    theme?.destroy();
+    theme = null;
+
+    resetLmkConfigCache();
 });
 
 // start Turbo

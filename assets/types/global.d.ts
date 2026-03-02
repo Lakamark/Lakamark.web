@@ -7,9 +7,3 @@ export interface LmkConfig {
     isLogged: boolean;
     preferredTheme: string | null;
 }
-
-declare global {
-    interface Window {
-        LmkConfig?: LmkConfig;
-    }
-}
