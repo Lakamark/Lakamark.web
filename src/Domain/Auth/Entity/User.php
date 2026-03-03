@@ -72,6 +72,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Content::class, mappedBy: 'author', orphanRemoval: false)]
     private Collection $contents;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['default' => null])]
+    private ?string $preferredTheme = null;
+
     public function __construct()
     {
         $this->contents = new ArrayCollection();
@@ -268,6 +271,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->contents->add($content);
             $content->setAuthor($this);
         }
+
+        return $this;
+    }
+
+    public function getPreferredTheme(): ?string
+    {
+        return $this->preferredTheme;
+    }
+
+    public function setPreferredTheme(?string $preferredTheme): static
+    {
+        $this->preferredTheme = $preferredTheme;
 
         return $this;
     }
