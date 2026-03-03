@@ -15,14 +15,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
-use Symfony\Component\VarDumper\Cloner\Stub;
 
 class AuthenticatorTest extends TestCase
 {
     private UserRepository|MockObject $userRepository;
-
-    private Stub|EventDispatcherInterface $dispatcher;
-
     private Authenticator $authenticator;
 
     protected function setUp(): void
@@ -46,7 +42,6 @@ class AuthenticatorTest extends TestCase
         $this->authenticator = new Authenticator(
             $this->userRepository,
             $urlGenerator,
-            $this->dispatcher,
             $this->createStub(UrlMatcherInterface::class)
         );
     }
@@ -54,7 +49,7 @@ class AuthenticatorTest extends TestCase
     public function testAuthenticateHasRightParameters(): void
     {
         // Prepare the request and set a fake session
-        $request = new Request([], ['_username' => 'johndo@lakamark.com']);
+        $request = new Request([], ['username' => 'johndo@lakamark.com']);
         $request->setSession(new Session(new MockArraySessionStorage()));
 
         // Prepare the SQL request to find a user in the DB

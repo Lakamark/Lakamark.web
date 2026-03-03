@@ -22,7 +22,8 @@ readonly class LoginAttemptsUserChecker implements UserCheckerInterface
         }
 
         // Check if user has to many failed tries.
-        if ($this->loginAttemptsService->hasTooManyAttempts($user)) {
+        $tooMany = $this->loginAttemptsService->hasTooManyAttempts($user);
+        if (true === $tooMany) {
             throw new TooManyAttemptsException();
         }
     }

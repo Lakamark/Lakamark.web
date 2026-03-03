@@ -3,9 +3,10 @@
 namespace App\Domain\Auth\Subscriber;
 
 use App\Domain\Auth\Entity\User;
-use App\Domain\Auth\Event\BadPasswordLoginEvent;
 use App\Domain\Auth\Service\LoginAttemptsService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
 readonly class LoginSubscriber implements EventSubscriberInterface
@@ -21,7 +22,7 @@ readonly class LoginSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            BadPasswordLoginEvent::class => 'onLoginFailure',
+            LoginFailureEvent::class => 'onLoginFailure',
             LoginSuccessEvent::class => 'onLoginSuccess',
         ];
     }
@@ -29,9 +30,24 @@ readonly class LoginSubscriber implements EventSubscriberInterface
     /**
      * We increment the attempt login.
      */
-    public function onLoginFailure(BadPasswordLoginEvent $event): void
+    public function onLoginFailure(LoginFailureEvent $event): void
     {
-        $this->loginAttemptsService->increment($event->getUser());
+        // Only count wrong passwords (not CSRF, not user locked, etc.)
+        if (!$event->getException() instanceof BadCredentialsException) {
+            return;
+        }
+
+        $passport = $event->getPassport();
+        if (null === $passport) {
+            return;
+        }
+
+        $user = $passport->getUser();
+        if (!$user instanceof User) {
+            return;
+        }
+
+        $this->loginAttemptsService->increment($user);
     }
 
     /**

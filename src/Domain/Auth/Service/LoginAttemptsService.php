@@ -62,6 +62,8 @@ class LoginAttemptsService
      * for the current user.
      * We compare the current attempts for a specific user with the const
      * MAX_LOGIN_ATTEMPTS defined in this service.
+     *
+     * @throws \DateMalformedStringException
      */
     public function hasTooManyAttempts(User $user): bool
     {

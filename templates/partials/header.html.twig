@@ -16,8 +16,20 @@
             <li><a href="#" title="You need help for your project?">Contact</a></li>
         </ul>
         <ul class="header__nav__right">
-            <li><a href="{{ path('app_login') }}" title="Login to your account">Login</a></li>
-            <li><a href="{{ path('app_register') }}" title="No account? Create you account.">Signup</a></li>
+           {% if app.user %}
+               <li><a href="#">Hello {{ app.user.username }}</a></li>
+               <li>
+                    <form method="post" action="{{ path('app_logout') }}" style="display:inline;">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                        <button type="submit" class="btn btn-link">
+                            Logout
+                        </button>
+                    </form>
+               </li>
+            {% else %}
+                <li><a href="{{ path('app_login') }}" title="Login to your account">Login</a></li>
+                <li><a href="{{ path('app_register') }}" title="No account? Create you account.">Signup</a></li>
+            {% endif %}
         </ul>
     </nav>
 </header>

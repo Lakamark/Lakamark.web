@@ -36,13 +36,15 @@ class UserRepository extends AbstractRepository implements PasswordUpgraderInter
     /**
      * Find a User identifier from his username or his email.
      */
-    public function findByUsernameIdentifier(string $username): ?User
+    public function findByUsernameIdentifier(string $identifier): ?User
     {
+        $identifier = mb_strtolower(trim($identifier));
+
         return $this->createQueryBuilder('u')
-            ->where('LOWER(u.username) = :username')
-            ->orWhere('LOWER(u.email) = :username')
+            ->where('LOWER(u.username) = :id')
+            ->orWhere('LOWER(u.email) = :id')
             ->setMaxResults(1)
-            ->setParameter('username', mb_strtolower($username))
+            ->setParameter('id', $identifier)
             ->getQuery()
             ->getOneOrNullResult();
     }

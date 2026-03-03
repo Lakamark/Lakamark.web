@@ -2,6 +2,8 @@
 
 namespace App\Http\Controller;
 
+use App\Http\Form\LoginFormType;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -11,18 +13,26 @@ class SecurityController extends AbstractController
 {
     use TargetPathTrait;
 
-    #[Route(path: '/login', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils): Response
-    {
-        // get the login error if there is one
-        $error = $authenticationUtils->getLastAuthenticationError();
+    #[Route(path: '/login', name: 'app_login', methods: ['GET', 'POST'])]
+    public function login(
+        Request $request,
+        AuthenticationUtils $authenticationUtils,
+    ): Response {
+        if ($this->getUser()) {
+            return $this->redirectToRoute('home');
+        }
 
-        // last username entered by the user
-        $lastUsername = $authenticationUtils->getLastUsername();
+        $form = $this->createForm(LoginFormType::class, [
+            'username' => $authenticationUtils->getLastUsername(),
+        ], [
+            'attr' => ['data-turbo' => 'false'],
+        ]);
+
+        $form->handleRequest($request);
 
         return $this->render('security/login.html.twig', [
-            'last_username' => $lastUsername,
-            'error' => $error,
+            'form' => $form,
+            'error' => $authenticationUtils->getLastAuthenticationError(),
         ]);
     }
 
