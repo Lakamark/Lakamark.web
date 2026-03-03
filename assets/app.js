@@ -4,7 +4,7 @@ import './elements/index.js'
 import * as Turbo from "@hotwired/turbo"
 import {HeaderUI} from "./lib/HeaderUI.js";
 import {ThemeSwitcher} from "./elements/ThemeSwitcher.ts";
-import {getLmkConfigSafe, resetLmkConfigCache} from "./helpers/config.ts";
+import {getLmkConfigSafe, resetLmkConfigCache} from "./helpers/config";
 
 
 let headerInstance = null;
