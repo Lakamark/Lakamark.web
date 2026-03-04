@@ -28,9 +28,13 @@ class TokenRequestRepository extends AbstractRepository implements TokenRequestR
         }
     }
 
-    public function findOneByTokenHashAndType(string $tokenHash, TokenRequestType $type): ?TokenRequest
-    {
+    public function findByTokenHashAndType(
+        string $tokenHash,
+        TokenRequestType $type,
+    ): ?TokenRequest {
         return $this->createQueryBuilder('tr')
+            ->addSelect('u')
+            ->leftJoin('tr.user', 'u')
             ->andWhere('tr.tokenHash = :hash')
             ->andWhere('tr.type = :type')
             ->setParameter('hash', $tokenHash)
@@ -39,13 +43,47 @@ class TokenRequestRepository extends AbstractRepository implements TokenRequestR
             ->getOneOrNullResult();
     }
 
-    public function revokeActiveForUserAndType(int $userId, TokenRequestType $type, \DateTimeImmutable $now): int
-    {
-        // mark all active (not consumed + not expired) as consumed now
-        return $this->getEntityManager()->createQueryBuilder()
+    public function findConsumableByTokenHashAndType(
+        string $tokenHash,
+        TokenRequestType $type,
+        \DateTimeImmutable $now,
+    ): ?TokenRequest {
+        return $this->createQueryBuilder('tr')
+            ->addSelect('u')
+            ->leftJoin('tr.user', 'u')
+            ->andWhere('tr.tokenHash = :hash')
+            ->andWhere('tr.type = :type')
+            ->andWhere('tr.consumedAt IS NULL')
+            ->andWhere('tr.expiresAt > :now')
+            ->setParameter('hash', $tokenHash)
+            ->setParameter('type', $type)
+            ->setParameter('now', $now)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * Revoke all consumable tokens for a given user and token type.
+     *
+     * A consumable token is defined as:
+     *  - not consumed
+     *  - not expired
+     *
+     * This method is mainly used when issuing a new token
+     * to ensure that only one active token exists per user/type.
+     *
+     * Returns the number of affected rows.
+     */
+    public function revokeConsumableForUserAndType(
+        int $userId,
+        TokenRequestType $type,
+        \DateTimeImmutable $now,
+    ): int {
+        // mark all consumable tokens (not consumed + not expired) as consumed now
+        return $this->createQueryBuilder('tr')
             ->update(TokenRequest::class, 'tr')
             ->set('tr.consumedAt', ':now')
-            ->where('tr.user = :userId')
+            ->andWhere('IDENTITY(tr.user) = :userId')
             ->andWhere('tr.type = :type')
             ->andWhere('tr.consumedAt IS NULL')
             ->andWhere('tr.expiresAt > :now')

@@ -2,181 +2,249 @@
 
 namespace App\Tests\Domain\Auth\Service;
 
+use App\Domain\Auth\Contract\TokenRequestRepositoryInterface;
 use App\Domain\Auth\Entity\TokenRequest;
 use App\Domain\Auth\Entity\User;
 use App\Domain\Auth\Enum\TokenRequestType;
 use App\Domain\Auth\Exception\InvalidTokenException;
-use App\Domain\Auth\Repository\TokenRequestRepository;
 use App\Domain\Auth\Service\TokenRequestService;
 use App\Foundation\Security\GeneratedTokenDTO;
-use App\Foundation\Security\TokenHasher;
 use App\Foundation\Security\TokenIssuer;
-use PHPUnit\Framework\TestCase;
+use App\Tests\FixturesLoaderTrait;
+use App\Tests\KernelTestCase;
+use Doctrine\ORM\Exception\ORMException;
 use Random\RandomException;
 
-class TokenRequestServiceTest extends TestCase
+class TokenRequestServiceTest extends KernelTestCase
 {
+    use FixturesLoaderTrait;
+
     /**
-     * @throws \DateMalformedStringException
      * @throws RandomException
      */
-    public function testIssueCreatesTokenAndReturnsRawToken(): void
+    public function testIssueCreatesTokenRequestAndReturnsIssuedDto(): void
     {
-        $repository = $this->createMock(TokenRequestRepository::class);
-        $tokenHasher = $this->createStub(TokenHasher::class);
-        $tokenIssuer = $this->createMock(TokenIssuer::class);
+        $this->loadFixtures(['users']);
 
-        $generatedToken = new GeneratedTokenDTO(
+        $user = $this->em->getRepository(User::class)->findOneBy([]);
+        $this->assertInstanceOf(User::class, $user);
+        $userId = $user->getId();
+
+        $now = new \DateTimeImmutable('2026-03-03 12:00:00');
+
+        $repo = self::getContainer()->get(TokenRequestRepositoryInterface::class);
+
+        // Mock issuer
+        $issuer = $this->createMock(TokenIssuer::class);
+        $generated = new GeneratedTokenDTO(
             token: 'raw_token',
-            hash: 'hash-from-hasher'
+            hash: str_repeat('a', 64),
         );
 
-        $tokenIssuer
-            ->expects($this->once())
+        $issuer->expects($this->once())
             ->method('issue')
-            ->willReturn($generatedToken);
+            ->willReturn($generated);
 
-        $repository
-            ->expects($this->once())
-            ->method('consumeActiveForUserAndType');
+        $service = new TokenRequestService($repo, $issuer);
 
-        $repository
-            ->expects($this->once())
-            ->method('save')
-            ->with($this->isInstanceOf(TokenRequest::class), true);
-
-        $service = new TokenRequestService($repository, $tokenIssuer, $tokenHasher);
-
-        $user = $this->createStub(User::class);
-
-        $now = new \DateTimeImmutable('2026-03-03 12:00:00');
-
+        // ACT
         $result = $service->issue($user, TokenRequestType::EMAIL_CONFIRMATION, $now);
 
-        $this->assertSame('raw_token', $result->token);
-        $this->assertSame($generatedToken->hash, $result->hash);
+        $hash = $result->issued->hash;
+
+        // Assert return (values only)
+        $this->assertSame('raw_token', $result->issued->token);
+        $this->assertSame(str_repeat('a', 64), $result->issued->hash);
+
+        // Assert DB (ALWAYS use result->issued->hash)
+        $this->em->clear();
+
+        $saved = $this->em->getRepository(TokenRequest::class)->findOneBy([
+            'tokenHash' => $result->issued->hash,
+            'type' => TokenRequestType::EMAIL_CONFIRMATION,
+        ]);
+
+        $this->assertNotNull($saved);
+        $this->assertSame($userId, $saved->getUser()->getId());
+        $this->assertSame($hash, $saved->getTokenHash());
+        $this->assertEquals($now, $saved->getCreatedAt());
     }
 
-    public function testConsumeValidToken(): void
+    /**
+     * @throws \DateMalformedStringException
+     * @throws ORMException
+     */
+    public function testConsumeValidTokenMarksConsumedAndPersists(): void
     {
-        $repository = $this->createMock(TokenRequestRepository::class);
-        $user = $this->createStub(User::class);
-        $tokenIssuer = $this->createStub(TokenIssuer::class); // pas utilisé ici
-        $tokenHasher = $this->createMock(TokenHasher::class);
+        $this->loadFixtures(['users']);
+        $user = $this->em->getRepository(User::class)->findOneBy([]);
 
-        $request = (new TokenRequest())
-            ->setUser($user)
-            ->setType(TokenRequestType::EMAIL_CONFIRMATION)
-            ->setTokenHash('hash')
-            ->setExpiresAt(new \DateTimeImmutable('+1 hour'))
-            ->setCreatedAt(new \DateTimeImmutable());
+        $repo = self::getContainer()->get(TokenRequestRepositoryInterface::class);
+        $issuer = $this->createStub(TokenIssuer::class);
 
-        $tokenHasher
-            ->expects($this->once())
-            ->method('hash')
-            ->with('raw')
-            ->willReturn('hash');
-
-        $repository
-            ->expects($this->once())
-            ->method('findOneByTokenHashAndType')
-            ->with('hash', TokenRequestType::EMAIL_CONFIRMATION)
-            ->willReturn($request);
-
-        $repository
-            ->expects($this->once())
-            ->method('save')
-            ->with($request, true);
-
-        $service = new TokenRequestService($repository, $tokenIssuer, $tokenHasher, 3600);
-
-        $result = $service->consume('raw', TokenRequestType::EMAIL_CONFIRMATION, new \DateTimeImmutable());
-
-        $this->assertTrue($result->isConsumed());
-        $this->assertNotNull($result->getConsumedAt());
-    }
-
-    public function testConsumeExpiredTokenThrows(): void
-    {
-        $repository = $this->createMock(TokenRequestRepository::class);
-        $user = $this->createStub(User::class);
-        $tokenIssuer = $this->createStub(TokenIssuer::class); // pas utilisé
-        $tokenHasher = $this->createMock(TokenHasher::class);
+        $service = new TokenRequestService($repo, $issuer);
 
         $now = new \DateTimeImmutable('2026-03-03 12:00:00');
+        $hash = str_repeat('b', 64);
+
+        // Arrange: create a consumable token request in DB
+        $request = (new TokenRequest())
+            ->setUser($user)
+            ->setType(TokenRequestType::EMAIL_CONFIRMATION)
+            ->setTokenHash($hash)
+            ->setCreatedAt($now->modify('-10 minutes'))
+            ->setExpiresAt($now->modify('+1 hour'));
+
+        $this->em->persist($request);
+        $this->em->flush();
+        $this->em->clear();
+
+        $consumed = $service->consume($hash, TokenRequestType::EMAIL_CONFIRMATION, $now);
+
+        $this->assertTrue($consumed->isConsumed());
+        $this->assertEquals($now, $consumed->getConsumedAt());
+
+        $this->em->clear();
+
+        $saved = $this->em->getRepository(TokenRequest::class)->findOneBy([
+            'tokenHash' => $hash,
+            'type' => TokenRequestType::EMAIL_CONFIRMATION,
+        ]);
+
+        $this->assertNotNull($saved);
+        $this->assertTrue($saved->isConsumed());
+        $this->assertEquals($now, $saved->getConsumedAt());
+    }
+
+    /**
+     * @throws \DateMalformedStringException
+     * @throws ORMException
+     */
+    public function testConsumeExpiredTokenThrows(): void
+    {
+        $this->loadFixtures(['users']);
+
+        $user = $this->em->getRepository(User::class)->findOneBy([]);
+        $this->assertInstanceOf(User::class, $user);
+
+        $repo = self::getContainer()->get(TokenRequestRepositoryInterface::class);
+        $issuer = $this->createStub(TokenIssuer::class);
+
+        $service = new TokenRequestService($repo, $issuer);
+
+        $now = new \DateTimeImmutable('2026-03-03 12:00:00');
+        $hash = str_repeat('c', 64);
 
         $request = (new TokenRequest())
             ->setUser($user)
             ->setType(TokenRequestType::EMAIL_CONFIRMATION)
-            ->setTokenHash('hash')
-            ->setExpiresAt($now->modify('-1 second')) // expiré
-            ->setCreatedAt($now->modify('-2 hours'));
+            ->setTokenHash($hash)
+            ->setCreatedAt($now->modify('-2 hours'))
+            ->setExpiresAt($now->modify('-1 minute')); // expired
 
-        $tokenHasher
-            ->expects($this->once())
-            ->method('hash')
-            ->with('raw')
-            ->willReturn('hash');
-
-        $repository
-            ->expects($this->once())
-            ->method('findOneByTokenHashAndType')
-            ->with('hash', TokenRequestType::EMAIL_CONFIRMATION)
-            ->willReturn($request);
-
-        $repository
-            ->expects($this->never())
-            ->method('save');
-
-        $service = new TokenRequestService($repository, $tokenIssuer, $tokenHasher, 3600);
+        $this->em->persist($request);
+        $this->em->flush();
+        $this->em->clear();
 
         $this->expectException(InvalidTokenException::class);
         $this->expectExceptionMessage('Invalid token.');
 
-        $service->consume('raw', TokenRequestType::EMAIL_CONFIRMATION, $now);
+        $service->consume($hash, TokenRequestType::EMAIL_CONFIRMATION, $now);
     }
 
     /**
      * @throws \DateMalformedStringException
+     * @throws ORMException
      */
     public function testConsumeAlreadyConsumedTokenThrows(): void
     {
-        $repository = $this->createMock(TokenRequestRepository::class);
-        $user = $this->createStub(User::class);
-        $tokenIssuer = $this->createStub(TokenIssuer::class); // pas utilisé
-        $tokenHasher = $this->createMock(TokenHasher::class);
+        $this->loadFixtures(['users']);
+
+        $user = $this->em->getRepository(User::class)->findOneBy([]);
+        $this->assertInstanceOf(User::class, $user);
+
+        $repo = self::getContainer()->get(TokenRequestRepositoryInterface::class);
+        $issuer = $this->createStub(TokenIssuer::class);
+
+        $service = new TokenRequestService($repo, $issuer);
 
         $now = new \DateTimeImmutable('2026-03-03 12:00:00');
+        $hash = str_repeat('d', 64);
 
         $request = (new TokenRequest())
             ->setUser($user)
             ->setType(TokenRequestType::EMAIL_CONFIRMATION)
-            ->setTokenHash('hash')
+            ->setTokenHash($hash)
+            ->setCreatedAt($now->modify('-10 minutes'))
             ->setExpiresAt($now->modify('+1 hour'))
-            ->setCreatedAt($now->modify('-2 hours'))
-            ->setConsumedAt(new \DateTimeImmutable('-1 minute')); // déjà consommé
+            ->setConsumedAt($now->modify('-1 minute')); // already consumed
 
-        $tokenHasher
-            ->expects($this->once())
-            ->method('hash')
-            ->with('raw')
-            ->willReturn('hash');
-
-        $repository
-            ->expects($this->once())
-            ->method('findOneByTokenHashAndType')
-            ->with('hash', TokenRequestType::EMAIL_CONFIRMATION)
-            ->willReturn($request);
-
-        $repository
-            ->expects($this->never())
-            ->method('save');
-
-        $service = new TokenRequestService($repository, $tokenIssuer, $tokenHasher, 3600);
+        $this->em->persist($request);
+        $this->em->flush();
+        $this->em->clear();
 
         $this->expectException(InvalidTokenException::class);
         $this->expectExceptionMessage('Invalid token.');
 
-        $service->consume('raw', TokenRequestType::EMAIL_CONFIRMATION, $now);
+        $service->consume($hash, TokenRequestType::EMAIL_CONFIRMATION, $now);
+    }
+
+    /**
+     * @throws RandomException
+     * @throws \DateMalformedStringException
+     */
+    public function testIssueRevokesPreviousActiveToken(): void
+    {
+        $this->loadFixtures(['users']);
+
+        $user = $this->em->getRepository(User::class)->findOneBy([]);
+        $this->assertInstanceOf(User::class, $user);
+        $userId = $user->getId();
+
+        $repo = self::getContainer()->get(TokenRequestRepositoryInterface::class);
+
+        $issuer = $this->createStub(TokenIssuer::class);
+        $issuer->method('issue')->willReturnOnConsecutiveCalls(
+            new GeneratedTokenDTO('token1', str_repeat('a', 64)),
+            new GeneratedTokenDTO('token2', str_repeat('b', 64))
+        );
+
+        $service = new TokenRequestService($repo, $issuer);
+
+        $now = new \DateTimeImmutable('2026-03-03 12:00:00');
+
+        // First issue
+        $service->issue(
+            $user,
+            TokenRequestType::EMAIL_CONFIRMATION,
+            $now
+        );
+
+        // Second issue
+        $service->issue(
+            $user,
+            TokenRequestType::EMAIL_CONFIRMATION,
+            $now->modify('+1 minute')
+        );
+
+        $this->em->clear();
+
+        $repoDoctrine = $this->em->getRepository(TokenRequest::class);
+
+        $token1 = $repoDoctrine->findOneBy(['tokenHash' => str_repeat('a', 64)]);
+        $token2 = $repoDoctrine->findOneBy(['tokenHash' => str_repeat('b', 64)]);
+
+        $this->assertNotNull($token1);
+        $this->assertNotNull($token2);
+
+        // First token should now be consumed
+        $this->assertTrue($token1->isConsumed());
+
+        // Second token should remain active
+        $this->assertFalse($token2->isConsumed());
+
+        // Both belong to same user
+        $this->assertSame($userId, $token1->getUser()->getId());
+        $this->assertSame($userId, $token2->getUser()->getId());
     }
 }

@@ -7,6 +7,22 @@ use App\Domain\Auth\Repository\TokenRequestRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Represents a single-use token request associated with a user.
+ *
+ * Tokens are used for sensitive operations such as:
+ *  - email verification
+ *  - password reset
+ *
+ * A token request contains:
+ *  - a hashed token (never the raw value)
+ *  - expiration timestamp
+ *  - consumption timestamp
+ *
+ * A token is considered valid if:
+ *  - consumedAt is null
+ *  - expiresAt is in the future
+ */
 #[ORM\Entity(repositoryClass: TokenRequestRepository::class)]
 #[ORM\Table(name: 'token_request')]
 #[ORM\Index(name: 'idx_token_hash', columns: ['token_hash'])]

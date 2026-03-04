@@ -10,6 +10,12 @@ enum TokenRequestType: string
     case EMAIL_CONFIRMATION = 'email_confirmation';
     case PASSWORD_RESET = 'password_reset';
 
+    /**
+     * Returns the Time-To-Live (TTL) of the token type.
+     *
+     * This defines how long a TokenRequest remains valid
+     * after its creation.
+     */
     public function ttl(): \DateInterval
     {
         return match ($this) {

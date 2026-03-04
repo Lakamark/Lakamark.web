@@ -8,8 +8,8 @@ readonly class UserRegisteredEvent
 {
     public function __construct(
         private User $user,
-        private bool $useOauthRequest = false,
         private string $token,
+        private bool $useOauthRequest = false,
     ) {
     }
 
