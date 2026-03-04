@@ -4,7 +4,6 @@ App\Domain\Auth\Entity\User:
     username: johnDo<current()>
     password: <hashedPassword(@self, '0000')>
     createdAt: <date_create()>
-    confirmAt: <date_create()>
 
 App\Domain\Application\Entity\Category:
   category (template):

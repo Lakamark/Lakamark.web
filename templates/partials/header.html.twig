@@ -17,7 +17,7 @@
         </ul>
         <ul class="header__nav__right">
            {% if app.user %}
-               <li><a href="#">Hello {{ app.user.username }}</a></li>
+               <li><a href="{{ path('app_account') }}" title="Edit my account">Hello {{ app.user.username }}</a></li>
                <li>
                     <form method="post" action="{{ path('app_logout') }}" style="display:inline;">
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
@@ -25,6 +25,11 @@
                             Logout
                         </button>
                     </form>
+               </li>
+               <li>
+                   <button class="theme-toggle">
+                       Switch theme
+                   </button>
                </li>
             {% else %}
                 <li><a href="{{ path('app_login') }}" title="Login to your account">Login</a></li>

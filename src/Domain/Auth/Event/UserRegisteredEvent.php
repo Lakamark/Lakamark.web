@@ -9,6 +9,7 @@ readonly class UserRegisteredEvent
     public function __construct(
         private User $user,
         private bool $useOauthRequest = false,
+        private string $token,
     ) {
     }
 
@@ -20,5 +21,10 @@ readonly class UserRegisteredEvent
     public function isUseOauthRequest(): bool
     {
         return $this->useOauthRequest;
+    }
+
+    public function getToken(): string
+    {
+        return $this->token;
     }
 }

@@ -6,7 +6,7 @@ use App\Foundation\Security\Contract\TokenGeneratorInterface;
 use App\Foundation\Security\Exception\TokenInvalidArgumentException;
 use Random\RandomException;
 
-final readonly class TokenGeneratorService implements TokenGeneratorInterface
+readonly class TokenGeneratorService implements TokenGeneratorInterface
 {
     public function __construct(
         private int $defaultBytes = 32, // 256 bits

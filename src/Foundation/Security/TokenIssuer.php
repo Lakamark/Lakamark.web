@@ -15,7 +15,7 @@ use Random\RandomException;
  * $token  = $issued->token;
  * $hash   = $issued->hash;
  */
-final readonly class TokenIssuer
+readonly class TokenIssuer
 {
     public function __construct(
         private TokenGeneratorService $generator,

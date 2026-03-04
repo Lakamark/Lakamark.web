@@ -4,9 +4,11 @@ namespace App\Http\Controller;
 
 use App\Domain\Auth\Authenticator;
 use App\Domain\Auth\Entity\User;
+use App\Domain\Auth\Enum\TokenRequestType;
 use App\Domain\Auth\Event\BeforeUserRegisterEvent;
 use App\Domain\Auth\Event\UserRegisteredEvent;
-use App\Foundation\Security\TokenIssuer;
+use App\Domain\Auth\Exception\InvalidTokenException;
+use App\Domain\Auth\Service\TokenRequestService;
 use App\Http\Form\RegistrationFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -22,6 +24,7 @@ use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 class RegistrationController extends AbstractController
 {
     /**
+     * @throws \DateMalformedStringException
      * @throws RandomException
      */
     #[Route('/register', name: 'app_register')]
@@ -29,7 +32,7 @@ class RegistrationController extends AbstractController
         Request $request,
         UserPasswordHasherInterface $userPasswordHasher,
         EntityManagerInterface $em,
-        TokenIssuer $tokenIssuer,
+        TokenRequestService $tokenRequestService,
         EventDispatcherInterface $dispatcher,
         UserAuthenticatorInterface $userAuthenticator,
         Authenticator $authenticator,
@@ -59,8 +62,7 @@ class RegistrationController extends AbstractController
             // Save the new User Entity
             $user
                 ->setPassword($userPasswordHasher->hashPassword($user, $plainPassword))
-                ->setCreatedAt(new \DateTimeImmutable())
-                ->setConfirmationToken($tokenIssuer->issue()->token);
+                ->setCreatedAt(new \DateTimeImmutable());
 
             // Dispatch BeforeCreatedEvent
             $dispatcher->dispatch(new BeforeUserRegisterEvent($user, $request));
@@ -68,9 +70,16 @@ class RegistrationController extends AbstractController
             $em->persist($user);
             $em->flush();
 
+            // prepare the token request
+            $issued = $tokenRequestService->issue(
+                user: $user,
+                type: TokenRequestType::REGISTER_CONFIRMATION,
+                now: new \DateTimeImmutable(),
+            );
+
             // Dispatch an UserCreatedEvent.
             // A subscriber (AuthSubscriber)to listen this event to send an email
-            $dispatcher->dispatch(new UserRegisteredEvent($user, $isOwner));
+            $dispatcher->dispatch(new UserRegisteredEvent($user, $isOwner, $issued->token));
 
             if ($isOwner) {
                 $this->addFlash('success', 'Almost there, you should to confirm your account.');
@@ -94,38 +103,57 @@ class RegistrationController extends AbstractController
         ]);
     }
 
-    #[Route('/register/confirmation/{id}', name: 'app_register_confirm', requirements: ['id' => '\d+'])]
+    #[Route('/register/confirmation', name: 'app_register_confirm', methods: ['GET'])]
     public function confirm(
-        User $user,
         Request $request,
+        TokenRequestService $tokenRequestService,
         EntityManagerInterface $em,
     ): RedirectResponse {
-        $token = $request->request->get('token');
+        $rawToken = (string) $request->query->get('token', '');
 
-        // If the token is empty
-        // Or does not match with the current user confirmation token in the database
-        if (empty($token) || $user->getConfirmationToken() !== $token) {
+        // Empty token protection
+        if ('' === trim($rawToken)) {
             $this->addFlash('error', 'Invalid confirmation token.');
 
             return $this->redirectToRoute('app_register');
         }
 
-        // If the confirmation token is too old
-        if ($user->getCreatedAt() < new \DateTimeImmutable('-2 hours')) {
-            $this->addFlash('error', 'Your account has expired.');
+        try {
+            $tokenRequest = $tokenRequestService->consume(
+                rawToken: $rawToken,
+                type: TokenRequestType::REGISTER_CONFIRMATION,
+                now: new \DateTimeImmutable(),
+            );
+        } catch (InvalidTokenException) {
+            $this->addFlash('error', 'Invalid or expired confirmation token.');
 
             return $this->redirectToRoute('app_register');
         }
 
-        // We delete the token confirmation and to set validatedAt datetime.
-        // Later, we will use a cron task to delete all unconfirmed accounts
-        // or bots account in the database.
-        $user
-            ->setConfirmationToken(null)
-            ->setConfirmAt(new \DateTimeImmutable('now'));
+        // Get the user from the TokenRequest relation
+        $user = $tokenRequest->getUser();
 
-        $em->flush();
-        $this->addFlash('success', 'Your account has been confirmed');
+        // If already confirmed we don't do anything
+        if (null === $user->getConfirmAt()) {
+            $user->setConfirmAt(new \DateTimeImmutable());
+
+            // Add verified role safely
+            $roles = $user->getRoles();
+
+            if (!in_array('ROLE_USER', $roles, true)) {
+                $roles[] = 'ROLE_USER';
+            }
+
+            if (!in_array('ROLE_USER_VERIFIED', $roles, true)) {
+                $roles[] = 'ROLE_USER_VERIFIED';
+            }
+
+            $user->setRoles(array_values(array_unique($roles)));
+
+            $em->flush();
+        }
+
+        $this->addFlash('success', 'You have successfully confirmed your account.');
 
         return $this->redirectToRoute('app_login');
     }

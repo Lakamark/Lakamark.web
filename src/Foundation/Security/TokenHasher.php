@@ -5,7 +5,7 @@ namespace App\Foundation\Security;
 use App\Foundation\Security\Contract\TokenHasherInterface;
 use App\Foundation\Security\Exception\TokenInvalidArgumentException;
 
-final readonly class TokenHasher implements TokenHasherInterface
+readonly class TokenHasher implements TokenHasherInterface
 {
     public function __construct(
         private string $secret, // inject via env: APP_TOKEN_SECRET

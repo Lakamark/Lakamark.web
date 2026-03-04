@@ -57,9 +57,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    private ?string $confirmationToken = null;
-
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['default' => null])]
     private ?\DateTimeImmutable $lastLoginAt = null;
 
@@ -209,18 +206,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getConfirmationToken(): ?string
-    {
-        return $this->confirmationToken;
-    }
-
-    public function setConfirmationToken(?string $confirmationToken): static
-    {
-        $this->confirmationToken = $confirmationToken;
-
-        return $this;
-    }
-
     public function getLastLoginAt(): ?\DateTimeImmutable
     {
         return $this->lastLoginAt;
@@ -285,5 +270,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->preferredTheme = $preferredTheme;
 
         return $this;
+    }
+
+    public function isEmailConfirmed(): bool
+    {
+        return null !== $this->getConfirmAt();
     }
 }
