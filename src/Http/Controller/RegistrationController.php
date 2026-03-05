@@ -40,7 +40,7 @@ class RegistrationController extends AbstractController
         // The current user is already logging we will redirect to the homepage
         $alreadyLoggedIn = $this->getUser();
         if ($alreadyLoggedIn) {
-            return $this->redirectToRoute('app_login');
+            return $this->redirectToRoute('app_account');
         }
 
         $user = new User();
@@ -79,7 +79,7 @@ class RegistrationController extends AbstractController
 
             // Dispatch an UserCreatedEvent.
             // A subscriber (AuthSubscriber)to listen this event to send an email
-            $dispatcher->dispatch(new UserRegisteredEvent($user, $isOwner, $issued->token));
+            $dispatcher->dispatch(new UserRegisteredEvent($issued, $isOwner));
 
             if ($isOwner) {
                 $this->addFlash('success', 'Almost there, you should to confirm your account.');
@@ -109,10 +109,10 @@ class RegistrationController extends AbstractController
         TokenRequestService $tokenRequestService,
         EntityManagerInterface $em,
     ): RedirectResponse {
-        $rawToken = (string) $request->query->get('token', '');
+        $hash = (string) $request->query->get('token', '');
 
         // Empty token protection
-        if ('' === trim($rawToken)) {
+        if ('' === trim($hash)) {
             $this->addFlash('error', 'Invalid confirmation token.');
 
             return $this->redirectToRoute('app_register');
@@ -120,7 +120,7 @@ class RegistrationController extends AbstractController
 
         try {
             $tokenRequest = $tokenRequestService->consume(
-                rawToken: $rawToken,
+                hash: $hash,
                 type: TokenRequestType::REGISTER_CONFIRMATION,
                 now: new \DateTimeImmutable(),
             );

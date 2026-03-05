@@ -2,9 +2,8 @@
 {% import "mails/macros.twig" as e %}
 
 {% block body %}
-    <h1>Welcome to the Laka Mark Community!</h1>
+    <h1>Hell {{ user.username }}!</h1>
     <p>Almost here! You should confirm your email! To follow the link below:</p>
-        {{ e.button("Cofirme my email", url('app_register_confirm', {id: user.id, confirmation_token: user
-        .confirmationToken})) }}
+        {{ e.button("Cofirme my email", url('app_register_confirm', {hash: hash})) }}
     <p>Best regards</p>
 {% endblock %}

@@ -2,20 +2,14 @@
 
 namespace App\Domain\Auth\Event;
 
-use App\Domain\Auth\Entity\User;
+use App\Domain\Auth\DTO\IssuedTokenRequestDTO;
 
 readonly class UserRegisteredEvent
 {
     public function __construct(
-        private User $user,
-        private string $token,
+        private IssuedTokenRequestDTO $tokenRequestDTO,
         private bool $useOauthRequest = false,
     ) {
-    }
-
-    public function getUser(): User
-    {
-        return $this->user;
     }
 
     public function isUseOauthRequest(): bool
@@ -23,8 +17,8 @@ readonly class UserRegisteredEvent
         return $this->useOauthRequest;
     }
 
-    public function getToken(): string
+    public function getIssuedTokenRequestDto(): IssuedTokenRequestDTO
     {
-        return $this->token;
+        return $this->tokenRequestDTO;
     }
 }

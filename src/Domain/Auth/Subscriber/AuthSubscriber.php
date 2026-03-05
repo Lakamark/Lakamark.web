@@ -31,11 +31,21 @@ readonly class AuthSubscriber implements EventSubscriberInterface
             return;
         }
 
+        // Get the requestToken
+        $requestTokenDto = $event->getIssuedTokenRequestDto();
+
+        // user
+        $user = $requestTokenDto->request->getUser();
+
+        // hash
+        $hash = $requestTokenDto->request->getTokenHash();
+
         // Create a confirmation email and send it.
         $email = $this->mailerBuilder->buildEmail('mails/auth/register.twig', [
-            'user' => $event->getUser(),
+            'user' => $user,
+            'hash' => $hash,
         ])
-            ->to($event->getUser()->getEmail())
+            ->to($user->getEmail())
             ->subject('Laka Mark - Confirm your registration');
 
         // send in the queue.

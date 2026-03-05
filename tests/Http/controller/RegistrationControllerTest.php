@@ -3,15 +3,18 @@
 namespace App\Tests\Http\controller;
 
 use App\Domain\Auth\Entity\User;
+use App\Domain\Auth\Enum\TokenRequestType;
+use App\Domain\Auth\Service\TokenRequestService;
 use App\Tests\FixturesLoaderTrait;
 use App\Tests\WebTestCase;
+use Random\RandomException;
 
 class RegistrationControllerTest extends WebTestCase
 {
     use FixturesLoaderTrait;
 
     private const string SIGNUP_PATH = '/register';
-    private const string CONFIRM_PATH = '/register/confirmation/';
+    private const string CONFIRM_PATH = '/register/confirmation';
     private const string SIGNUP_BTN = 'Register';
 
     public function testGetTheRegisterPage(): void
@@ -104,65 +107,55 @@ class RegistrationControllerTest extends WebTestCase
 
         $this->client->request(
             'GET',
-            $this->makeConfirmationToken($users)
+            self::CONFIRM_PATH.'?token=faketoken'
         );
 
         $this->assertResponseRedirects(self::SIGNUP_PATH);
         $this->client->followRedirect();
     }
 
+    /**
+     * @throws RandomException
+     */
     public function testValidConfirmationToken(): void
     {
-        /** @var User[] $users */
+        /** @var array<string,User> $users */
         $users = $this->loadFixtures(['users']);
         $user = $users['user_unconfirmed'];
-        $this->client->request(
-            'GET',
-            $this->makeConfirmationToken($users, $user->getConfirmationToken())
-        );
+
+        $uri = $this->makeConfirmationUri($user);
+
+        $this->client->request('GET', $uri);
         $this->assertResponseRedirects();
         $this->client->followRedirect();
     }
 
+    /**
+     * @throws RandomException
+     */
     public function testUseExpiredConfirmationToken(): void
     {
-        /** @var User[] $users */
+        /** @var array<string,User> $users */
         $users = $this->loadFixtures(['users']);
         $user = $users['user_unconfirmed'];
-        $user->setCreatedAt(new \DateTimeImmutable('-1 day'));
-        $this->em->flush();
 
-        $this->client->request(
-            'GET',
-            $this->makeConfirmationToken($users, $user->getConfirmationToken())
-        );
+        // We pass the oldest token
+        $past = new \DateTimeImmutable('-10 days');
+        $uri = $this->makeConfirmationUri($user, $past);
+
+        $this->client->request('GET', $uri);
 
         $this->assertResponseRedirects(self::SIGNUP_PATH);
         $this->client->followRedirect();
     }
 
-    public function testGetWrongTokenQueryParameter(): void
+    public function testMissingTokenQueryParameter(): void
     {
-        /** @var User[] $users */
-        $users = $this->loadFixtures(['users']);
-        $user = $users['user_unconfirmed'];
-        $uri = self::CONFIRM_PATH.$user->getId().'?token='.$user->getConfirmationToken();
+        $this->loadFixtures(['users']);
 
-        $this->client->request('GET', $uri);
-        $request = $this->client->getRequest();
-        $this->assertFalse($request->query->has('confirmation_token'));
-    }
+        $this->client->request('GET', self::CONFIRM_PATH);
 
-    public function testGetRightTokenQueryParameter(): void
-    {
-        /** @var User[] $users */
-        $users = $this->loadFixtures(['users']);
-        $user = $users['user_unconfirmed'];
-        $uri = self::CONFIRM_PATH.$user->getId().'?confirmation_token='.$user->getConfirmationToken();
-
-        $this->client->request('GET', $uri);
-        $request = $this->client->getRequest();
-        $this->assertTrue($request->query->has('confirmation_token'));
+        $this->assertResponseRedirects(self::SIGNUP_PATH);
     }
 
     public function testUserAlreadyLoggedIn(): void
@@ -173,23 +166,23 @@ class RegistrationControllerTest extends WebTestCase
         $this->login($user);
         $this->client->request('GET', self::SIGNUP_PATH);
 
-        // TODO Change the redirection exception to the route profile
-        $this->assertResponseRedirects('/login');
+        $this->assertResponseRedirects('/account');
     }
 
     /**
      * To prepare a confirmation token request.
+     *
+     * @throws RandomException
      */
-    private function makeConfirmationToken($users, ?string $token = null): string
+    private function makeConfirmationUri(User $users, ?\DateTimeImmutable $now = null): string
     {
-        /** @var User[] $users */
-        $user = $users['user_unconfirmed'];
-        if (null === $token) {
-            $token = 'faketoken';
-        } else {
-            $token = $user->getConfirmationToken();
-        }
+        $now ?: new \DateTimeImmutable();
 
-        return self::CONFIRM_PATH.$user->getId().'?confirmation_token='.$token;
+        /** @var TokenRequestService $service */
+        $service = self::getContainer()->get(TokenRequestService::class);
+
+        $issued = $service->issue($users, TokenRequestType::REGISTER_CONFIRMATION, $now);
+
+        return self::CONFIRM_PATH.'?token='.$issued->issued->token;
     }
 }
