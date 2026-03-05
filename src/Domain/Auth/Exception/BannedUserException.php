@@ -4,10 +4,10 @@ namespace App\Domain\Auth\Exception;
 
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAccountStatusException;
 
-class BannedUserException extends CustomUserMessageAccountStatusException
+final class BannedUserException extends CustomUserMessageAccountStatusException
 {
     public function __construct()
     {
-        parent::__construct('Banned user.');
+        parent::__construct('auth.user_banned');
     }
 }

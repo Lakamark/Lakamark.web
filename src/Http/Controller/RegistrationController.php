@@ -9,6 +9,7 @@ use App\Domain\Auth\Event\BeforeUserRegisterEvent;
 use App\Domain\Auth\Event\UserRegisteredEvent;
 use App\Domain\Auth\Exception\InvalidTokenException;
 use App\Domain\Auth\Service\TokenRequestService;
+use App\Domain\Auth\Service\UserRoleManagerService;
 use App\Http\Form\RegistrationFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -23,6 +24,11 @@ use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 
 class RegistrationController extends AbstractController
 {
+    public function __construct(
+        private readonly UserRoleManagerService $userRoleManagerService,
+    ) {
+    }
+
     /**
      * @throws \DateMalformedStringException
      * @throws RandomException
@@ -137,18 +143,7 @@ class RegistrationController extends AbstractController
         if (null === $user->getConfirmAt()) {
             $user->setConfirmAt(new \DateTimeImmutable());
 
-            // Add verified role safely
-            $roles = $user->getRoles();
-
-            if (!in_array('ROLE_USER', $roles, true)) {
-                $roles[] = 'ROLE_USER';
-            }
-
-            if (!in_array('ROLE_USER_VERIFIED', $roles, true)) {
-                $roles[] = 'ROLE_USER_VERIFIED';
-            }
-
-            $user->setRoles(array_values(array_unique($roles)));
+            $this->userRoleManagerService->markVerified($user);
 
             $em->flush();
         }

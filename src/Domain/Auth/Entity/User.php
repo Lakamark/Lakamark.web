@@ -3,6 +3,7 @@
 namespace App\Domain\Auth\Entity;
 
 use App\Domain\Application\Entity\Content;
+use App\Domain\Auth\Enum\UserRole;
 use App\Domain\Auth\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -111,9 +112,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
+        $roles[] = UserRole::USER->value;
 
-        return array_unique($roles);
+        // Unique and reindex
+        $roles = array_values(array_unique($roles));
+
+        // sort by our hierarchy (highest first)
+        usort($roles, function (string $a, string $b) {
+            $pa = UserRole::tryFrom($a)->priority() ?? -1;
+            $pb = UserRole::tryFrom($b)->priority() ?? -1;
+
+            // DEC order
+            return $pb <=> $pa;
+        });
+
+        return $roles;
     }
 
     /**

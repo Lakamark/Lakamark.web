@@ -3,10 +3,10 @@
 namespace App\Tests\Domain\Auth\Security;
 
 use App\Domain\Auth\Entity\User;
+use App\Domain\Auth\Enum\UserAccess;
 use App\Domain\Auth\Exception\BannedUserException;
 use App\Domain\Auth\Security\BannedUserChecker;
-use App\Domain\Moderation\Service\ModerationService;
-use App\Tests\Helper\FixedClock;
+use App\Domain\Auth\Security\UserAccessPolicy;
 use PHPUnit\Framework\TestCase;
 
 class BannedUserCheckerTest extends TestCase
@@ -15,15 +15,15 @@ class BannedUserCheckerTest extends TestCase
     {
         $user = $this->createStub(User::class);
 
-        $moderation = $this->createMock(ModerationService::class);
-        $moderation
+        $userAccessPolicy = $this->createMock(UserAccessPolicy::class);
+
+        $userAccessPolicy
             ->expects($this->once())
-            ->method('isUserBanned')
+            ->method('has')
+            ->with($user, UserAccess::BANNED)
             ->willReturn(true);
 
-        $clock = new FixedClock(new \DateTimeImmutable('2026-02-03 09:00:00'));
-
-        $checker = new BannedUserChecker($moderation, $clock);
+        $checker = new BannedUserChecker($userAccessPolicy);
 
         $this->expectException(BannedUserException::class);
         $checker->checkPreAuth($user);
@@ -32,15 +32,16 @@ class BannedUserCheckerTest extends TestCase
     public function testPreAuthDoesNothingWhenUserIsNotBanned(): void
     {
         $user = $this->createStub(User::class);
-        $clock = new FixedClock(new \DateTimeImmutable('2026-02-03 09:00:00'));
 
-        $moderation = $this->createMock(ModerationService::class);
-        $moderation
+        $userAccessPolicy = $this->createMock(UserAccessPolicy::class);
+
+        $userAccessPolicy
             ->expects($this->once())
-            ->method('isUserBanned')
+            ->method('has')
+            ->with($user, UserAccess::BANNED)
             ->willReturn(false);
 
-        $checker = new BannedUserChecker($moderation, $clock);
+        $checker = new BannedUserChecker($userAccessPolicy);
         $checker->checkPreAuth($user);
 
         $this->addToAssertionCount(1);
