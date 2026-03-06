@@ -26,15 +26,15 @@
                         </button>
                     </form>
                </li>
-               <li>
-                   <button class="theme-toggle">
-                       Switch theme
-                   </button>
-               </li>
             {% else %}
                 <li><a href="{{ path('app_login') }}" title="Login to your account">Login</a></li>
                 <li><a href="{{ path('app_register') }}" title="No account? Create you account.">Signup</a></li>
             {% endif %}
+            <li>
+                <button class="theme-toggle">
+                    Switch theme
+                </button>
+            </li>
         </ul>
     </nav>
 </header>

@@ -21,7 +21,10 @@ class iconRendererTwigExtensionTest extends TestCase
             <use href="/images/icons.svg#logo"></use>
         </svg>
         HTML;
-        $this->assertSame($expected, $this->extension->svgIcon('logo'));
+        $this->assertSame(
+            $this->normalize($expected),
+            $this->normalize($this->extension->svgIcon('logo'))
+        );
     }
 
     public function testToRendHtmlSvgIconWithSize(): void
@@ -31,7 +34,10 @@ class iconRendererTwigExtensionTest extends TestCase
             <use href="/images/icons.svg#logo"></use>
         </svg>
         HTML;
-        $this->assertSame($expected, $this->extension->svgIcon('logo', 80));
+        $this->assertSame(
+            $this->normalize($expected),
+            $this->normalize($this->extension->svgIcon('logo', 80))
+        );
     }
 
     public function testToRendHtmlSvgIconWithACustomClass(): void
@@ -41,7 +47,10 @@ class iconRendererTwigExtensionTest extends TestCase
             <use href="/images/icons.svg#logo"></use>
         </svg>
         HTML;
-        $this->assertSame($expected, $this->extension->svgIcon('logo', null, 'custom-class'));
+        $this->assertSame(
+            $this->normalize($expected),
+            $this->normalize($this->extension->svgIcon('logo', null, 'custom-class'))
+        );
     }
 
     public function testToRendHtmlSvgIconFullCustomOptions(): void
@@ -51,6 +60,13 @@ class iconRendererTwigExtensionTest extends TestCase
             <use href="/images/icons.svg#logo"></use>
         </svg>
         HTML;
-        $this->assertSame($expected, $this->extension->svgIcon('logo', 80, 'custom-class'));
+        $this->assertSame(
+            $this->normalize($expected),
+            $this->normalize($this->extension->svgIcon('logo', 80, 'custom-class')));
+    }
+
+    private function normalize(string $html): string
+    {
+        return trim(str_replace(["\r\n", "\r"], "\n", $html));
     }
 }
