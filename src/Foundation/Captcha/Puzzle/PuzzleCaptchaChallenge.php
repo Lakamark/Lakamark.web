@@ -53,23 +53,34 @@ class PuzzleCaptchaChallenge implements CaptchaChallengeInterface
         }
 
         $payload = json_decode($answer, true);
-        if (!is_array($payload) || !isset($payload['x'], $payload['y'])) {
-            return false;
-        }
 
-        $actualX = filter_var($payload['x'], FILTER_VALIDATE_INT);
-        $actualY = filter_var($payload['y'], FILTER_VALIDATE_INT);
+        if (is_array($payload) && isset($payload['x'], $payload['y'])) {
+            $actualX = filter_var($payload['x'], FILTER_VALIDATE_INT);
+            $actualY = filter_var($payload['y'], FILTER_VALIDATE_INT);
+        } else {
+            $parts = explode('-', $answer);
+
+            if (2 !== count($parts)) {
+                return false;
+            }
+
+            $actualX = filter_var($parts[0], FILTER_VALIDATE_INT);
+            $actualY = filter_var($parts[1], FILTER_VALIDATE_INT);
+        }
 
         if (false === $actualX || false === $actualY) {
             return false;
         }
 
-        // Delete the solution in the session.
-        $this->store->delete($key);
-
-        return
+        $isValid =
             abs($expected['x'] - $actualX) <= self::POSITION_TOLERANCE_PX
             && abs($expected['y'] - $actualY) <= self::POSITION_TOLERANCE_PX;
+
+        if ($isValid) {
+            $this->store->delete($key);
+        }
+
+        return $isValid;
     }
 
     public function getSolution(string $key): mixed

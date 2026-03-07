@@ -22,7 +22,7 @@ class ResendConfirmationController extends AbstractController
         TokenRequestService $tokenRequestService,
     ): RedirectResponse {
         $user = $security->getUser();
-        
+
         if (!$user instanceof User) {
             throw $this->createAccessDeniedException();
         }
@@ -38,8 +38,6 @@ class ResendConfirmationController extends AbstractController
             TokenRequestType::REGISTER_CONFIRMATION,
             new \DateTimeImmutable()
         );
-        
-        
 
         $this->addFlash(
             'success',

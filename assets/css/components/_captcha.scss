@@ -6,6 +6,47 @@
   border: 1px solid var(--border-color);
   background: var(--image);
   touch-action: none;
+  overflow: hidden;
+}
+
+.captcha__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all .2s ease;
+  pointer-events: none;
+}
+
+.captcha__overlay.is-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.captcha__overlay.is-success {
+  background: rgba(0,200,0,.25);
+}
+
+.captcha__overlay.is-error {
+  background: rgba(200,0,0,.25);
+}
+
+.captcha-overlay__icon {
+  width: 48px;
+  height: 48px;
+  color: white;
+}
+
+.captcha-completed {
+  pointer-events: none;
+}
+
+.captcha__locked {
+  opacity: .6;
+  cursor: not-allowed;
 }
 
 .captcha__piece {

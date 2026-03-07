@@ -31,7 +31,7 @@ abstract class CaptchaType extends AbstractType
      */
     protected function getCaptchaRoute(): string
     {
-        return 'app_captcha';
+        return 'app_captcha_generate';
     }
 
     /**
