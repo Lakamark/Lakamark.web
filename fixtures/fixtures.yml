@@ -3,13 +3,26 @@ include:
 
 App\Domain\Auth\Entity\User:
   user{1..10} (extends user):
+    roles: ['ROLE_USER', 'ROLE_USER_VERIFIED']
+    confirm_at: <date_create()>
   editor (extends user):
     username: editor
     email: editor\@lakamark.com
+    roles: ['ROLE_USER', 'ROLE_USER_VERIFIED', 'ROLE_EDITOR']
+    confirm_at: <date_create()>
+  moderator (extends user):
+    username: moderator
+    email: moderator\@lakamark.com
+    roles: ['ROLE_USER', 'ROLE_USER_VERIFIED', 'ROLE_MODERATOR']
+    confirm_at: <date_create()>
   admin (extends user):
     username: Lakamark
     email: lakamark@lakamark.com
-    roles: ['ROLE_USER', 'ROLE_ADMIN']
+    roles: ['ROLE_USER', 'ROLE_USER_VERIFIED','ROLE_ADMIN']
+    confirm_at: <date_create()>
+  unconfirmed (extends user):
+    username: unconfirmed
+    email: unconfirmed\@lakamark.com
 
 App\Domain\Application\Entity\Category:
   category{1..10} (extends category):

@@ -24,7 +24,7 @@ readonly class BannedUserChecker implements UserCheckerInterface
             return;
         }
 
-        if ($this->policy->has($user, UserAccess::BANNED)) {
+        if ($this->policy->has($user, UserAccess::NOT_BANNED)) {
             throw new BannedUserException();
         }
     }

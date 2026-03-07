@@ -1,0 +1,8 @@
+<div class="alert alert-warning">
+    You forgot to confirm your email.
+    <form action="{{ path('app_auth_resend_confirmation') }}" method="post">
+        <button class="btn btn-primary" type="submit">
+            Resend confirmation email
+        </button>
+    </form>
+</div>

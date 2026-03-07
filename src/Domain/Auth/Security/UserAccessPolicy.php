@@ -23,7 +23,7 @@ readonly class UserAccessPolicy
 
         return match ($userAccess) {
             UserAccess::VERIFIED => $user->isEmailConfirmed(),
-            UserAccess::BANNED => $this->moderation->isUserBanned($user, $now),
+            UserAccess::NOT_BANNED => $this->moderation->isUserBanned($user, $now),
         };
     }
 }

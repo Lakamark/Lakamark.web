@@ -38,7 +38,7 @@ final class UserStatusVoter extends Voter
 
         return match ($attribute) {
             self::ROLE_USER_VERIFIED => $this->policy->has($user, UserAccess::VERIFIED),
-            self::ROLE_USER_BANNED => $this->policy->has($user, UserAccess::BANNED),
+            self::ROLE_USER_BANNED => $this->policy->has($user, UserAccess::NOT_BANNED),
             default => false,
         };
     }

@@ -78,3 +78,6 @@ services:
     App\Foundation\Security\TokenHasher:
         arguments:
             $secret: '%kernel.secret%'
+
+    App\Http\Twig\UserContextTwigExtension:
+        tags: ['twig.extension']

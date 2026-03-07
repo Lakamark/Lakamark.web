@@ -4,6 +4,12 @@
 
 {% block body %}
     <div class="container">
+        {% if email_unverified() %}
+            {% include 'partials/unconfirmed.html.twig' with {
+                url: path('app_auth_resend_confirmation')
+            } %}
+        {% endif %}
+
         <h1 class="h1">Account</h1>
         <p>You have an overflow of your account.</p>
     </div>

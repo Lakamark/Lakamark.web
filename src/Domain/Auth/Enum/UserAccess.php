@@ -7,5 +7,5 @@ namespace App\Domain\Auth\Enum;
 enum UserAccess: string
 {
     case VERIFIED = 'verified';
-    case BANNED = 'banned';
+    case NOT_BANNED = 'not_banned';
 }

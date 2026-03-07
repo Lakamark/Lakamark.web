@@ -20,7 +20,7 @@ class BannedUserCheckerTest extends TestCase
         $userAccessPolicy
             ->expects($this->once())
             ->method('has')
-            ->with($user, UserAccess::BANNED)
+            ->with($user, UserAccess::NOT_BANNED)
             ->willReturn(true);
 
         $checker = new BannedUserChecker($userAccessPolicy);
@@ -38,7 +38,7 @@ class BannedUserCheckerTest extends TestCase
         $userAccessPolicy
             ->expects($this->once())
             ->method('has')
-            ->with($user, UserAccess::BANNED)
+            ->with($user, UserAccess::NOT_BANNED)
             ->willReturn(false);
 
         $checker = new BannedUserChecker($userAccessPolicy);
