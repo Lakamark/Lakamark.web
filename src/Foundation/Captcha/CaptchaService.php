@@ -20,11 +20,14 @@ final class CaptchaService implements CaptchaVerifierInterface
     private const int LOCK_SECONDS = 300;
     private const int MIN_SOLVE_SECONDS = 2;
     private const int MAX_SOLVE_SECONDS = 300;
+
     private const string SESSION_CURRENT_KEY = 'CAPTCHA_KEY';
     private const string SESSION_TYPE = 'CAPTCHA_TYPE';
     private const string SESSION_TRIES = 'CAPTCHA_TRIES';
     private const string SESSION_LOCKED_UNTIL = 'CAPTCHA_LOCKED_UNTIL';
     private const string SESSION_GENERATED_AT = 'CAPTCHA_GENERATED_AT';
+    private const string SESSION_VERIFIED = 'CAPTCHA_VERIFIED';
+    private const string SESSION_VERIFIED_TYPE = 'CAPTCHA_VERIFIED_TYPE';
 
     public function __construct(
         private readonly CaptchaRegistryInterface $registry,
@@ -41,6 +44,8 @@ final class CaptchaService implements CaptchaVerifierInterface
         $generator = $this->registry->generator($type);
 
         $key = $challenge->generateKey();
+
+        $this->clearVerificationState($session);
 
         $session->set(self::SESSION_CURRENT_KEY, $key);
         $session->set(self::SESSION_TYPE, $type);
@@ -79,11 +84,10 @@ final class CaptchaService implements CaptchaVerifierInterface
         }
 
         $challengeService = $this->registry->challenge($captchaType);
-
         $valid = $challengeService->verify($key, $answer);
 
         if ($valid) {
-            $this->resetAfterSuccess($session);
+            $this->markAsVerified($session, $captchaType);
 
             return true;
         }
@@ -91,6 +95,38 @@ final class CaptchaService implements CaptchaVerifierInterface
         $this->registerFailure($session);
 
         return false;
+    }
+
+    public function isVerified(?string $type): bool
+    {
+        $session = $this->getSession();
+
+        $verified = $session->get(self::SESSION_VERIFIED, false);
+        $verifiedType = $session->get(self::SESSION_VERIFIED_TYPE);
+
+        if (true !== $verified) {
+            return false;
+        }
+
+        if (null !== $type && $verifiedType !== $type) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function consumeVerified(?string $type): bool
+    {
+        if (!$this->isVerified($type)) {
+            return false;
+        }
+
+        $session = $this->getSession();
+
+        $this->clearVerificationState($session);
+        $this->resetCaptchaState($session);
+
+        return true;
     }
 
     public function getKey(): string
@@ -147,33 +183,50 @@ final class CaptchaService implements CaptchaVerifierInterface
         $session->set(self::SESSION_TRIES, $tries);
 
         if ($tries >= self::LIMIT_TRIES) {
-            // lock captcha
             $session->set(
                 self::SESSION_LOCKED_UNTIL,
                 $this->now() + self::LOCK_SECONDS
             );
 
-            // invalidate challenge
-            $session->remove(self::SESSION_CURRENT_KEY);
-            $session->remove(self::SESSION_GENERATED_AT);
+            $this->resetCaptchaState($session);
 
             throw new CaptchaLockedException();
         }
     }
 
-    private function resetAfterSuccess(SessionInterface $session): void
+    private function markAsVerified(SessionInterface $session, string $captchaType): void
     {
         $session->set(self::SESSION_TRIES, 0);
         $session->remove(self::SESSION_LOCKED_UNTIL);
+        $session->set(self::SESSION_VERIFIED, true);
+        $session->set(self::SESSION_VERIFIED_TYPE, $captchaType);
+    }
+
+    private function clearVerificationState(SessionInterface $session): void
+    {
+        $session->remove(self::SESSION_VERIFIED);
+        $session->remove(self::SESSION_VERIFIED_TYPE);
+    }
+
+    private function resetCaptchaState(SessionInterface $session): void
+    {
         $session->remove(self::SESSION_CURRENT_KEY);
         $session->remove(self::SESSION_GENERATED_AT);
+        $session->remove(self::SESSION_TYPE);
+        $session->remove(self::SESSION_LOCKED_UNTIL);
+        $session->set(self::SESSION_TRIES, 0);
     }
 
     private function isSolveTimeValid(SessionInterface $session): bool
     {
         $generatedAt = (int) $session->get(self::SESSION_GENERATED_AT, 0);
 
+        if ($generatedAt <= 0) {
+            return false;
+        }
+
         $elapsed = $this->now() - $generatedAt;
+
         if ($elapsed < self::MIN_SOLVE_SECONDS) {
             return false;
         }

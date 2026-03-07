@@ -22,6 +22,10 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 
+/**
+ * FIXME: user role assignment after registration.
+ * // roles are not properly persisted during signup.
+ */
 class RegistrationController extends AbstractController
 {
     public function __construct(

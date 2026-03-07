@@ -14,6 +14,8 @@ use Symfony\Component\Routing\Attribute\Route;
 class ResendConfirmationController extends AbstractController
 {
     /**
+     *  FIXME: resend confirmation token flow
+     *  currently fails when user email is unconfirmed.
      * @throws RandomException
      */
     #[Route(path: '/account/confirmation/resend', name: 'app_auth_resend_confirmation', methods: ['POST'])]

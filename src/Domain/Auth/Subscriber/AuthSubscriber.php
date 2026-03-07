@@ -9,6 +9,10 @@ use App\Foundation\Mailing\MailerBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
 
+/**
+ * FIXME: handle unconfirmed users trying to login
+ * allow resend confirmation token.
+ */
 readonly class AuthSubscriber implements EventSubscriberInterface
 {
     public function __construct(
