@@ -60,6 +60,13 @@ export default class PuzzleCaptcha extends HTMLElement {
         this.bindEvents();
 
         this.isBound = true;
+
+        // disabled Turbo
+        const form = this.closest("form");
+
+        if (form instanceof HTMLFormElement) {
+            form.setAttribute("data-turbo", "false")
+        }
     }
 
     public disconnectedCallback(): void {
