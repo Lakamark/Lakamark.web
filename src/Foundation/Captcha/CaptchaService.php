@@ -6,6 +6,7 @@ use App\Foundation\Captcha\Contract\CaptchaRegistryInterface;
 use App\Foundation\Captcha\Contract\CaptchaVerifierInterface;
 use App\Foundation\Captcha\Exception\CaptchaLockedException;
 use App\Foundation\Captcha\Exception\CaptchaRuntimeException;
+use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -17,14 +18,18 @@ final class CaptchaService implements CaptchaVerifierInterface
      */
     private const int LIMIT_TRIES = 3;
     private const int LOCK_SECONDS = 300;
+    private const int MIN_SOLVE_SECONDS = 2;
+    private const int MAX_SOLVE_SECONDS = 300;
     private const string SESSION_CURRENT_KEY = 'CAPTCHA_KEY';
     private const string SESSION_TYPE = 'CAPTCHA_TYPE';
     private const string SESSION_TRIES = 'CAPTCHA_TRIES';
     private const string SESSION_LOCKED_UNTIL = 'CAPTCHA_LOCKED_UNTIL';
+    private const string SESSION_GENERATED_AT = 'CAPTCHA_GENERATED_AT';
 
     public function __construct(
         private readonly CaptchaRegistryInterface $registry,
         private readonly RequestStack $requestStack,
+        private readonly ClockInterface $clock,
     ) {
     }
 
@@ -39,6 +44,7 @@ final class CaptchaService implements CaptchaVerifierInterface
 
         $session->set(self::SESSION_CURRENT_KEY, $key);
         $session->set(self::SESSION_TYPE, $type);
+        $session->set(self::SESSION_GENERATED_AT, $this->now());
 
         return $generator->generate($key);
     }
@@ -51,6 +57,12 @@ final class CaptchaService implements CaptchaVerifierInterface
         $session = $this->getSession();
 
         $this->guardLocked($session);
+
+        if (!$this->isSolveTimeValid($session)) {
+            $this->registerFailure($session);
+
+            return false;
+        }
 
         $captchaType = $this->resolveCaptchaType($session, $type);
         if (null === $captchaType) {
@@ -93,11 +105,11 @@ final class CaptchaService implements CaptchaVerifierInterface
     {
         $lockedUntil = (int) $session->get(self::SESSION_LOCKED_UNTIL, 0);
 
-        if ($lockedUntil > time()) {
+        if ($lockedUntil > $this->now()) {
             throw new CaptchaLockedException();
         }
 
-        if ($lockedUntil > 0 && $lockedUntil <= time()) {
+        if ($lockedUntil > 0 && $lockedUntil <= $this->now()) {
             $session->remove(self::SESSION_LOCKED_UNTIL);
             $session->set(self::SESSION_TRIES, 0);
         }
@@ -138,11 +150,12 @@ final class CaptchaService implements CaptchaVerifierInterface
             // lock captcha
             $session->set(
                 self::SESSION_LOCKED_UNTIL,
-                time() + self::LOCK_SECONDS
+                $this->now() + self::LOCK_SECONDS
             );
 
             // invalidate challenge
             $session->remove(self::SESSION_CURRENT_KEY);
+            $session->remove(self::SESSION_GENERATED_AT);
 
             throw new CaptchaLockedException();
         }
@@ -153,6 +166,28 @@ final class CaptchaService implements CaptchaVerifierInterface
         $session->set(self::SESSION_TRIES, 0);
         $session->remove(self::SESSION_LOCKED_UNTIL);
         $session->remove(self::SESSION_CURRENT_KEY);
+        $session->remove(self::SESSION_GENERATED_AT);
+    }
+
+    private function isSolveTimeValid(SessionInterface $session): bool
+    {
+        $generatedAt = (int) $session->get(self::SESSION_GENERATED_AT, 0);
+
+        $elapsed = $this->now() - $generatedAt;
+        if ($elapsed < self::MIN_SOLVE_SECONDS) {
+            return false;
+        }
+
+        if ($elapsed > self::MAX_SOLVE_SECONDS) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function now(): int
+    {
+        return $this->clock->now()->getTimestamp();
     }
 
     private function getSession(): SessionInterface

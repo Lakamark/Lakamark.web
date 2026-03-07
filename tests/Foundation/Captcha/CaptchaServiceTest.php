@@ -6,160 +6,139 @@ use App\Foundation\Captcha\CaptchaService;
 use App\Foundation\Captcha\Contract\CaptchaChallengeInterface;
 use App\Foundation\Captcha\Contract\CaptchaGeneratorInterface;
 use App\Foundation\Captcha\Contract\CaptchaRegistryInterface;
-use App\Foundation\Captcha\Exception\CaptchaLockedException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 final class CaptchaServiceTest extends TestCase
 {
-    private const string CAPTCHA_TEST_TYPE = 'puzzle';
-    private const string CAPTCHA_TEST_KEY_SESSION = 'CAPTCHA_KEY';
-    private const string CAPTCHA_TEST_TYPE_SESSION = 'CAPTCHA_TYPE';
-    private const string CAPTCHA_TRIES_SESSION = 'CAPTCHA_TRIES';
-    private const string CAPTCHA_TEST_ID = 'K451';
+    private CaptchaRegistryInterface|MockObject $registry;
+    private CaptchaChallengeInterface|MockObject $challenge;
+    private CaptchaGeneratorInterface|MockObject $generator;
 
-    public function testGenerateStoresKeyTypeAndReturnsResponse(): void
+    private Session $session;
+    private RequestStack $requestStack;
+    private MockClock $clock;
+
+    private CaptchaService $service;
+
+    protected function setUp(): void
     {
-        $session = $this->createSession();
-        $stack = $this->createRequestStackWithSession($session);
+        $this->registry = $this->createMock(CaptchaRegistryInterface::class);
+        $this->challenge = $this->createMock(CaptchaChallengeInterface::class);
+        $this->generator = $this->createStub(CaptchaGeneratorInterface::class);
 
-        $registry = $this->createMock(CaptchaRegistryInterface::class);
-        $challenge = $this->createMock(CaptchaChallengeInterface::class);
-        $generator = $this->createMock(CaptchaGeneratorInterface::class);
+        $this->session = new Session(new MockArraySessionStorage());
 
-        $registry->expects($this->once())
-            ->method('challenge')
-            ->with(self::CAPTCHA_TEST_TYPE)
-            ->willReturn($challenge);
+        $request = new Request();
+        $request->setSession($this->session);
 
-        $registry->expects($this->once())
-            ->method('generator')
-            ->with(self::CAPTCHA_TEST_TYPE)
-            ->willReturn($generator);
+        $this->requestStack = new RequestStack();
+        $this->requestStack->push($request);
 
-        $challenge->expects($this->once())
-            ->method('generateKey')
-            ->willReturn(self::CAPTCHA_TEST_ID);
+        $this->clock = new MockClock('2026-03-07 12:00:00');
 
-        $generator->expects($this->once())
-            ->method('generate')
-            ->with(self::CAPTCHA_TEST_ID)
-            ->willReturn(new Response('ok', 200));
-
-        $service = new CaptchaService($registry, $stack);
-
-        $response = $service->generate(self::CAPTCHA_TEST_TYPE);
-
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame(self::CAPTCHA_TEST_ID, $session->get(self::CAPTCHA_TEST_KEY_SESSION));
-        $this->assertSame(self::CAPTCHA_TEST_TYPE, $session->get(self::CAPTCHA_TEST_TYPE_SESSION));
-        $this->assertSame(0, $session->get(self::CAPTCHA_TRIES_SESSION, 0));
+        $this->service = new CaptchaService(
+            $this->registry,
+            $this->requestStack,
+            $this->clock,
+        );
     }
 
-    public function testVerifyReturnsFalseWhenNoTypeInSession(): void
+    /**
+     * @throws \DateMalformedStringException
+     */
+    public function testVerifyReturnsTrueWhenAnswerIsValid(): void
     {
-        $session = $this->createSession();
-        $stack = $this->createRequestStackWithSession($session);
+        $this->seedCaptchaSession();
+        $this->clock->modify('+3 seconds');
 
-        $registry = $this->createMock(CaptchaRegistryInterface::class);
-        $registry->expects($this->never())->method('challenge');
-
-        $service = new CaptchaService($registry, $stack);
-
-        $this->assertFalse($service->verify(self::CAPTCHA_TEST_TYPE, 'answer'));
-    }
-
-    public function testVerifyIncrementsTriesOnFailure(): void
-    {
-        $session = $this->createSession();
-        $session->set(self::CAPTCHA_TEST_TYPE_SESSION, self::CAPTCHA_TEST_TYPE);
-        $session->set(self::CAPTCHA_TEST_KEY_SESSION, self::CAPTCHA_TEST_ID);
-        $session->set(self::CAPTCHA_TRIES_SESSION, 0);
-
-        $stack = $this->createRequestStackWithSession($session);
-
-        $registry = $this->createMock(CaptchaRegistryInterface::class);
-        $challenge = $this->createMock(CaptchaChallengeInterface::class);
-
-        $registry->expects($this->once())
-            ->method('challenge')
-            ->with(self::CAPTCHA_TEST_TYPE)
-            ->willReturn($challenge);
-
-        $challenge->expects($this->once())
+        $this->challenge
+            ->expects($this->once())
             ->method('verify')
-            ->with(self::CAPTCHA_TEST_ID, 'bad')
-            ->willReturn(false);
-
-        $service = new CaptchaService($registry, $stack);
-
-        $this->assertFalse($service->verify(self::CAPTCHA_TEST_TYPE, 'bad'));
-        $this->assertSame(1, $session->get(self::CAPTCHA_TRIES_SESSION));
-    }
-
-    public function testVerifyResetsTriesOnSuccess(): void
-    {
-        $session = $this->createSession();
-        $session->set(self::CAPTCHA_TEST_TYPE_SESSION, self::CAPTCHA_TEST_TYPE);
-        $session->set(self::CAPTCHA_TEST_KEY_SESSION, self::CAPTCHA_TEST_ID);
-        $session->set(self::CAPTCHA_TRIES_SESSION, 2);
-
-        $stack = $this->createRequestStackWithSession($session);
-
-        $registry = $this->createMock(CaptchaRegistryInterface::class);
-        $challenge = $this->createMock(CaptchaChallengeInterface::class);
-
-        $registry->expects($this->once())
-            ->method('challenge')
-            ->with(self::CAPTCHA_TEST_TYPE)
-            ->willReturn($challenge);
-
-        $challenge->expects($this->once())
-            ->method('verify')
-            ->with(self::CAPTCHA_TEST_ID, 'good')
+            ->with('abc123', '42')
             ->willReturn(true);
 
-        $service = new CaptchaService($registry, $stack);
+        $this->registry
+            ->expects($this->once())
+            ->method('challenge')
+            ->with('image')
+            ->willReturn($this->challenge);
 
-        $this->assertTrue($service->verify(self::CAPTCHA_TEST_TYPE, 'good'));
-        $this->assertSame(0, $session->get(self::CAPTCHA_TRIES_SESSION));
+        $this->assertTrue($this->service->verify('image', '42'));
+        $this->assertSame(0, $this->session->get('CAPTCHA_TRIES'));
+        $this->assertNull($this->session->get('CAPTCHA_KEY'));
+        $this->assertNull($this->session->get('CAPTCHA_GENERATED_AT'));
     }
 
-    public function testVerifyThrowsWhenLocked(): void
+    /**
+     * @throws \DateMalformedStringException
+     */
+    public function testVerifyReturnsFalseWhenAnswerIsInvalid(): void
     {
-        $session = $this->createSession();
-        $session->set(self::CAPTCHA_TEST_TYPE_SESSION, self::CAPTCHA_TEST_TYPE);
-        $session->set(self::CAPTCHA_TEST_KEY_SESSION, self::CAPTCHA_TEST_ID);
-        $session->set(self::CAPTCHA_TRIES_SESSION, 3);
+        $this->seedCaptchaSession();
+        $this->clock->modify('+3 seconds');
 
-        $stack = $this->createRequestStackWithSession($session);
+        $this->challenge
+            ->expects($this->once())
+            ->method('verify')
+            ->with('abc123', 'wrong')
+            ->willReturn(false);
 
-        $registry = $this->createMock(CaptchaRegistryInterface::class);
-        $registry->expects($this->never())->method('challenge');
+        $this->registry
+            ->expects($this->once())
+            ->method('challenge')
+            ->with('image')
+            ->willReturn($this->challenge);
 
-        $service = new CaptchaService($registry, $stack);
-
-        $this->expectException(CaptchaLockedException::class);
-        $service->verify(self::CAPTCHA_TEST_TYPE, 'anything');
+        $this->assertFalse($this->service->verify('image', 'wrong'));
+        $this->assertSame(1, $this->session->get('CAPTCHA_TRIES'));
     }
 
-    private function createSession(): Session
+    public function testVerifyReturnsFalseWhenSolvedTooFast(): void
     {
-        return new Session(new MockArraySessionStorage());
+        $this->seedCaptchaSession();
+
+        $this->challenge
+            ->expects($this->never())
+            ->method('verify');
+
+        $this->registry
+            ->expects($this->never())
+            ->method('challenge');
+
+        $this->assertFalse($this->service->verify('image', '42'));
+        $this->assertSame(1, $this->session->get('CAPTCHA_TRIES'));
     }
 
-    private function createRequestStackWithSession(Session $session): RequestStack
+    /**
+     * @throws \DateMalformedStringException
+     */
+    public function testVerifyReturnsFalseWhenCaptchaExpired(): void
     {
-        $request = new Request();
-        $request->setSession($session);
+        $this->seedCaptchaSession();
+        $this->clock->modify('+6 minutes');
 
-        $stack = new RequestStack();
-        $stack->push($request);
+        $this->challenge
+            ->expects($this->never())
+            ->method('verify');
 
-        return $stack;
+        $this->registry
+            ->expects($this->never())
+            ->method('challenge');
+
+        $this->assertFalse($this->service->verify('image', '42'));
+        $this->assertSame(1, $this->session->get('CAPTCHA_TRIES'));
+    }
+
+    private function seedCaptchaSession(): void
+    {
+        $this->session->set('CAPTCHA_KEY', 'abc123');
+        $this->session->set('CAPTCHA_TYPE', 'image');
+        $this->session->set('CAPTCHA_GENERATED_AT', $this->clock->now()->getTimestamp());
     }
 }
