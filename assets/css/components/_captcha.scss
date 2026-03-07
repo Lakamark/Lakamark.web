@@ -15,38 +15,46 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background: rgba(10, 16, 24, 0.28);
+  backdrop-filter: blur(2px);
   opacity: 0;
-  visibility: hidden;
-  transition: all .2s ease;
   pointer-events: none;
+  transition: opacity 180ms ease;
 }
 
 .captcha__overlay.is-visible {
   opacity: 1;
-  visibility: visible;
-}
-
-.captcha__overlay.is-success {
-  background: rgba(0,200,0,.25);
-}
-
-.captcha__overlay.is-error {
-  background: rgba(200,0,0,.25);
 }
 
 .captcha-overlay__icon {
-  width: 48px;
-  height: 48px;
-  color: white;
+  width: 32px;
+  height: 32px;
+  display: block;
+  overflow: visible;
 }
 
-.captcha-completed {
-  pointer-events: none;
+.captcha__icon__path {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
 }
 
-.captcha__locked {
-  opacity: .6;
-  cursor: not-allowed;
+.captcha__overlay.is-success::before,
+.captcha__overlay.is-error::before {
+  content: "";
+  position: absolute;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.captcha__overlay.is-success .captcha-overlay__icon,
+.captcha__overlay.is-error .captcha-overlay__icon {
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.25));
 }
 
 .captcha__piece {

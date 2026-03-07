@@ -1,4 +1,4 @@
-import {fetchApi} from "./fetchApi";
+import { fetchApi, type FetchApiResult } from "./fetchApi";
 
 interface VerifyCaptchaPayload {
     type: string;
@@ -17,7 +17,7 @@ export interface VerifyCaptchaResponse {
  */
 export async function verifyCaptcha(
     payload: VerifyCaptchaPayload
-) {
+): Promise<FetchApiResult<VerifyCaptchaResponse> | null> {
     return fetchApi<VerifyCaptchaResponse>("/captcha/verify", {
         method: "POST",
         body: JSON.stringify(payload),

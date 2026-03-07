@@ -17,13 +17,14 @@ interface PuzzleCaptchaState {
 }
 
 export default class PuzzleCaptcha extends HTMLElement {
-    private static ICON_SUCCESS = `M5 13l4 4L19 7`;
+    private static readonly ICON_SUCCESS = "M5 13l4 4L19 7";
+    private static readonly ICON_ERROR = "M6 6L18 18M18 6L6 18";
 
-    private static ICON_ERROR = `M6 6L18 18M18 6L6 18`;
     private isDragging = false;
     private isValidated = false;
     private isBound = false;
     private isLocked = false;
+    private isSubmitting = false;
 
     private position = {
         x: 0,
@@ -43,7 +44,7 @@ export default class PuzzleCaptcha extends HTMLElement {
     private message: HTMLElement | null = null;
     private piece: HTMLDivElement | null = null;
     private overlay: HTMLDivElement | null = null;
-    private icon: HTMLElement | null = null;
+    private icon: SVGPathElement | null = null;
 
     public connectedCallback(): void {
         if (this.isBound) {
@@ -53,10 +54,10 @@ export default class PuzzleCaptcha extends HTMLElement {
         this.config = this.readConfig();
         this.cacheElements();
         this.createPiece();
+        this.createOverlay();
         this.applyStyles();
         this.randomizePosition();
         this.bindEvents();
-        this.createOverlay();
 
         this.isBound = true;
     }
@@ -66,6 +67,7 @@ export default class PuzzleCaptcha extends HTMLElement {
         document.body.style.removeProperty("user-select");
 
         this.isDragging = false;
+        this.isSubmitting = false;
         this.isBound = false;
     }
 
@@ -102,6 +104,28 @@ export default class PuzzleCaptcha extends HTMLElement {
         this.appendChild(this.piece);
     }
 
+    private createOverlay(): void {
+        const existingOverlay = this.querySelector(".captcha__overlay");
+
+        if (existingOverlay instanceof HTMLDivElement) {
+            this.overlay = existingOverlay;
+            this.icon = this.overlay.querySelector(".captcha__icon__path") as SVGPathElement | null;
+            return;
+        }
+
+        this.overlay = document.createElement("div");
+        this.overlay.className = "captcha__overlay";
+
+        this.overlay.innerHTML = `
+            <svg class="captcha-overlay__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path class="captcha__icon__path"></path>
+            </svg>
+        `;
+
+        this.appendChild(this.overlay);
+        this.icon = this.overlay.querySelector(".captcha__icon__path") as SVGPathElement | null;
+    }
+
     private applyStyles(): void {
         this.classList.add("captcha", "captcha-waiting-interaction");
 
@@ -116,26 +140,6 @@ export default class PuzzleCaptcha extends HTMLElement {
         for (const [key, value] of Object.entries(cssVars)) {
             this.style.setProperty(key, value);
         }
-    }
-
-    private createOverlay(): void {
-        const existingOverlay  = this.querySelector(".captcha__overlay");
-
-        if (existingOverlay instanceof HTMLDivElement) {
-            this.overlay = existingOverlay;
-        }
-
-        this.overlay = document.createElement("div");
-        this.overlay.className = "captcha__overlay";
-
-        this.overlay.innerHTML = `
-        <svg class="captcha-overlay__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path class="captcha__icon__path" fill="currentColor"/>
-        </svg>`;
-
-        this.appendChild(this.overlay);
-        this.icon = this.overlay.querySelector('.captcha__icon__path')
-
     }
 
     private randomizePosition(): void {
@@ -160,7 +164,7 @@ export default class PuzzleCaptcha extends HTMLElement {
     }
 
     private readonly handlePointerDown = (): void => {
-        if (this.isValidated || this.isLocked) {
+        if (this.isValidated || this.isLocked || this.isSubmitting) {
             return;
         }
 
@@ -172,7 +176,7 @@ export default class PuzzleCaptcha extends HTMLElement {
     };
 
     private readonly handlePointerMove = (event: PointerEvent): void => {
-        if (!this.isDragging || this.isValidated || this.isLocked) {
+        if (!this.isDragging || this.isValidated || this.isLocked || this.isSubmitting) {
             return;
         }
 
@@ -183,15 +187,21 @@ export default class PuzzleCaptcha extends HTMLElement {
     };
 
     private readonly handlePointerUp = async (): Promise<void> => {
-        if (!this.isDragging) {
+        if (!this.isDragging || this.isSubmitting) {
             return;
         }
 
         this.isDragging = false;
+        this.isSubmitting = true;
+
         document.body.style.removeProperty("user-select");
         this.piece?.classList.remove("is-moving");
 
-        await this.validateCaptcha();
+        try {
+            await this.validateCaptcha();
+        } finally {
+            this.isSubmitting = false;
+        }
     };
 
     private syncPosition(): void {
@@ -238,12 +248,13 @@ export default class PuzzleCaptcha extends HTMLElement {
 
                 if (result.data?.locked) {
                     this.isLocked = true;
-                    this.classList.add('captcha__locked')
+                    this.classList.add("is-locked");
                     this.setInvalid("Too many attempts.");
                     return;
                 }
 
                 this.setInvalid("Invalid captcha.");
+                this.randomizePosition();
                 return;
             }
 
@@ -260,6 +271,7 @@ export default class PuzzleCaptcha extends HTMLElement {
             }
 
             this.setInvalid("Invalid captcha.");
+            this.randomizePosition();
         } catch (error) {
             console.error("PuzzleCaptcha validation error:", error);
             this.setInvalid("Network error.");
@@ -267,11 +279,11 @@ export default class PuzzleCaptcha extends HTMLElement {
     }
 
     private setState({
-            valid = false,
-            invalid = false,
-            message = "",
-        }: PuzzleCaptchaState): void {
-        this.overlay?.classList.toggle("is-visible", valid);
+                         valid = false,
+                         invalid = false,
+                         message = "",
+                     }: PuzzleCaptchaState): void {
+        this.overlay?.classList.toggle("is-visible", valid || invalid);
         this.overlay?.classList.toggle("is-success", valid);
         this.overlay?.classList.toggle("is-error", invalid);
 
