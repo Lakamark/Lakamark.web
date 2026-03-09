@@ -7,155 +7,79 @@ use App\Domain\Auth\DTO\IssuedTokenRequestDTO;
 use App\Domain\Auth\Entity\TokenRequest;
 use App\Domain\Auth\Entity\User;
 use App\Domain\Auth\Enum\TokenRequestType;
-use App\Domain\Auth\Exception\InvalidTokenException;
+use App\Domain\Auth\Exception\TokenRequest\InvalidTokenException;
+use App\Foundation\Security\TokenHasher;
 use App\Foundation\Security\TokenIssuer;
 use Random\RandomException;
+use Symfony\Component\Clock\ClockInterface;
 
-/**
- * TokenRequest Service.
- *
- * This service manages short-lived authentication tokens used for actions such as:
- *  - Email confirmation
- *  - Password reset
- *  - Magic login links
- *
- * Design goals:
- *  - Tokens are single-use
- *  - Tokens expire automatically
- *  - Only ONE active token can exist per (user + token type)
- *  - Raw tokens are never stored in the database
- *
- * Security model:
- *  - A secure random token is generated via TokenIssuer.
- *  - The raw token is sent to the user (email link, etc).
- *  - Only the hashed version of the token is stored in database.
- *  - When consuming the token, the hash is matched against stored values.
- *
- * Token lifecycle:
- *
- *   issue()
- *     ↓
- *   revoke existing active tokens
- *     ↓
- *   persist new TokenRequest
- *     ↓
- *   user receives raw token
- *     ↓
- *   consume()
- *     ↓
- *   token marked as consumed
- *
- * This ensures:
- *  - tokens cannot be reused
- *  - tokens cannot be guessed from database leaks
- *  - only one active token exists per user/type
- */
 readonly class TokenRequestService
 {
     public function __construct(
         private TokenRequestRepositoryInterface $tokenRequestRepository,
         private TokenIssuer $tokenIssuer,
+        private TokenHasher $tokenHasher,
+        private ClockInterface $clock,
     ) {
     }
 
     /**
-     * Issue a new TokenRequest for a given user and type.
-     *
-     * This method guarantees that only ONE active token exists
-     * per (user + TokenRequestType).
-     *
-     * Behavior:
-     * 1. Revoke all currently consumable tokens for the same user and type
-     *    (not consumed AND not expired).
-     * 2. Generate a new secure token using TokenIssuer.
-     * 3. Persist a new TokenRequest entity with:
-     *      - hashed token
-     *      - creation timestamp
-     *      - expiration timestamp based on TokenRequestType TTL
-     * 4. Return both the persisted TokenRequest and the raw token
-     *    (used for email links).
-     *
-     * Important:
-     * The raw token is never stored in database.
-     * Only the hashed version is persisted for security reasons.
-     *
      * @throws RandomException
      */
-    public function issue(User $user, TokenRequestType $type, ?\DateTimeImmutable $now = null): IssuedTokenRequestDTO
-    {
-        $now ??= new \DateTimeImmutable();
+    public function issue(
+        User $user,
+        TokenRequestType $type,
+    ): IssuedTokenRequestDTO {
+        $now = $this->clock->now();
 
-        $this->tokenRequestRepository->revokeConsumableForUserAndType(
-            userId: $user->getId(),
-            type: $type,
-            now: $now,
+        $usableRequests = $this->tokenRequestRepository->findUsableForUserAndType(
+            $user,
+            $type,
+            $now
         );
 
-        $issued = $this->tokenIssuer->issue();
+        // Revoke all previously the user token owner
+        foreach ($usableRequests as $usableRequest) {
+            $usableRequest->revoke($now);
+        }
 
-        $tokenRequest = $this->createTokenRequest(
-            user: $user,
-            type: $type,
-            hash: $issued->hash,
-            now: $now,
-        );
+        $generated = $this->tokenIssuer->issue();
 
-        $this->tokenRequestRepository->save($tokenRequest, true);
+        $request = (new TokenRequest())
+            ->setUser($user)
+            ->setType($type)
+            ->setTokenHash($generated->hash)
+            ->setCreatedAt($now)
+            ->setExpiresAt($now->add($type->ttl()));
+
+        $this->tokenRequestRepository->save($request, true);
 
         return new IssuedTokenRequestDTO(
-            request: $tokenRequest,
-            issued: $issued,
+            request: $request,
+            generated: $generated,
         );
     }
 
-    /**
-     * Consume a TokenRequest using its hashed token.
-     *
-     * A token can only be consumed if it is:
-     *  - not expired
-     *  - not already consumed
-     *
-     * If the token is invalid, expired or already used,
-     * an InvalidTokenException is thrown.
-     *
-     * On success:
-     *  - consumedAt is set
-     *  - the entity is persisted
-     *
-     * @throws InvalidTokenException
-     */
     public function consume(
-        string $hash,
+        string $rawToken,
         TokenRequestType $type,
-        \DateTimeImmutable $now,
     ): TokenRequest {
-        $request = $this->tokenRequestRepository->findConsumableByTokenHashAndType(
-            tokenHash: $hash,
-            type: $type,
-            now: $now,
+        $now = $this->clock->now();
+        $hash = $this->tokenHasher->hash($rawToken);
+
+        $request = $this->tokenRequestRepository->findByTokenHashAndType(
+            $hash,
+            $type,
         );
 
-        if (!$request) {
-            throw new InvalidTokenException('Invalid token.');
+        if (!$request instanceof TokenRequest) {
+            throw new InvalidTokenException('Invalid token not found.');
         }
 
-        $request->consume($now);
+        $request->consume($this->clock->now());
+
         $this->tokenRequestRepository->save($request, true);
 
         return $request;
-    }
-
-    private function createTokenRequest(
-        User $user,
-        TokenRequestType $type,
-        string $hash,
-        \DateTimeImmutable $now,
-    ): TokenRequest {
-        return (new TokenRequest())
-            ->setUser($user)
-            ->setType($type)
-            ->setTokenHash($hash)
-            ->setCreatedAt($now)
-            ->setExpiresAt($now->add($type->ttl()));
     }
 }

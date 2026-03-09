@@ -4,16 +4,24 @@ namespace App\Tests\Helper;
 
 use Symfony\Component\Clock\ClockInterface;
 
-final readonly class FixedClock implements ClockInterface
+final class FixedClock implements ClockInterface
 {
+    private \DateTimeImmutable $now;
+
     public function __construct(
-        private \DateTimeImmutable $now,
+        ?\DateTimeImmutable $now = null,
     ) {
+        $this->now = $now ?? new \DateTimeImmutable('2000-01-01 00:00:00');
+    }
+
+    public function setNow(\DateTimeImmutable $now): void
+    {
+        $this->now = $now;
     }
 
     public function sleep(float|int $seconds): void
     {
-        // We cant put on pause during process test!
+        // no-op in tests
     }
 
     public function now(): \DateTimeImmutable
@@ -27,6 +35,9 @@ final readonly class FixedClock implements ClockInterface
             ? $timezone
             : new \DateTimeZone($timezone);
 
-        return new self($this->now->setTimezone($tz));
+        $clone = clone $this;
+        $clone->now = $this->now->setTimezone($tz);
+
+        return $clone;
     }
 }

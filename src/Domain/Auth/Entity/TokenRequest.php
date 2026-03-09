@@ -3,6 +3,9 @@
 namespace App\Domain\Auth\Entity;
 
 use App\Domain\Auth\Enum\TokenRequestType;
+use App\Domain\Auth\Exception\TokenRequest\ConsumedTokenException;
+use App\Domain\Auth\Exception\TokenRequest\ExpiredTokenException;
+use App\Domain\Auth\Exception\TokenRequest\RevokedTokenException;
 use App\Domain\Auth\Repository\TokenRequestRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -50,8 +53,25 @@ class TokenRequest
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $consumedAt = null;
 
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $revokedAt = null;
+
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private \DateTimeImmutable $createdAt;
+
+    public static function issueFor(
+        User $user,
+        TokenRequestType $type,
+        string $tokenHash,
+        \DateTimeImmutable $now,
+    ): self {
+        return (new self())
+            ->setUser($user)
+            ->setType($type)
+            ->setTokenHash($tokenHash)
+            ->setCreatedAt($now)
+            ->setExpiresAt($now->add($type->ttl()));
+    }
 
     public function getId(): ?int
     {
@@ -111,11 +131,9 @@ class TokenRequest
         return $this->consumedAt;
     }
 
-    public function setConsumedAt(?\DateTimeImmutable $consumedAt): static
+    public function getRevokedAt(): ?\DateTimeImmutable
     {
-        $this->consumedAt = $consumedAt;
-
-        return $this;
+        return $this->revokedAt;
     }
 
     public function getCreatedAt(): \DateTimeImmutable
@@ -134,25 +152,54 @@ class TokenRequest
     {
         $now ??= new \DateTimeImmutable();
 
-        return $this->getExpiresAt() <= $now;
+        return $this->expiresAt <= $now;
     }
 
     public function isConsumed(): bool
     {
-        return null !== $this->getConsumedAt();
+        return null !== $this->consumedAt;
     }
 
-    public function canBeUsed(?\DateTimeImmutable $now = null): bool
+    public function isRevoked(): bool
     {
-        return !$this->isConsumed($now) && !$this->isExpired($now);
+        return null !== $this->revokedAt;
+    }
+
+    public function isUsable(?\DateTimeImmutable $now = null): bool
+    {
+        return !$this->isConsumed()
+            && !$this->isExpired($now)
+            && !$this->isRevoked();
     }
 
     public function consume(\DateTimeImmutable $now): void
     {
-        if ($this->isConsumed()) {
+        $this->ensureIsUsable($now);
+
+        $this->consumedAt = $now;
+    }
+
+    public function revoke(\DateTimeImmutable $now): void
+    {
+        if ($this->isConsumed() || $this->isRevoked()) {
             return;
         }
 
-        $this->setConsumedAt($now);
+        $this->revokedAt = $now;
+    }
+
+    public function ensureIsUsable(\DateTimeImmutable $now): void
+    {
+        if ($this->isExpired($now)) {
+            throw new ExpiredTokenException('Token request is expired.');
+        }
+
+        if ($this->isRevoked()) {
+            throw new RevokedTokenException('Token request has been revoked.');
+        }
+
+        if ($this->isConsumed()) {
+            throw new ConsumedTokenException('Token request has already been consumed.');
+        }
     }
 }

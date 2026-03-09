@@ -170,19 +170,42 @@ class RegistrationControllerTest extends WebTestCase
     }
 
     /**
+     * @throws RandomException
+     */
+    public function testUserHasValidatedUserRole(): void
+    {
+        /** @var User[] $users */
+        $users = $this->loadFixtures(['users']);
+        $user = $users['user_unconfirmed'];
+        $now = new \DateTimeImmutable();
+        $uri = $this->makeConfirmationUri($user, $now);
+
+        $this->client->request('GET', $uri);
+        $this->assertResponseRedirects(self::SIGNUP_PATH);
+        $this->client->followRedirect();
+
+        $this->em->clear();
+
+        $updatedUser = $this->em->getRepository(User::class)->find($user->getId());
+
+        $this->assertInstanceOf(User::class, $updatedUser);
+        $this->assertContains('ROLE_USER_VERIFIED', $updatedUser->getRoles());
+    }
+
+    /**
      * To prepare a confirmation token request.
      *
      * @throws RandomException
      */
     private function makeConfirmationUri(User $users, ?\DateTimeImmutable $now = null): string
     {
-        $now ?: new \DateTimeImmutable();
+        $now ??= new \DateTimeImmutable();
 
         /** @var TokenRequestService $service */
         $service = self::getContainer()->get(TokenRequestService::class);
 
         $issued = $service->issue($users, TokenRequestType::REGISTER_CONFIRMATION, $now);
 
-        return self::CONFIRM_PATH.'?token='.$issued->issued->token;
+        return self::CONFIRM_PATH.'?token='.$issued->issued->hash;
     }
 }

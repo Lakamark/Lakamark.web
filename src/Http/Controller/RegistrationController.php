@@ -130,7 +130,7 @@ class RegistrationController extends AbstractController
 
         try {
             $tokenRequest = $tokenRequestService->consume(
-                hash: $hash,
+                rawToken: $hash,
                 type: TokenRequestType::REGISTER_CONFIRMATION,
                 now: new \DateTimeImmutable(),
             );
@@ -146,6 +146,8 @@ class RegistrationController extends AbstractController
         // If already confirmed we don't do anything
         if (null === $user->getConfirmAt()) {
             $user->setConfirmAt(new \DateTimeImmutable());
+
+            dd('test');
 
             $this->userRoleManagerService->markVerified($user);
 

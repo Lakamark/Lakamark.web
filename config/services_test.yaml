@@ -6,3 +6,10 @@ services:
     alias: App\Foundation\Bridge\Resolver\NullAssetResolver
 
   App\Foundation\Captcha\Contract\CaptchaSolutionStoreInterface: '@App\Foundation\Captcha\Store\InMemoryCaptchaSolutionStore'
+
+  App\Tests\Helper\FixedClock:
+    public: true
+
+  Symfony\Component\Clock\ClockInterface:
+    alias: App\Tests\Helper\FixedClock
+    public: true
