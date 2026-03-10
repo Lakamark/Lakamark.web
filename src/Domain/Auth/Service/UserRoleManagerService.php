@@ -5,7 +5,7 @@ namespace App\Domain\Auth\Service;
 use App\Domain\Auth\Entity\User;
 use App\Domain\Auth\Enum\UserRole;
 
-final readonly class UserRoleManagerService
+readonly class UserRoleManagerService
 {
     public function grant(
         User $user,

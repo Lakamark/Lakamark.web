@@ -17,4 +17,9 @@ readonly class RegisterUserResultDTO
     {
         return null !== $this->issuedTokenRequest;
     }
+
+    public function isOauthRequest(): bool
+    {
+        return $this->isOauthRequest;
+    }
 }

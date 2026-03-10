@@ -2,18 +2,13 @@
 
 namespace App\Domain\Auth\Subscriber;
 
-use App\Domain\Auth\Contract\ConfirmationTokenEventInterface;
-use App\Domain\Auth\Entity\User;
+use App\Domain\Auth\Event\BeforeUserRegisterEvent;
 use App\Domain\Auth\Event\UserRegisteredEvent;
 use App\Domain\Auth\Event\UserResentConfirmationEvent;
 use App\Foundation\Mailing\MailerBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
 
-/**
- * FIXME: handle unconfirmed users trying to login
- * allow resend confirmation token.
- */
 readonly class AuthSubscriber implements EventSubscriberInterface
 {
     public function __construct(
@@ -24,33 +19,26 @@ readonly class AuthSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            UserRegisteredEvent::class => 'onConfirmationRequested',
-            UserResentConfirmationEvent::class => 'onConfirmationRequested',
+            BeforeUserRegisterEvent::class => 'onBeforeUserRegister',
+            UserRegisteredEvent::class => 'onUserRegistered',
+            UserResentConfirmationEvent::class => 'onUserResentConfirmation',
         ];
     }
 
-    /**
-     * @throws ExceptionInterface
-     */
-    public function onConfirmationRequested(
-        ConfirmationTokenEventInterface $event,
-    ): void {
-        if ($event instanceof UserRegisteredEvent && $event->isUseOauthRequest()) {
-            return;
-        }
-
-        $dto = $event->getIssuedTokenRequestDto();
-        $user = $dto->request->getUser();
-        $token = $dto->getToken();
-
-        $this->sendEmail($user, $token);
+    public function onBeforeUserRegister(BeforeUserRegisterEvent $event): void
+    {
+        // no-op for now
     }
 
     /**
      * @throws ExceptionInterface
      */
-    private function sendEmail(User $user, string $token): void
+    public function onUserRegistered(UserRegisteredEvent $event): void
     {
+        $dto = $event->getIssuedTokenRequestDto();
+        $user = $dto->getUser();
+        $token = $dto->getToken();
+
         $email = $this->mailerBuilder->buildEmail('mails/auth/register.twig', [
             'user' => $user,
             'token' => $token,
@@ -59,5 +47,9 @@ readonly class AuthSubscriber implements EventSubscriberInterface
             ->subject('Laka Mark - Confirm your registration');
 
         $this->mailerBuilder->deliveryEmail($email);
+    }
+
+    public function onUserResentConfirmation(UserResentConfirmationEvent $event): void
+    {
     }
 }

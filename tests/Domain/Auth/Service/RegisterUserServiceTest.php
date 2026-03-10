@@ -2,6 +2,7 @@
 
 namespace App\Tests\Domain\Auth\Service;
 
+use App\Domain\Auth\DTO\IssuedTokenRequestDTO;
 use App\Domain\Auth\Entity\TokenRequest;
 use App\Domain\Auth\Entity\User;
 use App\Domain\Auth\Enum\TokenRequestType;
@@ -11,6 +12,7 @@ use App\Tests\DomainServiceTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Random\RandomException;
+use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -26,6 +28,7 @@ class RegisterUserServiceTest extends DomainServiceTestCase
         $em = $this->service(EntityManagerInterface::class);
         $tokenRequestService = $this->service(TokenRequestService::class);
         $dispatcher = $this->service(EventDispatcherInterface::class);
+        $clock = $this->service(ClockInterface::class);
 
         $this->assertInstanceOf(UserPasswordHasherInterface::class, $passwordHasher);
         $this->assertInstanceOf(EntityManagerInterface::class, $em);
@@ -37,19 +40,18 @@ class RegisterUserServiceTest extends DomainServiceTestCase
             $em,
             $tokenRequestService,
             $dispatcher,
+            $clock
         );
     }
 
     /**
      * @throws RandomException
      */
-    public function testRegisterDoesNotIssueConfirmationTokenForOauthRequest(): void
+    public function testRegisterIssuesConfirmationTokenForRegularRequest(): void
     {
-        $this->setFixedClock(new \DateTimeImmutable('2026-03-09 10:00:00'));
-
         $user = (new User())
-            ->setEmail('oauth@example.com')
-            ->setUsername('OAuthUser');
+            ->setEmail('regular@example.com')
+            ->setUsername('RegularUser');
 
         $request = new Request();
 
@@ -57,28 +59,37 @@ class RegisterUserServiceTest extends DomainServiceTestCase
             user: $user,
             plainPassword: 'secret123',
             request: $request,
-            isOauthRequest: true,
         );
+
+        $this->assertFalse($result->isOauthRequest());
+        $this->assertTrue($result->hasIssuedTokenRequest());
+        $this->assertInstanceOf(User::class, $result->user);
+
+        $this->assertInstanceOf(IssuedTokenRequestDTO::class, $result->issuedTokenRequest);
+        $this->assertSame(
+            TokenRequestType::REGISTER_CONFIRMATION,
+            $result->issuedTokenRequest->getType()
+        );
+        $this->assertNotEmpty($result->issuedTokenRequest->getToken());
+        $this->assertNotEmpty($result->issuedTokenRequest->getHash());
 
         $this->flushAndClear();
 
         $savedUser = $this->repository(User::class)->findOneBy([
-            'email' => 'oauth@example.com',
+            'email' => 'regular@example.com',
         ]);
 
         $this->assertInstanceOf(User::class, $savedUser);
         $this->assertNotSame('secret123', $savedUser->getPassword());
-        $this->assertNotNull($savedUser->getPassword());
         $this->assertNotNull($savedUser->getCreatedAt());
 
-        $tokenRequest = $this->repository(TokenRequest::class)->findOneBy([
+        $savedTokenRequest = $this->repository(TokenRequest::class)->findOneBy([
             'user' => $savedUser,
             'type' => TokenRequestType::REGISTER_CONFIRMATION,
         ]);
 
-        $this->assertNull($tokenRequest);
-        $this->assertFalse($result->hasIssuedTokenRequest());
-        $this->assertTrue($result->isOauthRequest);
-        $this->assertSame('oauth@example.com', $result->user->getEmail());
+        $this->assertInstanceOf(TokenRequest::class, $savedTokenRequest);
+        $this->assertSame(TokenRequestType::REGISTER_CONFIRMATION, $savedTokenRequest->getType());
+        $this->assertSame($savedUser->getId(), $savedTokenRequest->getUser()->getId());
     }
 }

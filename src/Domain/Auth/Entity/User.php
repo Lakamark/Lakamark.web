@@ -289,4 +289,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return null !== $this->getConfirmAt();
     }
+
+    public function confirmEmail(\DateTimeImmutable $confirmedAt): self
+    {
+        $this->setConfirmAt($confirmedAt);
+
+        return $this;
+    }
 }

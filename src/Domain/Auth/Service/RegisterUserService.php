@@ -2,6 +2,7 @@
 
 namespace App\Domain\Auth\Service;
 
+use App\Domain\Auth\DTO\IssuedTokenRequestDTO;
 use App\Domain\Auth\DTO\RegisterUserResultDTO;
 use App\Domain\Auth\Entity\User;
 use App\Domain\Auth\Enum\TokenRequestType;
@@ -10,6 +11,7 @@ use App\Domain\Auth\Event\UserRegisteredEvent;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Random\RandomException;
+use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -20,6 +22,7 @@ readonly class RegisterUserService
         private EntityManagerInterface $em,
         private TokenRequestService $tokenRequestService,
         private EventDispatcherInterface $dispatcher,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -36,32 +39,46 @@ readonly class RegisterUserService
     ): RegisterUserResultDTO {
         $user
             ->setPassword($this->passwordHasher->hashPassword($user, $plainPassword))
-            ->setCreatedAt(new \DateTimeImmutable());
+            ->setCreatedAt($this->clock->now());
 
-        $this->dispatcher->dispatch(new BeforeUserRegisterEvent($user, $request));
+        $this->dispatchBeforeRegister($user, $request);
 
         $this->em->persist($user);
         $this->em->flush();
 
         $issuedTokenRequest = null;
 
-        // If the user signup with via the RegistrationForm
+        // Issue a confirmation token only for non-OAuth registrations.
         if (!$isOauthRequest) {
             $issuedTokenRequest = $this->tokenRequestService->issue(
                 user: $user,
                 type: TokenRequestType::REGISTER_CONFIRMATION,
             );
 
-            // Dispatch UserRegisteredEvent.
-            $this->dispatcher->dispatch(
-                new UserRegisteredEvent($issuedTokenRequest)
-            );
+            $this->dispatchUserRegistered($issuedTokenRequest);
         }
 
         return new RegisterUserResultDTO(
             user: $user,
             isOauthRequest: $isOauthRequest,
             issuedTokenRequest: $issuedTokenRequest,
+        );
+    }
+
+    private function dispatchBeforeRegister(
+        User $user,
+        Request $request,
+    ): void {
+        $this->dispatcher->dispatch(
+            new BeforeUserRegisterEvent($user, $request)
+        );
+    }
+
+    private function dispatchUserRegistered(
+        IssuedTokenRequestDTO $issuedTokenRequest,
+    ): void {
+        $this->dispatcher->dispatch(
+            new UserRegisteredEvent($issuedTokenRequest)
         );
     }
 }

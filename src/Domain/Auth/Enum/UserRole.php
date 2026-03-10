@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Domain\Auth\Enum;
 
-use App\Domain\Auth\Entity\User;
-
 enum UserRole: string
 {
     case USER = 'ROLE_USER';
