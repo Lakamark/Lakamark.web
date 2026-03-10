@@ -4,10 +4,6 @@
 
 {% block body %}
     <div class="narrow-container">
-        {% for flash_error in app.flashes('verify_email_error') %}
-            <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
-        {% endfor %}
-
         <h1 class="h1">Register</h1>
 
         {{ form_errors(registrationForm) }}

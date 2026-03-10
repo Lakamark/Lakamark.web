@@ -5,6 +5,7 @@ namespace App\Domain\Auth\Service;
 use App\Domain\Auth\DTO\IssuedTokenRequestDTO;
 use App\Domain\Auth\DTO\RegisterUserResultDTO;
 use App\Domain\Auth\Entity\User;
+use App\Domain\Auth\Enum\OAuthProvider;
 use App\Domain\Auth\Enum\TokenRequestType;
 use App\Domain\Auth\Event\BeforeUserRegisterEvent;
 use App\Domain\Auth\Event\UserRegisteredEvent;
@@ -35,32 +36,36 @@ readonly class RegisterUserService
         User $user,
         string $plainPassword,
         Request $request,
-        bool $isOauthRequest = false,
+        OAuthProvider $authProvider = OAuthProvider::LOCAL,
     ): RegisterUserResultDTO {
-        $user
-            ->setPassword($this->passwordHasher->hashPassword($user, $plainPassword))
-            ->setCreatedAt($this->clock->now());
+        $user->setCreatedAt($this->clock->now());
 
-        $this->dispatchBeforeRegister($user, $request);
+        if (OAuthProvider::LOCAL === $authProvider) {
+            $user->setPassword(
+                $this->passwordHasher->hashPassword($user, $plainPassword)
+            );
+        }
+
+        $this->dispatchBeforeRegister($user, $request, $authProvider);
 
         $this->em->persist($user);
         $this->em->flush();
 
         $issuedTokenRequest = null;
 
-        // Issue a confirmation token only for non-OAuth registrations.
-        if (!$isOauthRequest) {
+        // Issue a confirmation token only for local registrations.
+        if (OAuthProvider::LOCAL === $authProvider) {
             $issuedTokenRequest = $this->tokenRequestService->issue(
                 user: $user,
                 type: TokenRequestType::REGISTER_CONFIRMATION,
             );
-
-            $this->dispatchUserRegistered($issuedTokenRequest);
         }
+
+        $this->dispatchUserRegistered($user, $authProvider, $issuedTokenRequest);
 
         return new RegisterUserResultDTO(
             user: $user,
-            isOauthRequest: $isOauthRequest,
+            authProvider: $authProvider,
             issuedTokenRequest: $issuedTokenRequest,
         );
     }
@@ -68,17 +73,20 @@ readonly class RegisterUserService
     private function dispatchBeforeRegister(
         User $user,
         Request $request,
+        OAuthProvider $authProvider,
     ): void {
         $this->dispatcher->dispatch(
-            new BeforeUserRegisterEvent($user, $request)
+            new BeforeUserRegisterEvent($user, $request, $authProvider)
         );
     }
 
     private function dispatchUserRegistered(
-        IssuedTokenRequestDTO $issuedTokenRequest,
+        User $user,
+        OAuthProvider $authProvider,
+        ?IssuedTokenRequestDTO $issuedTokenRequest,
     ): void {
         $this->dispatcher->dispatch(
-            new UserRegisteredEvent($issuedTokenRequest)
+            new UserRegisteredEvent($user, $authProvider, $issuedTokenRequest)
         );
     }
 }

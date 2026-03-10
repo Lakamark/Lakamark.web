@@ -5,6 +5,7 @@ namespace App\Tests\Domain\Auth\Subscriber;
 use App\Domain\Auth\DTO\IssuedTokenRequestDTO;
 use App\Domain\Auth\Entity\TokenRequest;
 use App\Domain\Auth\Entity\User;
+use App\Domain\Auth\Enum\OAuthProvider;
 use App\Domain\Auth\Event\UserRegisteredEvent;
 use App\Domain\Auth\Subscriber\AuthSubscriber;
 use App\Foundation\Mailing\MailerBuilder;
@@ -37,7 +38,7 @@ class AuthSubscriberBehaviorTest extends TestCase
             ),
         );
 
-        $event = new UserRegisteredEvent($issuedTokenRequest);
+        $event = new UserRegisteredEvent($user, OAuthProvider::LOCAL, $issuedTokenRequest);
 
         $email = new Email();
 

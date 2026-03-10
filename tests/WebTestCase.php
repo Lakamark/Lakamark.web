@@ -88,6 +88,11 @@ class WebTestCase extends \Symfony\Bundle\FrameworkBundle\Test\WebTestCase
         return new Kernel($env, $debug);
     }
 
+    protected function service(string $id): object
+    {
+        return self::getContainer()->get($id);
+    }
+
     /**
      * To count errors form validation.
      */

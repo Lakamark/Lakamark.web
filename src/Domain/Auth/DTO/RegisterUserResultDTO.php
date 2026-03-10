@@ -3,12 +3,13 @@
 namespace App\Domain\Auth\DTO;
 
 use App\Domain\Auth\Entity\User;
+use App\Domain\Auth\Enum\OAuthProvider;
 
 readonly class RegisterUserResultDTO
 {
     public function __construct(
         public User $user,
-        public bool $isOauthRequest,
+        public OAuthProvider $authProvider,
         public ?IssuedTokenRequestDTO $issuedTokenRequest = null,
     ) {
     }
@@ -18,8 +19,13 @@ readonly class RegisterUserResultDTO
         return null !== $this->issuedTokenRequest;
     }
 
-    public function isOauthRequest(): bool
+    public function isLocalRegistration(): bool
     {
-        return $this->isOauthRequest;
+        return OAuthProvider::LOCAL === $this->authProvider;
+    }
+
+    public function isOauthRegistration(): bool
+    {
+        return OAuthProvider::LOCAL !== $this->authProvider;
     }
 }

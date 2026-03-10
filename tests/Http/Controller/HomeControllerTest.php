@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Http\controller;
+namespace App\Tests\Http\Controller;
 
 use App\Tests\FixturesLoaderTrait;
 use App\Tests\WebTestCase;

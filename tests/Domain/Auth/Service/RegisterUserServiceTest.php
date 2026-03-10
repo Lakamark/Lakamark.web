@@ -47,7 +47,7 @@ class RegisterUserServiceTest extends DomainServiceTestCase
     /**
      * @throws RandomException
      */
-    public function testRegisterIssuesConfirmationTokenForRegularRequest(): void
+    public function testRegisterIssuesConfirmationTokenForLocalRegistration(): void
     {
         $user = (new User())
             ->setEmail('regular@example.com')
@@ -61,7 +61,7 @@ class RegisterUserServiceTest extends DomainServiceTestCase
             request: $request,
         );
 
-        $this->assertFalse($result->isOauthRequest());
+        $this->assertTrue($result->isLocalRegistration());
         $this->assertTrue($result->hasIssuedTokenRequest());
         $this->assertInstanceOf(User::class, $result->user);
 

@@ -10,7 +10,7 @@
 
     {{ e.button(
         "Confirm my email",
-        url('app_register_confirm', { token: token })
+        url('app_auth_resend_confirmation', { token: token })
     ) }}
 
     <p>Best regards</p>
