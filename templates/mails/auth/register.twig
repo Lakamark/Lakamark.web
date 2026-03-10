@@ -2,8 +2,16 @@
 {% import "mails/macros.twig" as e %}
 
 {% block body %}
-    <h1>Hell {{ user.username }}!</h1>
-    <p>Almost here! You should confirm your email! To follow the link below:</p>
-        {{ e.button("Cofirme my email", url('app_register_confirm', {hash: hash})) }}
+    <h1>Hello {{ user.username }}!</h1>
+
+    <p>
+        Almost there! Please confirm your email by clicking the link below:
+    </p>
+
+    {{ e.button(
+        "Confirm my email",
+        url('app_register_confirm', { token: token })
+    ) }}
+
     <p>Best regards</p>
 {% endblock %}

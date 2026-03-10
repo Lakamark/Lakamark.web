@@ -2,6 +2,7 @@
 
 namespace App\Domain\Auth\Subscriber;
 
+use App\Domain\Auth\Contract\ConfirmationTokenEventInterface;
 use App\Domain\Auth\Entity\User;
 use App\Domain\Auth\Event\UserRegisteredEvent;
 use App\Domain\Auth\Event\UserResentConfirmationEvent;
@@ -23,63 +24,40 @@ readonly class AuthSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            UserRegisteredEvent::class => 'onUserRegistered',
-            UserResentConfirmationEvent::class => 'onUserResentConfirmation',
+            UserRegisteredEvent::class => 'onConfirmationRequested',
+            UserResentConfirmationEvent::class => 'onConfirmationRequested',
         ];
     }
 
     /**
      * @throws ExceptionInterface
      */
-    public function onUserRegistered(UserRegisteredEvent $event): void
-    {
-        // If the user use oauth login e.g. (Facebook, Google GitHub etc.)
-        if ($event->isUseOauthRequest()) {
+    public function onConfirmationRequested(
+        ConfirmationTokenEventInterface $event,
+    ): void {
+        if ($event instanceof UserRegisteredEvent && $event->isUseOauthRequest()) {
             return;
         }
 
-        // Get the requestToken
-        $requestTokenDto = $event->getIssuedTokenRequestDto();
+        $dto = $event->getIssuedTokenRequestDto();
+        $user = $dto->request->getUser();
+        $token = $dto->getToken();
 
-        // user
-        $user = $requestTokenDto->request->getUser();
-
-        // hash
-        $hash = $requestTokenDto->request->getTokenHash();
-
-        // Create a confirmation email and send it.
-        $this->buildEmailAndSend($user, $hash);
+        $this->sendEmail($user, $token);
     }
 
     /**
      * @throws ExceptionInterface
      */
-    public function onUserResentConfirmation(UserResentConfirmationEvent $event): void
-    {
-        // Get the requestToken
-        $requestTokenDto = $event->getTokenRequestDTO();
-
-        // user
-        $user = $requestTokenDto->request->getUser();
-
-        // hash
-        $hash = $requestTokenDto->request->getTokenHash();
-        $this->buildEmailAndSend($user, $hash);
-    }
-
-    /**
-     * @throws ExceptionInterface
-     */
-    private function buildEmailAndSend(User $user, string $hash): void
+    private function sendEmail(User $user, string $token): void
     {
         $email = $this->mailerBuilder->buildEmail('mails/auth/register.twig', [
             'user' => $user,
-            'hash' => $hash,
+            'token' => $token,
         ])
             ->to($user->getEmail())
             ->subject('Laka Mark - Confirm your registration');
 
-        // send in the queue.
         $this->mailerBuilder->deliveryEmail($email);
     }
 }

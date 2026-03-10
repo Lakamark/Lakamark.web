@@ -2,16 +2,17 @@
 
 namespace App\Domain\Auth\Event;
 
+use App\Domain\Auth\Contract\ConfirmationTokenEventInterface;
 use App\Domain\Auth\DTO\IssuedTokenRequestDTO;
 
-readonly class UserResentConfirmationEvent
+readonly class UserResentConfirmationEvent implements ConfirmationTokenEventInterface
 {
     public function __construct(
         private IssuedTokenRequestDTO $tokenRequestDTO,
     ) {
     }
 
-    public function getTokenRequestDTO(): IssuedTokenRequestDTO
+    public function getIssuedTokenRequestDto(): IssuedTokenRequestDTO
     {
         return $this->tokenRequestDTO;
     }
