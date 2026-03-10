@@ -71,8 +71,11 @@ final class CaptchaServiceTest extends TestCase
 
         $this->assertTrue($this->service->verify('image', '42'));
         $this->assertSame(0, $this->session->get('CAPTCHA_TRIES'));
-        $this->assertNull($this->session->get('CAPTCHA_KEY'));
-        $this->assertNull($this->session->get('CAPTCHA_GENERATED_AT'));
+        $this->assertSame('abc123', $this->session->get('CAPTCHA_KEY'));
+        $this->assertSame('image', $this->session->get('CAPTCHA_TYPE'));
+        $this->assertNotNull($this->session->get('CAPTCHA_GENERATED_AT'));
+        $this->assertTrue($this->session->get('CAPTCHA_VERIFIED'));
+        $this->assertSame('image', $this->session->get('CAPTCHA_VERIFIED_TYPE'));
     }
 
     /**

@@ -15,23 +15,152 @@ use Random\RandomException;
 final class TokenRequestRepositoryTest extends KernelTestCase
 {
     use FixturesLoaderTrait;
+
     private TokenRequestRepositoryInterface $repository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        /** @var TokenRequestRepositoryInterface $repo */
-        $repo = $this->em->getRepository(TokenRequest::class);
-
-        $this->repository = $repo;
+        /** @var TokenRequestRepositoryInterface $repository */
+        $repository = $this->em->getRepository(TokenRequest::class);
+        $this->repository = $repository;
     }
 
     /**
-     * @throws OptimisticLockException
      * @throws ORMException
+     * @throws OptimisticLockException
+     * @throws RandomException
      */
-    public function testFindByTokenHashAndTypeReturnsTokenEvenIfExpired(): void
+    public function testSavePersistsTokenRequest(): void
+    {
+        $this->loadFixtures(['users']);
+
+        $user = $this->em->getRepository(User::class)->findOneBy([]);
+        $this->assertInstanceOf(User::class, $user);
+
+        $token = $this->createTokenRequest(
+            user: $user,
+            type: TokenRequestType::EMAIL_CONFIRMATION,
+            expiresAt: new \DateTimeImmutable('+1 hour'),
+        );
+
+        $hash = $token->getTokenHash();
+
+        $this->repository->save($token, true);
+        $this->em->clear();
+
+        $found = $this->repository->findByTokenHashAndType(
+            $hash,
+            TokenRequestType::EMAIL_CONFIRMATION,
+        );
+
+        $this->assertNotNull($found);
+        $this->assertSame($hash, $found->getTokenHash());
+    }
+
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @throws RandomException
+     */
+    public function testFindByTokenHashAndTypeReturnsMatchingToken(): void
+    {
+        $this->loadFixtures(['users']);
+
+        $user = $this->em->getRepository(User::class)->findOneBy([]);
+        $this->assertInstanceOf(User::class, $user);
+
+        $token = $this->createTokenRequest(
+            user: $user,
+            type: TokenRequestType::EMAIL_CONFIRMATION,
+            expiresAt: new \DateTimeImmutable('+1 hour'),
+        );
+
+        $hash = $token->getTokenHash();
+
+        $this->em->persist($token);
+        $this->em->flush();
+        $this->em->clear();
+
+        $found = $this->repository->findByTokenHashAndType(
+            $hash,
+            TokenRequestType::EMAIL_CONFIRMATION,
+        );
+
+        $this->assertNotNull($found);
+        $this->assertSame($hash, $found->getTokenHash());
+        $this->assertSame(TokenRequestType::EMAIL_CONFIRMATION, $found->getType());
+    }
+
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @throws RandomException
+     */
+    public function testFindByTokenHashAndTypeReturnsNullForUnknownHash(): void
+    {
+        $this->loadFixtures(['users']);
+
+        $user = $this->em->getRepository(User::class)->findOneBy([]);
+        $this->assertInstanceOf(User::class, $user);
+
+        $token = $this->createTokenRequest(
+            user: $user,
+            type: TokenRequestType::EMAIL_CONFIRMATION,
+            expiresAt: new \DateTimeImmutable('+1 hour'),
+        );
+
+        $this->em->persist($token);
+        $this->em->flush();
+        $this->em->clear();
+
+        $found = $this->repository->findByTokenHashAndType(
+            str_repeat('f', 64),
+            TokenRequestType::EMAIL_CONFIRMATION,
+        );
+
+        $this->assertNull($found);
+    }
+
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @throws RandomException
+     */
+    public function testFindByTokenHashAndTypeReturnsNullForWrongType(): void
+    {
+        $this->loadFixtures(['users']);
+
+        $user = $this->em->getRepository(User::class)->findOneBy([]);
+        $this->assertInstanceOf(User::class, $user);
+
+        $token = $this->createTokenRequest(
+            user: $user,
+            type: TokenRequestType::EMAIL_CONFIRMATION,
+            expiresAt: new \DateTimeImmutable('+1 hour'),
+        );
+
+        $hash = $token->getTokenHash();
+
+        $this->em->persist($token);
+        $this->em->flush();
+        $this->em->clear();
+
+        $found = $this->repository->findByTokenHashAndType(
+            $hash,
+            TokenRequestType::PASSWORD_RESET,
+        );
+
+        $this->assertNull($found);
+    }
+
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @throws RandomException
+     */
+    public function testFindByTokenHashAndTypeReturnsExpiredToken(): void
     {
         $this->loadFixtures(['users']);
 
@@ -43,94 +172,29 @@ final class TokenRequestRepositoryTest extends KernelTestCase
             type: TokenRequestType::EMAIL_CONFIRMATION,
             expiresAt: new \DateTimeImmutable('-1 hour'),
         );
+
         $hash = $token->getTokenHash();
 
         $this->em->persist($token);
         $this->em->flush();
         $this->em->clear();
 
-        $found = $this->repository->findByTokenHashAndType($hash, TokenRequestType::EMAIL_CONFIRMATION);
-
-        $this->assertNotNull($found);
-        $this->assertSame($hash, $found->getTokenHash());
-        $this->assertSame(TokenRequestType::EMAIL_CONFIRMATION, $found->getType());
-    }
-
-    /**
-     * @throws \DateMalformedStringException
-     * @throws OptimisticLockException
-     * @throws ORMException
-     */
-    public function testFindConsumableByTokenHashAndTypeReturnsActiveToken(): void
-    {
-        $this->loadFixtures(['users']);
-
-        $user = $this->em->getRepository(User::class)->findOneBy([]);
-        $this->assertInstanceOf(User::class, $user);
-
-        $now = new \DateTimeImmutable('now');
-        $token = $this->createTokenRequest(
-            user: $user,
-            type: TokenRequestType::EMAIL_CONFIRMATION,
-            expiresAt: $now->modify('+1 hour'),
-        );
-        $hash = $token->getTokenHash();
-
-        $this->em->persist($token);
-        $this->em->flush();
-        $this->em->clear();
-
-        $found = $this->repository->findConsumableByTokenHashAndType(
+        $found = $this->repository->findByTokenHashAndType(
             $hash,
             TokenRequestType::EMAIL_CONFIRMATION,
-            $now,
         );
 
         $this->assertNotNull($found);
         $this->assertSame($hash, $found->getTokenHash());
-        $this->assertSame(TokenRequestType::EMAIL_CONFIRMATION, $found->getType());
-        $this->assertNull($found->getConsumedAt());
     }
 
     /**
-     * @throws OptimisticLockException
-     * @throws \DateMalformedStringException
      * @throws ORMException
-     */
-    public function testFindConsumableByTokenHashAndTypeDoesNotReturnExpiredToken(): void
-    {
-        $this->loadFixtures(['users']);
-
-        $user = $this->em->getRepository(User::class)->findOneBy([]);
-        $this->assertInstanceOf(User::class, $user);
-
-        $now = new \DateTimeImmutable('now');
-        $token = $this->createTokenRequest(
-            user: $user,
-            type: TokenRequestType::EMAIL_CONFIRMATION,
-            expiresAt: $now->modify('-1 hour'),
-        );
-        $hash = $token->getTokenHash();
-
-        $this->em->persist($token);
-        $this->em->flush();
-        $this->em->clear();
-
-        $found = $this->repository->findConsumableByTokenHashAndType(
-            $hash,
-            TokenRequestType::EMAIL_CONFIRMATION,
-            $now,
-        );
-
-        $this->assertNull($found);
-    }
-
-    /**
      * @throws OptimisticLockException
+     * @throws RandomException
      * @throws \DateMalformedStringException
-     * @throws ORMException
      */
-    public function testFindConsumableByTokenHashAndTypeDoesNotReturnConsumedToken(): void
+    public function testFindByTokenHashAndTypeReturnsConsumedToken(): void
     {
         $this->loadFixtures(['users']);
 
@@ -144,8 +208,6 @@ final class TokenRequestRepositoryTest extends KernelTestCase
             type: TokenRequestType::EMAIL_CONFIRMATION,
             expiresAt: $now->modify('+1 hour'),
         );
-
-        // Mark as consumed
         $token->consume($now);
 
         $hash = $token->getTokenHash();
@@ -154,87 +216,183 @@ final class TokenRequestRepositoryTest extends KernelTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $found = $this->repository->findConsumableByTokenHashAndType(
+        $found = $this->repository->findByTokenHashAndType(
             $hash,
+            TokenRequestType::EMAIL_CONFIRMATION,
+        );
+
+        $this->assertNotNull($found);
+        $this->assertSame($hash, $found->getTokenHash());
+        $this->assertNotNull($found->getConsumedAt());
+    }
+
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @throws \DateMalformedStringException
+     */
+    public function testFindUsableForUserAndTypeReturnsOnlyUsableTokens(): void
+    {
+        $this->loadFixtures(['users']);
+
+        $users = $this->em->getRepository(User::class)->findAll();
+        $this->assertGreaterThanOrEqual(2, count($users));
+
+        /** @var User $user */
+        $user = $users[0];
+
+        /** @var User $otherUser */
+        $otherUser = $users[1];
+
+        $this->assertInstanceOf(User::class, $user);
+        $this->assertInstanceOf(User::class, $otherUser);
+        $this->assertNotSame($user->getId(), $otherUser->getId());
+
+        $userId = $user->getId();
+
+        $now = new \DateTimeImmutable('2026-03-10 12:00:00');
+
+        $usable1 = (new TokenRequest())
+            ->setUser($user)
+            ->setType(TokenRequestType::EMAIL_CONFIRMATION)
+            ->setTokenHash(str_repeat('a', 64))
+            ->setCreatedAt($now->modify('-10 minutes'))
+            ->setExpiresAt($now->modify('+1 hour'));
+
+        $usable2 = (new TokenRequest())
+            ->setUser($user)
+            ->setType(TokenRequestType::EMAIL_CONFIRMATION)
+            ->setTokenHash(str_repeat('b', 64))
+            ->setCreatedAt($now->modify('-20 minutes'))
+            ->setExpiresAt($now->modify('+2 hours'));
+
+        $expired = (new TokenRequest())
+            ->setUser($user)
+            ->setType(TokenRequestType::EMAIL_CONFIRMATION)
+            ->setTokenHash(str_repeat('c', 64))
+            ->setCreatedAt($now->modify('-3 hours'))
+            ->setExpiresAt($now->modify('-1 minute'));
+
+        $consumed = (new TokenRequest())
+            ->setUser($user)
+            ->setType(TokenRequestType::EMAIL_CONFIRMATION)
+            ->setTokenHash(str_repeat('d', 64))
+            ->setCreatedAt($now->modify('-30 minutes'))
+            ->setExpiresAt($now->modify('+1 hour'));
+
+        $consumed->consume($now->modify('-5 minutes'));
+
+        $revoked = (new TokenRequest())
+            ->setUser($user)
+            ->setType(TokenRequestType::EMAIL_CONFIRMATION)
+            ->setTokenHash(str_repeat('e', 64))
+            ->setCreatedAt($now->modify('-40 minutes'))
+            ->setExpiresAt($now->modify('+1 hour'));
+
+        $revoked->revoke($now->modify('-2 minutes'));
+
+        $wrongType = (new TokenRequest())
+            ->setUser($user)
+            ->setType(TokenRequestType::PASSWORD_RESET)
+            ->setTokenHash(str_repeat('f', 64))
+            ->setCreatedAt($now->modify('-15 minutes'))
+            ->setExpiresAt($now->modify('+1 hour'));
+
+        $otherUserToken = (new TokenRequest())
+            ->setUser($otherUser)
+            ->setType(TokenRequestType::EMAIL_CONFIRMATION)
+            ->setTokenHash(str_repeat('g', 64))
+            ->setCreatedAt($now->modify('-12 minutes'))
+            ->setExpiresAt($now->modify('+1 hour'));
+
+        $this->em->persist($usable1);
+        $this->em->persist($usable2);
+        $this->em->persist($expired);
+        $this->em->persist($consumed);
+        $this->em->persist($revoked);
+        $this->em->persist($wrongType);
+        $this->em->persist($otherUserToken);
+        $this->em->flush();
+        $this->em->clear();
+
+        /** @var User|null $user */
+        $user = $this->em->getRepository(User::class)->find($userId);
+        $this->assertInstanceOf(User::class, $user);
+
+        $results = $this->repository->findUsableForUserAndType(
+            $user,
             TokenRequestType::EMAIL_CONFIRMATION,
             $now,
         );
 
-        $this->assertNull($found);
+        $this->assertCount(2, $results);
+
+        $hashes = array_map(
+            static fn (TokenRequest $tokenRequest): string => $tokenRequest->getTokenHash(),
+            $results,
+        );
+
+        $this->assertContains(str_repeat('a', 64), $hashes);
+        $this->assertContains(str_repeat('b', 64), $hashes);
+        $this->assertNotContains(str_repeat('c', 64), $hashes);
+        $this->assertNotContains(str_repeat('d', 64), $hashes);
+        $this->assertNotContains(str_repeat('e', 64), $hashes);
+        $this->assertNotContains(str_repeat('f', 64), $hashes);
+        $this->assertNotContains(str_repeat('g', 64), $hashes);
     }
 
     /**
+     * @throws ORMException
      * @throws OptimisticLockException
      * @throws \DateMalformedStringException
-     * @throws ORMException
      */
-    public function testRevokeConsumableForUserAndTypeConsumesOnlyActiveTokens(): void
+    public function testFindUsableForUserAndTypeReturnsEmptyArrayWhenNoUsableTokenExists(): void
     {
         $this->loadFixtures(['users']);
 
         $user = $this->em->getRepository(User::class)->findOneBy([]);
         $this->assertInstanceOf(User::class, $user);
 
-        $now = new \DateTimeImmutable('now');
+        $now = new \DateTimeImmutable('2026-03-10 12:00:00');
 
-        // 1) active token (should be revoked)
-        $active = $this->createTokenRequest(
-            user: $user,
-            type: TokenRequestType::EMAIL_CONFIRMATION,
-            expiresAt: $now->modify('+2 hours'),
-        );
+        $expired = (new TokenRequest())
+            ->setUser($user)
+            ->setType(TokenRequestType::EMAIL_CONFIRMATION)
+            ->setTokenHash(str_repeat('h', 64))
+            ->setCreatedAt($now->modify('-2 hours'))
+            ->setExpiresAt($now->modify('-1 minute'));
 
-        // 2) expired token (should NOT be revoked)
-        $expired = $this->createTokenRequest(
-            user: $user,
-            type: TokenRequestType::EMAIL_CONFIRMATION,
-            expiresAt: $now->modify('-2 hours'),
-        );
+        $consumed = (new TokenRequest())
+            ->setUser($user)
+            ->setType(TokenRequestType::EMAIL_CONFIRMATION)
+            ->setTokenHash(str_repeat('i', 64))
+            ->setCreatedAt($now->modify('-30 minutes'))
+            ->setExpiresAt($now->modify('+1 hour'));
 
-        // 3) consumed token (should NOT be revoked again)
-        $consumed = $this->createTokenRequest(
-            user: $user,
-            type: TokenRequestType::EMAIL_CONFIRMATION,
-            expiresAt: $now->modify('+2 hours'),
-        );
-        $consumed->consume($now);
+        $consumed->consume($now->modify('-10 minutes'));
 
-        $this->em->persist($active);
+        $revoked = (new TokenRequest())
+            ->setUser($user)
+            ->setType(TokenRequestType::EMAIL_CONFIRMATION)
+            ->setTokenHash(str_repeat('j', 64))
+            ->setCreatedAt($now->modify('-30 minutes'))
+            ->setExpiresAt($now->modify('+1 hour'));
+
+        $revoked->revoke($now->modify('-5 minutes'));
+
         $this->em->persist($expired);
         $this->em->persist($consumed);
+        $this->em->persist($revoked);
         $this->em->flush();
         $this->em->clear();
 
-        $count = $this->repository->revokeConsumableForUserAndType(
-            $user->getId(),
+        $results = $this->repository->findUsableForUserAndType(
+            $user,
             TokenRequestType::EMAIL_CONFIRMATION,
             $now,
         );
 
-        // Only the single active token should be affected
-        $this->assertSame(1, $count);
-
-        // Reload & assert states
-        $reloadedActive = $this->repository->findByTokenHashAndType(
-            $active->getTokenHash(),
-            TokenRequestType::EMAIL_CONFIRMATION
-        );
-        $this->assertNotNull($reloadedActive);
-        $this->assertNotNull($reloadedActive->getConsumedAt());
-
-        $reloadedExpired = $this->repository->findByTokenHashAndType(
-            $expired->getTokenHash(),
-            TokenRequestType::EMAIL_CONFIRMATION
-        );
-        $this->assertNotNull($reloadedExpired);
-        $this->assertNull($reloadedExpired->getConsumedAt());
-
-        $reloadedConsumed = $this->repository->findByTokenHashAndType(
-            $consumed->getTokenHash(),
-            TokenRequestType::EMAIL_CONFIRMATION
-        );
-        $this->assertNotNull($reloadedConsumed);
-        $this->assertNotNull($reloadedConsumed->getConsumedAt());
+        $this->assertSame([], $results);
     }
 
     /**
@@ -248,92 +406,8 @@ final class TokenRequestRepositoryTest extends KernelTestCase
         return (new TokenRequest())
             ->setUser($user)
             ->setType($type)
-            ->setExpiresAt($expiresAt)
+            ->setTokenHash(hash('sha256', bin2hex(random_bytes(32))))
             ->setCreatedAt(new \DateTimeImmutable())
-            ->setTokenHash(hash('sha256', bin2hex(random_bytes(32))));
-    }
-
-    /**
-     * @throws \DateMalformedStringException
-     * @throws ORMException
-     */
-    public function testRevokeConsumableForUserAndTypeConsumesOnlyConsumableTokens(): void
-    {
-        $this->loadFixtures(['users']);
-
-        $user = $this->em->getRepository(User::class)->findOneBy([]);
-        $this->assertInstanceOf(User::class, $user);
-        $userId = $user->getId();
-
-        $repo = self::getContainer()->get(TokenRequestRepositoryInterface::class);
-        $now = new \DateTimeImmutable('2026-03-03 12:00:00');
-
-        // Consumable (should be revoked)
-        $active1 = (new TokenRequest())
-            ->setUser($user)
-            ->setType(TokenRequestType::EMAIL_CONFIRMATION)
-            ->setTokenHash(str_repeat('a', 64))
-            ->setCreatedAt($now->modify('-10 minutes'))
-            ->setExpiresAt($now->modify('+1 hour'));
-
-        // Consumable (should be revoked)
-        $active2 = (new TokenRequest())
-            ->setUser($user)
-            ->setType(TokenRequestType::EMAIL_CONFIRMATION)
-            ->setTokenHash(str_repeat('b', 64))
-            ->setCreatedAt($now->modify('-20 minutes'))
-            ->setExpiresAt($now->modify('+2 hours'));
-
-        // Expired (should NOT be revoked)
-        $expired = (new TokenRequest())
-            ->setUser($user)
-            ->setType(TokenRequestType::EMAIL_CONFIRMATION)
-            ->setTokenHash(str_repeat('c', 64))
-            ->setCreatedAt($now->modify('-3 hours'))
-            ->setExpiresAt($now->modify('-1 minute'));
-
-        // Already consumed (should NOT be revoked)
-        $consumed = (new TokenRequest())
-            ->setUser($user)
-            ->setType(TokenRequestType::EMAIL_CONFIRMATION)
-            ->setTokenHash(str_repeat('d', 64))
-            ->setCreatedAt($now->modify('-30 minutes'))
-            ->setExpiresAt($now->modify('+1 hour'))
-            ->setConsumedAt($now->modify('-5 minutes'));
-
-        $this->em->persist($active1);
-        $this->em->persist($active2);
-        $this->em->persist($expired);
-        $this->em->persist($consumed);
-        $this->em->flush();
-        $this->em->clear();
-
-        $count = $repo->revokeConsumableForUserAndType($userId, TokenRequestType::EMAIL_CONFIRMATION, $now);
-
-        // Assert: only 2 active should be affected
-        $this->assertSame(2, $count);
-
-        // Reload and assert each state
-        $this->em->clear();
-
-        $r1 = $this->em->getRepository(TokenRequest::class)->findOneBy(['tokenHash' => str_repeat('a', 64)]);
-        $r2 = $this->em->getRepository(TokenRequest::class)->findOneBy(['tokenHash' => str_repeat('b', 64)]);
-        $r3 = $this->em->getRepository(TokenRequest::class)->findOneBy(['tokenHash' => str_repeat('c', 64)]);
-        $r4 = $this->em->getRepository(TokenRequest::class)->findOneBy(['tokenHash' => str_repeat('d', 64)]);
-
-        $this->assertNotNull($r1);
-        $this->assertNotNull($r2);
-        $this->assertNotNull($r3);
-        $this->assertNotNull($r4);
-        // revoked tokens
-        $this->assertTrue($r1->isConsumed());
-        $this->assertEquals($now, $r1->getConsumedAt());
-
-        $this->assertTrue($r2->isConsumed());
-        $this->assertEquals($now, $r2->getConsumedAt());
-
-        // untouched tokens
-        $this->assertFalse($r3->isConsumed()); // expired stays unconsumed
-        $this->assertTrue($r4->isConsumed());  // already consumed stays consumed
+            ->setExpiresAt($expiresAt);
     }
 }

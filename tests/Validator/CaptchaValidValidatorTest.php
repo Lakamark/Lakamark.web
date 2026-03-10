@@ -3,7 +3,6 @@
 namespace App\Tests\Validator;
 
 use App\Foundation\Captcha\Contract\CaptchaVerifierInterface;
-use App\Foundation\Captcha\Exception\CaptchaLockedException;
 use App\Validator\CaptchaValid;
 use App\Validator\CaptchaValidValidator;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -20,19 +19,12 @@ class CaptchaValidValidatorTest extends ConstraintValidatorTestCase
         return new CaptchaValidValidator($this->captcha);
     }
 
-    public function testDoesNothingOnEmptyValue(): void
-    {
-        $this->captcha->expects($this->never())->method('verify');
-        $this->validator->validate('', new CaptchaValid());
-        $this->assertNoViolation();
-    }
-
     public function testItAddsViolationWhenInvalid(): void
     {
         $this->captcha
             ->expects($this->once())
-            ->method('verify')
-            ->with(null, 'abc')
+            ->method('consumeVerified')
+            ->with(null)
             ->willReturn(false);
 
         $constraint = new CaptchaValid(message: 'Captcha invalid.');
@@ -43,31 +35,28 @@ class CaptchaValidValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testItAddsLockedViolationWhenLocked(): void
+    public function testItPassesWhenCaptchaWasPreviouslyVerified(): void
     {
         $this->captcha
             ->expects($this->once())
-            ->method('verify')
-            ->with(null, 'abc')
-            ->willThrowException(new CaptchaLockedException());
+            ->method('consumeVerified')
+            ->with(null)
+            ->willReturn(true);
 
-        $constraint = new CaptchaValid(lockedMessage: 'The captcha is locked.');
-        $this->validator->validate('abc', $constraint);
-
-        $this
-            ->buildViolation('The captcha is locked.')
-            ->assertRaised();
+        $this->validator->validate('abc', new CaptchaValid());
+        $this->assertNoViolation();
     }
 
     public function testItCanForceASpecificTypeIfProvided(): void
     {
         $this->captcha
             ->expects($this->once())
-            ->method('verify')
-            ->with('math', '123')
+            ->method('consumeVerified')
+            ->with('math')
             ->willReturn(true);
 
         $this->validator->validate('123', new CaptchaValid(type: 'math'));
+
         $this->assertNoViolation();
     }
 }
