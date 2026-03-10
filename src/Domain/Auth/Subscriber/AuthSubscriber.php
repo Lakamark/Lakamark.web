@@ -3,8 +3,9 @@
 namespace App\Domain\Auth\Subscriber;
 
 use App\Domain\Auth\Event\BeforeUserRegisterEvent;
+use App\Domain\Auth\Event\ConfirmationEmailRequestedEvent;
+use App\Domain\Auth\Event\ConfirmationTokenIssuedEvent;
 use App\Domain\Auth\Event\UserRegisteredEvent;
-use App\Domain\Auth\Event\UserResentConfirmationEvent;
 use App\Foundation\Mailing\MailerBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
@@ -21,7 +22,8 @@ readonly class AuthSubscriber implements EventSubscriberInterface
         return [
             BeforeUserRegisterEvent::class => 'onBeforeUserRegister',
             UserRegisteredEvent::class => 'onUserRegistered',
-            UserResentConfirmationEvent::class => 'onUserResentConfirmation',
+            ConfirmationTokenIssuedEvent::class => 'onConfirmationTokenIssued',
+            ConfirmationEmailRequestedEvent::class => 'onConfirmationEmailRequested',
         ];
     }
 
@@ -30,26 +32,35 @@ readonly class AuthSubscriber implements EventSubscriberInterface
         // no-op for now
     }
 
+    public function onUserRegistered(UserRegisteredEvent $event): void
+    {
+        // no-op for now
+        // good place later for audit/log/analytics
+    }
+
+    public function onConfirmationTokenIssued(ConfirmationTokenIssuedEvent $event): void
+    {
+        // no-op for now
+        // good place later for audit/log/token tracing
+    }
+
     /**
      * @throws ExceptionInterface
      */
-    public function onUserRegistered(UserRegisteredEvent $event): void
+    public function onConfirmationEmailRequested(ConfirmationEmailRequestedEvent $event): void
     {
-        $dto = $event->getIssuedTokenRequestDto();
-        $user = $dto->getUser();
+        $dto = $event->getIssuedTokenRequest();
+        $user = $event->getUser();
         $token = $dto->getToken();
 
         $email = $this->mailerBuilder->buildEmail('mails/auth/register.twig', [
             'user' => $user,
             'token' => $token,
+            'reason' => $event->getReason()->value,
         ])
             ->to($user->getEmail())
             ->subject('Laka Mark - Confirm your registration');
 
         $this->mailerBuilder->deliveryEmail($email);
-    }
-
-    public function onUserResentConfirmation(UserResentConfirmationEvent $event): void
-    {
     }
 }

@@ -5,8 +5,8 @@ namespace App\Tests\Domain\Auth\Subscriber;
 use App\Domain\Auth\DTO\IssuedTokenRequestDTO;
 use App\Domain\Auth\Entity\TokenRequest;
 use App\Domain\Auth\Entity\User;
-use App\Domain\Auth\Enum\OAuthProvider;
-use App\Domain\Auth\Event\UserRegisteredEvent;
+use App\Domain\Auth\Enum\ConfirmationEmailReason;
+use App\Domain\Auth\Event\ConfirmationEmailRequestedEvent;
 use App\Domain\Auth\Subscriber\AuthSubscriber;
 use App\Foundation\Mailing\MailerBuilder;
 use App\Foundation\Security\GeneratedTokenDTO;
@@ -19,7 +19,7 @@ class AuthSubscriberBehaviorTest extends TestCase
     /**
      * @throws ExceptionInterface
      */
-    public function testOnUserRegisteredSendsConfirmationEmail(): void
+    public function testOnConfirmationEmailRequestedSendsConfirmationEmail(): void
     {
         $user = (new User())
             ->setEmail('nomad@example.com')
@@ -38,7 +38,11 @@ class AuthSubscriberBehaviorTest extends TestCase
             ),
         );
 
-        $event = new UserRegisteredEvent($user, OAuthProvider::LOCAL, $issuedTokenRequest);
+        $event = new ConfirmationEmailRequestedEvent(
+            $user,
+            $issuedTokenRequest,
+            ConfirmationEmailReason::REGISTER
+        );
 
         $email = new Email();
 
@@ -52,6 +56,7 @@ class AuthSubscriberBehaviorTest extends TestCase
                 [
                     'user' => $user,
                     'token' => 'plain-token-123',
+                    'reason' => 'register',
                 ]
             )
             ->willReturn($email);
@@ -70,6 +75,6 @@ class AuthSubscriberBehaviorTest extends TestCase
             }));
 
         $subscriber = new AuthSubscriber($mailerBuilder);
-        $subscriber->onUserRegistered($event);
+        $subscriber->onConfirmationEmailRequested($event);
     }
 }

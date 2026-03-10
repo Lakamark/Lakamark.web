@@ -5,9 +5,12 @@ namespace App\Domain\Auth\Service;
 use App\Domain\Auth\DTO\IssuedTokenRequestDTO;
 use App\Domain\Auth\DTO\RegisterUserResultDTO;
 use App\Domain\Auth\Entity\User;
+use App\Domain\Auth\Enum\ConfirmationEmailReason;
 use App\Domain\Auth\Enum\OAuthProvider;
 use App\Domain\Auth\Enum\TokenRequestType;
 use App\Domain\Auth\Event\BeforeUserRegisterEvent;
+use App\Domain\Auth\Event\ConfirmationEmailRequestedEvent;
+use App\Domain\Auth\Event\ConfirmationTokenIssuedEvent;
 use App\Domain\Auth\Event\UserRegisteredEvent;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -51,17 +54,23 @@ readonly class RegisterUserService
         $this->em->persist($user);
         $this->em->flush();
 
+        $this->dispatchUserRegistered($user, $authProvider);
+
         $issuedTokenRequest = null;
 
-        // Issue a confirmation token only for local registrations.
         if (OAuthProvider::LOCAL === $authProvider) {
             $issuedTokenRequest = $this->tokenRequestService->issue(
                 user: $user,
                 type: TokenRequestType::REGISTER_CONFIRMATION,
             );
-        }
 
-        $this->dispatchUserRegistered($user, $authProvider, $issuedTokenRequest);
+            $this->dispatchConfirmationTokenIssued($user, $issuedTokenRequest);
+            $this->dispatchConfirmationEmailRequested(
+                $user,
+                $issuedTokenRequest,
+                ConfirmationEmailReason::REGISTER,
+            );
+        }
 
         return new RegisterUserResultDTO(
             user: $user,
@@ -83,10 +92,28 @@ readonly class RegisterUserService
     private function dispatchUserRegistered(
         User $user,
         OAuthProvider $authProvider,
-        ?IssuedTokenRequestDTO $issuedTokenRequest,
     ): void {
         $this->dispatcher->dispatch(
-            new UserRegisteredEvent($user, $authProvider, $issuedTokenRequest)
+            new UserRegisteredEvent($user, $authProvider)
+        );
+    }
+
+    private function dispatchConfirmationTokenIssued(
+        User $user,
+        IssuedTokenRequestDTO $issuedTokenRequest,
+    ): void {
+        $this->dispatcher->dispatch(
+            new ConfirmationTokenIssuedEvent($user, $issuedTokenRequest),
+        );
+    }
+
+    private function dispatchConfirmationEmailRequested(
+        User $user,
+        IssuedTokenRequestDTO $issuedTokenRequest,
+        ConfirmationEmailReason $reason,
+    ): void {
+        $this->dispatcher->dispatch(
+            new ConfirmationEmailRequestedEvent($user, $issuedTokenRequest, $reason)
         );
     }
 }
