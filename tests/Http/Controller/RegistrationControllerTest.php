@@ -4,13 +4,18 @@ namespace App\Tests\Http\Controller;
 
 use App\Domain\Auth\Entity\User;
 use App\Domain\Auth\Enum\TokenRequestType;
+use App\Domain\Auth\Exception\TokenRequest\ConsumedTokenException;
+use App\Domain\Auth\Service\ConfirmAccountService;
 use App\Domain\Auth\Service\TokenRequestService;
+use App\Tests\FixturesLoaderTrait;
 use App\Tests\WebTestCase;
 use Random\RandomException;
 use Symfony\Component\HttpFoundation\Response;
 
 class RegistrationControllerTest extends WebTestCase
 {
+    use FixturesLoaderTrait;
+
     private const string SIGNUP_ROUTE = '/register';
     private const string CONFIRM_ROUTE = '/register/confirm';
     private const string LOGIN_ROUTE = '/login';
@@ -117,5 +122,36 @@ class RegistrationControllerTest extends WebTestCase
         $this->client->request('GET', self::CONFIRM_ROUTE);
 
         $this->assertResponseRedirects(self::LOGIN_ROUTE);
+    }
+
+    /**
+     * @throws RandomException
+     */
+    public function testConfirmThrowsExceptionWhenTokenAlreadyConsumed(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy([]);
+        $this->assertInstanceOf(User::class, $user);
+
+        $userId = $user->getId();
+
+        $tokenRequestService = $this->service(TokenRequestService::class);
+        $issued = $tokenRequestService->issue(
+            user: $user,
+            type: TokenRequestType::REGISTER_CONFIRMATION,
+        );
+
+        $service = $this->service(ConfirmAccountService::class);
+
+        $service->confirm($issued->getToken());
+
+        $this->em->clear();
+
+        $savedUser = $this->em->getRepository(User::class)->find($userId);
+
+        $this->assertInstanceOf(User::class, $savedUser);
+        $this->assertNotNull($savedUser->getConfirmAt());
+
+        $this->expectException(ConsumedTokenException::class);
+        $service->confirm($issued->getToken());
     }
 }
