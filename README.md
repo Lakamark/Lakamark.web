@@ -43,7 +43,7 @@ Project documentation is available in the `/docs` directory.
 | `design-principles.md` | Design principles used in the project       |
 | `project-structure.md` | Organization of the source code             |
 | `auth-flow.md`         | Authentication system workflows             |
----
+
 
 ## Architecture
 
@@ -66,7 +66,7 @@ The UI/UX design of the platform is developed using Figma.
 To gather feedback from the community, the design template is publicly
 available so people can review the interface and leave comments.
 
-[![Figma]()](https://www.figma.com/design/S6I1cdHhcpOqaOZOtTuF0w/Lakamark.com?node-id=14-2&t=v9mXQU6cAIC4THhB-1)
+[![Figma](https://img.shields.io/badge/Figma-Design-F24E1E?logo=figma&logoColor=white)](https://www.figma.com/design/S6I1cdHhcpOqaOZOtTuF0w/Lakamark.com?node-id=14-2&t=v9mXQU6cAIC4THhB-1)
 
 ## Project Roadmap
 
