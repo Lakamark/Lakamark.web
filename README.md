@@ -14,8 +14,7 @@ This project is a personal web platform built with Symfony.
 It is designed to centralize my creative work, projects and community
 interactions.
 
-The application follows a domain-oriented architecture in order to keep
-business logic separated from HTTP and infrastructure concerns.
+The application follows a domain-oriented architecture to keep business logic separated from HTTP and infrastructure concerns.
 
 ---
 
@@ -115,7 +114,7 @@ If you want to contribute:
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE.md).
 
 The **Laka Mark** name and logo are not covered by the MIT License and
 may not be used without permission.
