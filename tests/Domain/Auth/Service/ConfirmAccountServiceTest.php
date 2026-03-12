@@ -22,6 +22,11 @@ class ConfirmAccountServiceTest extends TestCase
         $user = $this->createMock(User::class);
         $user
             ->expects($this->once())
+            ->method('isEmailConfirmed')
+            ->willReturn(false);
+
+        $user
+            ->expects($this->once())
             ->method('confirmEmail')
             ->with($now)
             ->willReturnSelf();
@@ -35,14 +40,23 @@ class ConfirmAccountServiceTest extends TestCase
         $tokenRequestService = $this->createMock(TokenRequestService::class);
         $tokenRequestService
             ->expects($this->once())
-            ->method('consume')
+            ->method('consumeAnyOfTypes')
             ->with(
                 rawToken: 'plain-token-123',
-                type: TokenRequestType::REGISTER_CONFIRMATION,
+                types: [
+                    TokenRequestType::REGISTER_CONFIRMATION,
+                    TokenRequestType::EMAIL_CONFIRMATION,
+                ],
             )
             ->willReturn($tokenRequest);
 
         $roleManager = $this->createMock(UserRoleManagerService::class);
+        $roleManager
+            ->expects($this->once())
+            ->method('has')
+            ->with($user, UserRole::USER_VERIFIED)
+            ->willReturn(false);
+
         $roleManager
             ->expects($this->once())
             ->method('grant')

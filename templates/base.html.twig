@@ -32,6 +32,7 @@
     <div class="page-wrapper">
             {% include '/partials/header.html.twig' %}
             <main class="page-content">
+                {% include '/partials/flash_messages.html.twig' %}
                 {% block body %}{% endblock %}
             </main>
             {% include '/partials/footer.html.twig' %}

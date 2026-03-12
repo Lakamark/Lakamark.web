@@ -12,3 +12,8 @@ App\Domain\Auth\Entity\User:
   banned_user (extends user):
     username: 'UserBanned'
     email: userbanned\@lakamark.xyz
+  user_confirmed (extends user):
+    username: Nibbler
+    email: nibble\@planetexpress.com
+    roles: ['ROLE_USER', 'ROLE_USER_VERIFIED']
+    confirm_at: <date_create()>

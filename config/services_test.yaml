@@ -1,5 +1,9 @@
 # yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
 services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
   App\Foundation\Bridge\Resolver\NullAssetResolver: ~
 
   App\Foundation\Bridge\Contract\AssetResolverInterface:
@@ -12,4 +16,7 @@ services:
 
   Symfony\Component\Clock\ClockInterface:
     alias: App\Tests\Helper\FixedClock
+    public: true
+
+  App\Domain\Auth\Service\ResendConfirmationEmailService:
     public: true

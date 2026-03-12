@@ -64,7 +64,6 @@ readonly class TokenRequestService
         string $rawToken,
         TokenRequestType $type,
     ): TokenRequest {
-        $now = $this->clock->now();
         $hash = $this->tokenHasher->hash($rawToken);
 
         $request = $this->tokenRequestRepository->findByTokenHashAndType(
@@ -81,5 +80,27 @@ readonly class TokenRequestService
         $this->tokenRequestRepository->save($request, true);
 
         return $request;
+    }
+
+    public function consumeAnyOfTypes(
+        string $rawToken,
+        array $types,
+    ): TokenRequest {
+        foreach ($types as $type) {
+            if (!$type instanceof TokenRequestType) {
+                continue;
+            }
+
+            try {
+                return $this->consume(
+                    rawToken: $rawToken,
+                    type: $type,
+                );
+            } catch (InvalidTokenException) {
+                continue;
+            }
+        }
+
+        throw new InvalidTokenException('Invalid token.');
     }
 }

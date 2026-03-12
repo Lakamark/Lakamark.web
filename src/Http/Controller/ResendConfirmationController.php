@@ -1,11 +1,9 @@
 <?php
 
-namespace App\Http\Controller\Account;
+namespace App\Http\Controller;
 
 use App\Domain\Auth\Entity\User;
-use App\Domain\Auth\Enum\TokenRequestType;
-use App\Domain\Auth\Service\TokenRequestService;
-use App\Http\Controller\AbstractController;
+use App\Domain\Auth\Service\ResendConfirmationEmailService;
 use Random\RandomException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -14,15 +12,12 @@ use Symfony\Component\Routing\Attribute\Route;
 class ResendConfirmationController extends AbstractController
 {
     /**
-     *  FIXME: resend confirmation token flow
-     *  currently fails when user email is unconfirmed.
-     *
      * @throws RandomException
      */
     #[Route(path: '/account/confirmation/resend', name: 'app_auth_resend_confirmation', methods: ['POST'])]
     public function sendConfirmationEmail(
         Security $security,
-        TokenRequestService $tokenRequestService,
+        ResendConfirmationEmailService $service,
     ): RedirectResponse {
         $user = $security->getUser();
 
@@ -36,11 +31,7 @@ class ResendConfirmationController extends AbstractController
             return $this->redirectToRoute('app_account');
         }
 
-        $tokenRequestService->issue(
-            $user,
-            TokenRequestType::REGISTER_CONFIRMATION,
-            new \DateTimeImmutable()
-        );
+        $service->resend($user->getEmail());
 
         $this->addFlash(
             'success',
