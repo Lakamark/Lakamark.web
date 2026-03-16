@@ -3,7 +3,7 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "strict": false,
+    "strict": true,
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
     "allowJs": true,
@@ -11,5 +11,8 @@
     "noEmit": true,
     "types": ["vite/client"],
   },
-  "include": ["assets"]
+  "include": [
+    "assets/**/*.ts",
+    "assets/**/*.d.ts"
+  ]
 }

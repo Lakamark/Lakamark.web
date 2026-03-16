@@ -46,8 +46,8 @@ export default defineConfig({
         manualChunks: undefined
       },
       input: {
-        app: resolve(__dirname, 'assets/app.js'),
-        dashboard: resolve(__dirname, '/assets/dashboard.js')
+        app: resolve(__dirname, 'assets/app.ts'),
+        dashboard: resolve(__dirname, 'assets/dashboard.ts')
       }
     }
   }
