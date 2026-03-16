@@ -7,6 +7,7 @@ const DEFAULT_CONFIG: Readonly<LmkConfig> = Object.freeze({
     isPremium: false,
     isLogged: false,
     preferredTheme: null,
+    language: null
 });
 
 let cachedConfig: Readonly<LmkConfig> | null = null;
@@ -29,6 +30,10 @@ function readConfigPayloadFromDom(): unknown {
     }
 }
 
+function isLanguage(value: unknown): value is "fr" | "en" {
+    return value === "fr" || value === "en";
+}
+
 function decodeLmkConfig(raw: unknown): LmkConfig | null {
     if (!isRecord(raw)) return null;
 
@@ -41,12 +46,14 @@ function decodeLmkConfig(raw: unknown): LmkConfig | null {
     const preferredTheme = isThemeName(raw.preferredTheme)
         ? raw.preferredTheme
         : null;
+    const language = isLanguage(raw.language) ? raw.language : 'en'
     return {
         userId,
         roles,
         isPremium,
         isLogged,
-        preferredTheme
+        preferredTheme,
+        language
     };
 }
 

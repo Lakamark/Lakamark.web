@@ -26,7 +26,8 @@
                 roles: app.user ? app.user.roles : [],
                 isPremium: is_granted('ROLE_PREMIUM'),
                 isLogged: app.user ? true : false,
-                preferredTheme: (app.user and app.user.preferredTheme is defined) ? app.user.preferredTheme : null
+                preferredTheme: (app.user and app.user.preferredTheme is defined) ? app.user.preferredTheme : null,
+                language: (app.user and app.user.language is defined) ? app.user.language: 'en'
             }|json_encode|raw }}
   </script>
     <div class="page-wrapper">

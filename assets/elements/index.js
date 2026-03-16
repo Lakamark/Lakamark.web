@@ -10,6 +10,8 @@
  */
 import PuzzleCaptcha from "./PuzzleCaptcha.js";
 import Spotlight from "./SpotlightElement/Spotlight.js";
+import ThemeComponent from "./ThemeComponent.ts";
 
 customElements.define('puzzle-captcha', PuzzleCaptcha)
 customElements.define('spotlight-bar', Spotlight)
+customElements.define('theme-switcher', ThemeComponent)

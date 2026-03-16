@@ -6,4 +6,5 @@ export interface LmkConfig {
     isPremium: boolean;
     isLogged: boolean;
     preferredTheme: string | null;
+    language: "fr" | "en" | null;
 }
