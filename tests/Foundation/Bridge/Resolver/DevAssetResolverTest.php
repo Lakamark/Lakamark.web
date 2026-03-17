@@ -12,7 +12,6 @@ final class DevAssetResolverTest extends TestCase
     #[DataProvider('provideJsEntries')]
     public function testResolveJsInDev(string $entry, string $mappedEntry, string $expectedUrl): void
     {
-        
         $mapper = $this->createMock(EntryMapperInterface::class);
 
         $mapper

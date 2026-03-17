@@ -1,6 +1,7 @@
 <div class="alert alert-warning">
     You forgot to confirm your email.
     <form action="{{ path('app_auth_resend_confirmation') }}" method="post">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('submit') }}">
         <button class="btn btn-primary" type="submit">
             Resend confirmation email
         </button>

@@ -1,0 +1,19 @@
+# config/packages/rate_limiter.yaml
+framework:
+  rate_limiter:
+    limiters:
+      resend_confirmation_short:
+        policy: 'fixed_window'
+        limit: 2
+        interval: '10 minutes'
+
+      resend_confirmation_long:
+        policy: 'fixed_window'
+        limit: 5
+        interval: '1 hour'
+
+      resend_confirmation_email:
+        policy: 'compound'
+        limiters:
+          - resend_confirmation_short
+          - resend_confirmation_long
