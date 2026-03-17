@@ -9,11 +9,11 @@
     </div>
     <nav class="header__nav" id="menuNav">
         <ul class="header__nav__left">
-            <li><a href="#" title="Get last news about the Laka Mark artist.">Blog</a></li>
-            <li><a href="#" title="My last Projects">Projects</a></li>
-            <li><a href="#" title="Get last update events.">Events</a></li>
+            <li><a href="{{ path('app_blog') }}" title="Get last news about the Laka Mark artist.">Blog</a></li>
+            <li><a href="{{ path('app_projects') }}" title="My last Projects">Projects</a></li>
+            <li><a href="{{ path('app_events') }}" title="Get last update events.">Events</a></li>
             <li><a href="https://shop.lakamark.com/" title="You can get some awesome products!" target="_blank">Shop</a></li>
-            <li><a href="#" title="You need help for your project?">Contact</a></li>
+            <li><a href="{{ path('app_contact') }}" title="You need help for your project?">Contact</a></li>
         </ul>
         <ul class="header__nav__right">
            {% if app.user %}
