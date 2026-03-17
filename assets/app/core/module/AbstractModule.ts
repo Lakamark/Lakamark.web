@@ -1,5 +1,6 @@
-import { AppModuleInterface } from "@core/module/AppModuleInterface";
-import { AppRunner } from "@core/runner/AppRunner";
+import {AppModuleInterface} from "./AppModuleInterface";
+import {AppRunner} from "../runner/AppRunner";
+
 
 export abstract class AbstractModule implements AppModuleInterface {
     private mounted = false;

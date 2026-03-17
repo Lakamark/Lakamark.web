@@ -1,4 +1,4 @@
-import { AppModuleInterface } from "@core/module/AppModuleInterface";
+import {AppModuleInterface} from "../module/AppModuleInterface";
 
 export class AppRunner {
     private readonly modules: AppModuleInterface[] = [];

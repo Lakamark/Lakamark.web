@@ -1,9 +1,10 @@
-import { ThemeManager } from "@lib/ThemeManager";
 import {
     THEME_SWITCHER_MESSAGES,
     ThemeSwitcherMessages
-} from "@/i18n/messages/theme-switcher";
-import {translate} from "@/i18n/translate";
+} from "../i18n/messages/theme-switcher";
+
+import {translate} from "../i18n/translate";
+import {ThemeManager} from "../lib/ThemeManager";
 
 export default class ThemeSwitcherElement extends HTMLElement {
     public static manager: ThemeManager | null = null;

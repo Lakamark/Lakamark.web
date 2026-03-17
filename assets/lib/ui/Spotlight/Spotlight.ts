@@ -1,6 +1,7 @@
 import SpotlightItem from "./SpotlightItem";
-import { debounce } from "@/helper/Timer";
-import ScrollTrigger from "../../../lib/ScrollTrigger";
+import {debounce} from "../../../helper/Timer";
+import ScrollTrigger from "../../ScrollTrigger";
+
 
 export default class Spotlight extends HTMLElement {
     public input!: HTMLInputElement;

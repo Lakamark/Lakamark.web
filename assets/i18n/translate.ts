@@ -1,5 +1,6 @@
-import {AppLanguage, DEFAULT_LANGUAGE} from "@core/config/AppLanguage";
-import { appConfigParser } from "@core/config/AppConfigParser";
+import {AppLanguage, DEFAULT_LANGUAGE} from "../app/core/config";
+import {appConfigParser} from "../app/core/config/AppConfigParser";
+
 
 export type TranslationDictionary<T> = Record<AppLanguage, T>;
 

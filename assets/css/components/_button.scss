@@ -1,0 +1,92 @@
+@use "../tools/functions";
+
+.btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  font-weight: bold;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  outline: none;
+
+  &:hover {
+    transition: background-color .3s;
+  }
+}
+
+.btn .icon-element {
+  width: 1rem;
+  height: 1rem;
+}
+
+/*
+ Button Sizes
+*/
+.btn-md {
+  padding: 8px 24px;
+}
+
+.btn-lg {
+  padding: 8px 40px;
+}
+
+.btn-xl {
+  padding: 8px 48px;
+  font-size: 1.6rem;
+
+  .icon-element {
+    width: 1.6rem;
+    height: 1.6rem;
+  }
+}
+
+/**
+Button Styles
+*/
+.btn-primary {
+  background-color: var(--primary-color);
+  color: var(--btn-label-primary);
+
+  &:hover {
+    background-color: functions.saturateColor(#82A2E3, 10%);
+  }
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: var(--btn-label-secondary);
+
+  &:hover {
+    background-color: functions.saturateColor(#142252, 10%);
+  }
+}
+
+.btn-success {
+  background-color: var(--success-color);
+  color: var(--btn-label-success);
+
+  &:hover {
+    background-color: functions.saturateColor(#4EB261, 10%);
+  }
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  color: var(--btn-label-danger);
+
+  &:hover {
+    background-color: functions.saturateColor(#E49D9D, 10%);
+  }
+}
+
+.btn-ghost {
+  color: var(--btn-label-ghost);
+
+  &:hover {
+    background-color: functions.saturateColor(rgba(0, 0, 0, 0.49), 10%);
+  }
+}

@@ -1,4 +1,4 @@
-import { getRadius } from "@/helper/Maths";
+import {getRadius} from "../helper/Maths";
 
 export type ThemeName = "day-theme" | "night-theme";
 

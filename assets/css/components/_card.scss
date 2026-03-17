@@ -1,0 +1,59 @@
+@use "../tools/functions";
+
+%card,
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: functions.spacing(2);
+
+  width: 100%;
+  padding: functions.spacing(2);
+
+  background-color: var(--card-background-color);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  box-shadow: -1px 10px 3px 0 rgba(0, 0, 0, 0.00), -1px 7px 3px 0 rgba(0, 0, 0, 0.02), 0 4px 2px 0 rgba(0, 0, 0, 0.08), 0 2px 2px 0 rgba(0, 0, 0, 0.13), 0 0 1px 0 rgba(0, 0, 0, 0.15);
+  transition: all .3s;
+}
+
+.card .card__header {
+  display: flex;
+  width: 100%;
+
+  img {
+    width: 100%;
+    border-radius: var(--radius-sm);
+  }
+}
+
+.card__body,
+.card__content__info,
+.card__description
+{
+  display: flex;
+  height: 100%;
+}
+
+.card__body .card__content {
+  display: flex;
+  flex-direction: column;
+}
+
+.card__footer {
+  display: flex;
+  justify-content: flex-end;
+  justify-self: stretch;
+}
+
+.card__link {
+  position: absolute!important;
+  inset: 0;
+  cursor: pointer;
+  z-index: 3;
+  transition: all 0.3s;
+}
+
+.card:hover {
+  border-color: var(--accent-color);
+}

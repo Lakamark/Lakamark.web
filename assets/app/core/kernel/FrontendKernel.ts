@@ -1,5 +1,6 @@
-import {AppRunner} from "@core/runner/AppRunner";
-import {AppModuleInterface} from "@core/module/AppModuleInterface";
+import {AppRunner} from "../runner/AppRunner";
+import {AppModuleInterface} from "../module/AppModuleInterface";
+
 
 export class FrontendKernel {
     private readonly runner: AppRunner;

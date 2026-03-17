@@ -1,4 +1,4 @@
-import {AppRunner} from "@core/runner/AppRunner";
+import {AppRunner} from "../runner/AppRunner";
 
 export interface AppModuleInterface {
     mount(runner: AppRunner): void;

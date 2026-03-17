@@ -1,0 +1,42 @@
+@use "sass:meta";
+@use "sass:math";
+@use "sass:color";
+
+// To convert a  value to px unit.
+@function to-px($v) {
+  @if meta.type-of($v) != "number" {
+    @error "to-px() expects a number.";
+  }
+
+  @if math.is-unitless($v) {
+    @return $v * 1px;
+  }
+
+  // If the value is already px unit return the original value.
+  @return $v;
+}
+
+// Return number without unit (px -> unitless).
+@function unit($value) {
+  @if meta.type-of($value) == "number" and not math.is-unitless($value) {
+    @return math.div($value, ($value * 0 + 1));
+  }
+
+  @return $value;
+}
+
+
+// Spacing helper.
+@function spacing($n) {
+  @return calc(#{$n} * var(--spacing));
+}
+
+// Adjust lightness in HSL space (positive = lighter, negative = darker).
+@function adjustLightness($c, $amount) {
+  @return color.adjust($c, $lightness: $amount, $space: hsl);
+}
+
+// Real saturation adjust.
+@function saturateColor($c, $amount) {
+  @return color.adjust($c, $saturation: $amount, $space: hsl);
+}

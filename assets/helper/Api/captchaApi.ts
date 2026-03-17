@@ -1,4 +1,4 @@
-import {fetchApi, FetchApiResult} from "@/helper/Api/fetchApi";
+import {fetchApi, FetchApiResult} from "./fetchApi";
 
 interface VerifyCaptchaPayload {
     type: string;

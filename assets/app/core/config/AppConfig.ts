@@ -1,5 +1,7 @@
-import {AppLanguage} from "@core/config/AppLanguage";
-import {AppConfigInterface} from "@core/config/AppConfigInterface";
+import {
+    AppConfigInterface,
+    AppLanguage
+} from "../config/index";
 
 export class AppConfig {
     public readonly userId: string | number | null;

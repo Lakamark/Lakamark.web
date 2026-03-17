@@ -1,6 +1,8 @@
-import {AppConfig} from "@core/config/AppConfig";
-import {AppConfigInterface} from "@core/config/AppConfigInterface";
-import {normalizeLanguage} from "@core/config/AppLanguage";
+import {
+    AppConfig,
+    normalizeLanguage,
+    AppConfigInterface
+} from "./index";
 
 const CONFIG_ELEMENT_ID  = "lmk-config";
 

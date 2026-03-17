@@ -1,6 +1,7 @@
-import {AbstractInstanceModule} from "@core/module/AbstractInstanceModule";
-import {HeaderUI} from "@lib/HeaderUI";
-import {AppRunner} from "@core/runner/AppRunner";
+import {AbstractInstanceModule} from "../app/core/module/AbstractInstanceModule";
+import {HeaderUI} from "../lib/HeaderUI";
+import {AppRunner} from "../app/core/runner/AppRunner";
+
 export class HeaderModule extends AbstractInstanceModule<HeaderUI> {
     protected createInstance(_runner: AppRunner): HeaderUI {
         const headerUI = new HeaderUI();

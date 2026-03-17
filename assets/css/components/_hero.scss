@@ -1,0 +1,21 @@
+@use "../tools/functions";
+
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background-color: var(--hero-background-color);
+  border-radius: var(--radius-sm);
+  margin: functions.spacing(4) 0;
+}
+
+.hero .with-image {
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+
+}

@@ -1,4 +1,4 @@
-import {AppLanguage} from "@core/config/AppLanguage";
+import {AppLanguage} from "./AppLanguage";
 
 export interface AppConfigInterface {
     userId: string | number | null;

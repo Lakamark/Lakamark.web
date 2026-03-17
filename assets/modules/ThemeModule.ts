@@ -1,7 +1,7 @@
-import {AbstractInstanceModule} from "@core/module/AbstractInstanceModule";
-import {ThemeManager} from "@lib/ThemeManager";
-import {AppRunner} from "@core/runner/AppRunner";
-import ThemeSwitcherElement from "@/components/ThemeSwitcherElement";
+import {AbstractInstanceModule} from "../app/core/module/AbstractInstanceModule";
+import {ThemeManager} from "../lib/ThemeManager";
+import {AppRunner} from "../app/core/runner/AppRunner";
+import ThemeSwitcherElement from "../components/ThemeSwitcherElement";
 
 export class ThemeModule extends AbstractInstanceModule<ThemeManager> {
     protected createInstance(_runner: AppRunner): ThemeManager {

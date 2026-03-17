@@ -1,0 +1,48 @@
+@use "../tools/functions";
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--gap);
+}
+
+.form-group label {
+  display: flex;
+  width: 100%;
+}
+
+.form-control {
+  display: flex;
+  padding: var(--spacing-xxs);
+  align-items: center;
+  border-radius: var(--radius-xs);
+  background-color: var(--card-background-color);
+  border: 2px solid var(--border-color);
+  color: var(--text-muted-color);
+  align-self: stretch;
+  outline: none;
+  transition: all .3s;
+
+  &:focus {
+    color: var(--text-color);
+    border-color: var(--accent-color);
+  }
+
+  &:disabled {
+    background-color: var(--border-color);
+    color: var(--text-color);
+  }
+}
+
+/**
+  Validation Errors styles
+*/
+.form-control .is-invalid {
+  border-color: var(--danger-color);
+  color: var(--danger-color);
+}
+
+.form-control .is-valid {
+  border-color: var(--success-color);
+  color: var(--success-color);
+}

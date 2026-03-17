@@ -1,6 +1,6 @@
-import { AppRunner } from "@app/core/runner/AppRunner";
-import {AbstractModule} from "@core/module/AbstractModule";
-import Spotlight from "@lib/ui/Spotlight/Spotlight";
+import {AbstractModule} from "../app/core/module/AbstractModule";
+import {AppRunner} from "../app/core/runner/AppRunner";
+import Spotlight from "../lib/ui/Spotlight/Spotlight";
 
 export class SpotlightModule extends AbstractModule {
    protected onMount(_runner: AppRunner) {

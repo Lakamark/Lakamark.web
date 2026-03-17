@@ -1,6 +1,6 @@
-import {DestroyableInterface} from "@core/module/DestroyableInterface";
-import {AbstractModule} from "@core/module/AbstractModule";
-import {AppRunner} from "@core/runner/AppRunner";
+import {DestroyableInterface} from "./DestroyableInterface";
+import {AppRunner} from "../runner/AppRunner";
+import {AbstractModule} from "./AbstractModule";
 
 export abstract class AbstractInstanceModule<T extends DestroyableInterface> extends AbstractModule {
     protected instance: T | null = null;

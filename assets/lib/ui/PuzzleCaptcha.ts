@@ -1,5 +1,5 @@
-import { clamp, randomNumberBetween } from "@/helper/Maths";
-import { verifyCaptcha } from "@/helper/Api/captchaApi";
+import {clamp, randomNumberBetween} from "../../helper/Maths";
+import {verifyCaptcha} from "../../helper/Api/captchaApi";
 
 interface PuzzleCaptchaConfig {
     width: number;

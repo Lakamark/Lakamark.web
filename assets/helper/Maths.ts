@@ -6,7 +6,6 @@ export type RadiusResult = {
     radius: number;
 };
 
-
 /**
  * To clamp a value between the min value and the max value
  *
