@@ -1,5 +1,5 @@
-import {CarouselPlugin} from "./CarouselPlugin";
-import {Carousel} from "./Carousel";
+import {CarouselPlugin} from "../CarouselPlugin";
+import {Carousel} from "../Carousel";
 
 export class CarouselPagination implements CarouselPlugin {
     private carousel!: Carousel;
