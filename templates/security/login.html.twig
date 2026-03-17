@@ -8,20 +8,24 @@
             <h1 class="h1">Laka Mark Community</h1>
             <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolores eligendi enim fugit incidunt optio sint tenetur. Ad eligendi est exercitationem, hic in iste laboriosam nam necessitatibus sequi unde? Necessitatibus, velit.</p>
         </div>
+
         <div class="grid-2">
             <div class="login-page">
                 <h2 class="h3 mb-3 font-weight-normal">Already an account?</h2>
-                {{ form_start(form, { action: path('app_login'), attr: { 'data-turbo': 'false' } }) }}
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
                 {% if error %}
-                    <div class="alert alert-danger">
-                        {{ error.message }}
+                    <div class="alert alert-danger" data-test="auth-error">
+                        {{ error.messageKey|trans(error.messageData, 'security') }}
                     </div>
                 {% endif %}
-                    {{ form_row(form.username) }}
-                    {{ form_row(form.password) }}
+
+                {{ form_start(form, { action: path('app_login'), attr: { 'data-turbo': 'false' } }) }}
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                {{ form_row(form.username) }}
+                {{ form_row(form.password) }}
                 {{ form_end(form) }}
             </div>
+
             <div class="network-login">
                 <h2 class="h2">Login with</h2>
                 <a href="#" class="btn btn-lg btn-secondary">Patreon</a>
