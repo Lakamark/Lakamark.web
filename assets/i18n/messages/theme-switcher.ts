@@ -1,4 +1,4 @@
-import {TranslationDictionary} from "@/i18n/translate";
+import {TranslationDictionary} from "../translate";
 
 export interface ThemeSwitcherMessages {
     switchTheme: string;
