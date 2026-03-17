@@ -17,3 +17,15 @@ framework:
         limiters:
           - resend_confirmation_short
           - resend_confirmation_long
+
+      auth_login_username_ip:
+        policy: token_bucket
+        limit: 5
+        rate:
+          interval: '15 minutes'
+          amount: 5
+
+      auth_login_ip:
+          policy: sliding_window
+          limit: 25
+          interval: '15 minutes'

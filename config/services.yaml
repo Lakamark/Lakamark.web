@@ -81,3 +81,10 @@ services:
 
     App\Http\Twig\UserContextTwigExtension:
         tags: ['twig.extension']
+
+    app.auth.login_rate_limiter:
+        class: Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter
+        arguments:
+            $globalFactory: '@limiter.auth_login_ip'
+            $localFactory: '@limiter.auth_login_username_ip'
+            $secret: '%kernel.secret%'

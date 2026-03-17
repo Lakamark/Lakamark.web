@@ -31,6 +31,8 @@ security:
             logout:
                 path: app_logout
                 csrf_token_id: logout
+            login_throttling:
+                limiter: app.auth.login_rate_limiter
 
 
             # Activate different ways to authenticate:
