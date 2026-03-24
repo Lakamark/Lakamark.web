@@ -87,10 +87,11 @@ export class CarouselTouch implements CarouselPlugin {
 
         const dx = event.clientX - this.startX;
         const dy = event.clientY - this.startY;
+        const directionLocked = this.directionLocked;
 
         this.reset();
 
-        if (this.directionLocked !== 'horizontal') return;
+        if (directionLocked !== 'horizontal') return;
         if (Math.abs(dx) < this.swipeThreshold) return;
         if (Math.abs(dy) > Math.abs(dx)) return;
 
@@ -98,7 +99,9 @@ export class CarouselTouch implements CarouselPlugin {
 
         dx < 0 ? this.carousel.next() : this.carousel.prev();
 
-        setTimeout(() => (this.didSwipe = false), 0);
+        setTimeout(() => {
+            this.didSwipe = false;
+        }, 0);
     }
 
     private onPointerCancel(): void {

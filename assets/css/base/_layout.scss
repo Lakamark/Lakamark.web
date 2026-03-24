@@ -25,30 +25,35 @@
   }
 }
 
+// Mixins
+@mixin container {
+  width: 100%;
+  box-sizing: border-box;
+  padding-inline: calc(50% - (var(--container-width) / 2));
+}
+
+@mixin narrow-container {
+  max-width: 700px;
+  margin-inline: auto;
+}
+
 /**
  * Containers
  *
  * `.container` uses "fluid centering" with side paddings computed from container width.
  * `.content` constrains the inner width only.
  */
-
-%container,
 .container {
-  width: 100%;
-  box-sizing: border-box;
-  padding-inline: calc(50% - (var(--container-width) / 2));
+  @include container;
 }
 
-%content,
 .content {
   width: var(--container-width);
   margin-inline: auto;
 }
 
-%narrow-container,
 .narrow-container {
-  max-width: 700px;
-  margin-inline: auto;
+  @include narrow-container;
 }
 
 /* Useful for media blocks */

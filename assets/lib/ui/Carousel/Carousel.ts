@@ -34,6 +34,18 @@ export class Carousel {
 
         const children = Array.from(this.element.children) as HTMLElement[];
 
+        if (children.length === 0) {
+            throw new Error('Carousel requires at least one child element.');
+        }
+
+        if (this.options.slidesVisible > children.length) {
+            throw new Error('slidesVisible cannot exceed the number of items.');
+        }
+
+        if (this.options.slidesToScroll > children.length) {
+            throw new Error('slidesToScroll cannot exceed the number of items.');
+        }
+
         this.root = this.createDiv('carousel');
         if (this.options.overflow) {
             this.root.classList.add('carousel__overflow__hidden');

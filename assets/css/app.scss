@@ -3,7 +3,7 @@
 /* Base layout */
 @use "base/reset";
 @use "base/base";
-@use "base/layout";
+@use "base/layout"; // main container here
 @use "base/typography";
 @use "base/animation";
 
@@ -19,3 +19,4 @@
 @use "components/captcha";
 @use "components/spotlight";
 @use "components/theme_switcher";
+@use "components/carousel"; // Carousel here
