@@ -3,7 +3,8 @@ import {
     CarouselA11y,
     CarouselNavigation,
     CarouselPagination,
-    CarouselTouch
+    CarouselTouch,
+    CarouselAutoPlay
 } from "../lib/ui/Carousel";
 
 export class CarouselElement extends HTMLElement {
@@ -11,6 +12,7 @@ export class CarouselElement extends HTMLElement {
 
     connectedCallback(): void {
         this.carousel = new Carousel(this, {
+            loop: true,
             iconPrev: this.renderPrevIcon(),
             iconNext: this.renderNextIcon()
         });
@@ -19,6 +21,7 @@ export class CarouselElement extends HTMLElement {
         this.carousel.registerPlugin(new CarouselPagination());
         this.carousel.registerPlugin(new CarouselA11y());
         this.carousel.registerPlugin(new CarouselTouch());
+        this.carousel.registerPlugin(new CarouselAutoPlay())
     }
 
     disconnectedCallback(): void {

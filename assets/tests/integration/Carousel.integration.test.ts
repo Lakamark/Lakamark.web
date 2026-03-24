@@ -3,6 +3,7 @@ import {describe, it, expect} from "vitest";
 import {createCarousel} from "../helpers/createCarousel";
 import {
     CarouselA11y,
+    CarouselAutoPlay,
     CarouselNavigation,
     CarouselPagination,
     CarouselTouch
@@ -25,6 +26,7 @@ describe('Carousel integration', () => {
         carousel.registerPlugin(new CarouselPagination());
         carousel.registerPlugin(new CarouselA11y());
         carousel.registerPlugin(new CarouselTouch());
+        carousel.registerPlugin(new CarouselAutoPlay())
 
         const root = carousel.getRoot();
 

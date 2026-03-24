@@ -15,4 +15,5 @@ export {
     CarouselPagination,
     CarouselA11y,
     CarouselTouch,
+    CarouselAutoPlay
 } from './plugin';
