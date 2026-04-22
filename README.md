@@ -61,10 +61,11 @@ More details are available in the documentation.
 
 ## Web Design Workflow
 
-The UI/UX design of the platform is developed using Figma.
+> ⚠️ The following Figma file is **outdated** and represents an earlier design exploration.
 
-To gather feedback from the community, the design template is publicly
-available so people can review the interface and leave comments.
+It is kept for reference only and is no longer the source of truth.
+
+A new design system and updated mockups are currently in progress.
 
 [![Figma](https://img.shields.io/badge/Figma-Design-F24E1E?logo=figma&logoColor=white)](https://www.figma.com/design/S6I1cdHhcpOqaOZOtTuF0w/Lakamark.com?node-id=14-2&t=v9mXQU6cAIC4THhB-1)
 
