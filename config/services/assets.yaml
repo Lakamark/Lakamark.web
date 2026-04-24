@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+services:
+  App\Foundation\Bridge\Contract\ManifestReaderInterface:
+    alias: App\Foundation\Bridge\ManifestReader
+
+  App\Foundation\Bridge\Contract\AssetResolverInterface:
+    alias: App\Foundation\Bridge\Resolver\EnvironmentAssetResolver
+
+  App\Foundation\Bridge\Contract\AssetBridgeInterface:
+    alias: App\Foundation\Bridge\AssetBridge
+
+  App\Foundation\Bridge\ManifestReader:
+    arguments:
+      $manifestPath: '%app.vite.manifest_path%'
+
+  App\Foundation\Bridge\Resolver\EnvironmentAssetResolver:
+    arguments:
+      $environment: '%kernel.environment%'
+      $devResolver: '@App\Foundation\Bridge\Resolver\ViteDevAssetResolver'
+      $prodResolver: '@App\Foundation\Bridge\Resolver\ManifestAssetResolver'

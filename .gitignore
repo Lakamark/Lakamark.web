@@ -17,6 +17,7 @@
 .idea
 config/reference.php
 /node_modules/
+/public/assets
 
 ###> friendsofphp/php-cs-fixer ###
 /.php-cs-fixer.php

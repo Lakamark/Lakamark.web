@@ -1,17 +1,4 @@
 # yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
-services:
-  App\Foundation\Bridge\Mapper\EntryMapper: ~
 
-  App\Foundation\Bridge\Contract\EntryMapperInterface:
-    alias: App\Foundation\Bridge\Mapper\EntryMapper
-
-  App\Foundation\Bridge\Resolver\DevAssetResolver:
-    arguments:
-      $devServerOrigin: 'https://localhost:3000'
-      $entryMapper: '@App\Foundation\Bridge\Mapper\EntryMapper'
-      $assetsPrefix: '/assets'
-
-  App\Foundation\Bridge\Contract\AssetResolverInterface:
-    alias: App\Foundation\Bridge\Resolver\DevAssetResolver
-
-  App\Foundation\Captcha\Contract\CaptchaSolutionStoreInterface: '@App\Foundation\Captcha\Store\CacheCaptchaSolutionStore'
+#  App\Foundation\Captcha\Contract\CaptchaSolutionStoreInterface:
+ # '@App\Foundation\Captcha\Store\CacheCaptchaSolutionStore'

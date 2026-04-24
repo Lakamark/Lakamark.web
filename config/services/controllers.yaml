@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=../../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+services:
+  App\Http\Controller\:
+    resource: '../../src/Http/controller'
+    tags: ['controller.service_arguments']
+  
+  App\Http\Dashboard\Controller\:
+    resource: '../../src/Http/Dashboard/Controller'
+    tags: ['controller.service_arguments']

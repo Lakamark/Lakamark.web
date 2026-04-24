@@ -2,50 +2,93 @@
 
 namespace App\Tests\Foundation\Bridge;
 
+use App\Foundation\Bridge\Exception\AssetManifestInvalidException;
+use App\Foundation\Bridge\Exception\AssetManifestNotFoundException;
 use App\Foundation\Bridge\ManifestReader;
 use PHPUnit\Framework\TestCase;
-use Psr\Cache\InvalidArgumentException;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
-class ManifestReaderTest extends TestCase
+final class ManifestReaderTest extends TestCase
 {
-    /**
-     * Regression test:
-     * - Manifest cached as empty array in prod must not persist after deploy.
-     *
-     * @throws InvalidArgumentException
-     * @throws \JsonException
-     */
-    public function testReadUsesMtimeVersionToAvoidStaleEmptyCache(): void
+    private string $tempDir;
+
+    protected function setUp(): void
     {
-        $cache = new ArrayAdapter();
-        $tmpDir = sys_get_temp_dir().'/lmk_manifest_test';
-        @mkdir($tmpDir);
-        $manifestPath = $tmpDir.'/manifest.json';
-        @unlink($manifestPath);
+        $this->tempDir = sys_get_temp_dir().'/manifest-reader-tests-'.uniqid('', true);
 
-        $reader = new ManifestReader($cache, 'vite_manifest', $manifestPath);
+        if (!mkdir($concurrentDirectory = $this->tempDir, recursive: true) && !is_dir($concurrentDirectory)) {
+            $this->fail(sprintf('Unable to create temp directory "%s".', $this->tempDir));
+        }
+    }
 
-        // 1. No file = []
-        $first = $reader->read();
-        $this->assertSame([], $first);
+    protected function tearDown(): void
+    {
+        if (!is_dir($this->tempDir)) {
+            return;
+        }
 
-        // 2. Create the manifest AFTER first read
-        file_put_contents($manifestPath, json_encode([
-            'app.js' => [
-                'file' => 'app-AAA.js',
-                'css' => ['app-BBB.css'],
-                'isEntry' => true,
+        $files = glob($this->tempDir.'/*');
+        if (is_array($files)) {
+            foreach ($files as $file) {
+                if (is_file($file)) {
+                    unlink($file);
+                }
+            }
+        }
+
+        rmdir($this->tempDir);
+    }
+
+    public function testReadReturnsParsedManifest(): void
+    {
+        $path = $this->tempDir.'/manifest.json';
+
+        file_put_contents($path, json_encode([
+            'app.ts' => [
+                'file' => 'assets/app.123.js',
+                'css' => ['assets/app.123.css'],
             ],
         ], JSON_THROW_ON_ERROR));
 
-        // Ensure mtime changes on fast FS
-        clearstatcache(true, $manifestPath);
+        $reader = new ManifestReader($path);
 
-        $second = $reader->read();
+        $manifest = $reader->read();
 
-        $this->assertArrayHasKey('app.js', $second);
-        $this->assertSame('app-AAA.js', $second['app.js']['file']);
-        $this->assertSame('app-BBB.css', $second['app.js']['css'][0]);
+        $this->assertIsArray($manifest);
+        $this->assertArrayHasKey('app.ts', $manifest);
+        $this->assertSame('assets/app.123.js', $manifest['app.ts']['file']);
+    }
+
+    public function testReadThrowsWhenManifestFileDoesNotExist(): void
+    {
+        $path = $this->tempDir.'/missing-manifest.json';
+        $reader = new ManifestReader($path);
+
+        $this->expectException(AssetManifestNotFoundException::class);
+
+        $reader->read();
+    }
+
+    public function testReadThrowsWhenManifestContainsInvalidJson(): void
+    {
+        $path = $this->tempDir.'/manifest.json';
+        file_put_contents($path, '{invalid json}');
+
+        $reader = new ManifestReader($path);
+
+        $this->expectException(AssetManifestInvalidException::class);
+
+        $reader->read();
+    }
+
+    public function testReadThrowsWhenManifestRootIsNotAnObject(): void
+    {
+        $path = $this->tempDir.'/manifest.json';
+        file_put_contents($path, json_encode(['app.ts', 'other.ts'], JSON_THROW_ON_ERROR));
+
+        $reader = new ManifestReader($path);
+
+        $this->expectException(AssetManifestInvalidException::class);
+
+        $reader->read();
     }
 }

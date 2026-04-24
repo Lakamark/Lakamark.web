@@ -4,11 +4,6 @@ services:
     autowire: true
     autoconfigure: true
 
-  App\Foundation\Bridge\Resolver\NullAssetResolver: ~
-
-  App\Foundation\Bridge\Contract\AssetResolverInterface:
-    alias: App\Foundation\Bridge\Resolver\NullAssetResolver
-
   App\Foundation\Captcha\Contract\CaptchaSolutionStoreInterface: '@App\Foundation\Captcha\Store\InMemoryCaptchaSolutionStore'
 
   App\Tests\Helper\FixedClock:
@@ -20,3 +15,15 @@ services:
 
   App\Domain\Auth\Service\ResendConfirmationEmailService:
     public: true
+
+  App\Foundation\Bridge\Resolver\EnvironmentAssetResolver:
+    arguments:
+      $environment: '%kernel.environment%'
+      $devResolver: '@App\Foundation\Bridge\Resolver\ViteDevAssetResolver'
+      $prodResolver: '@App\Foundation\Bridge\Resolver\ManifestAssetResolver'
+
+  App\Foundation\Bridge\Resolver\ViteDevAssetResolver:
+    public: true
+    arguments:
+      $devServerUrl: '%app.vite.dev_server_url%'
+      $publicBasePath: '%app.assets.public_base_path%'

@@ -2,103 +2,158 @@
 
 namespace App\Foundation\Bridge;
 
+use App\Foundation\Bridge\Contract\AssetBridgeInterface;
 use App\Foundation\Bridge\Contract\AssetResolverInterface;
-use App\Foundation\Bridge\Contract\UserAgentDeciderInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
-final class AssetBridge
+/**
+ * Application-facing facade for resolved asset entries.
+ *
+ * AssetBridge is the public entry point used by higher-level layers such as
+ * Twig extensions. Its purpose is to expose a simple and stable API while
+ * delegating all resolution work to the configured AssetResolver.
+ *
+ * Responsibilities:
+ * - receive asset entry requests from application-facing code
+ * - delegate resolution to the resolver layer
+ * - expose resolved asset files through a simpler API
+ *
+ * Non-responsibilities:
+ * - reading the manifest file
+ * - implementing resolution logic
+ * - applying environment-specific behavior
+ * - rendering HTML
+ * - silently swallowing pipeline exceptions
+ *
+ * Pipeline:
+ * Twig Extension -> AssetBridge -> AssetResolver -> ManifestReader
+ */
+final readonly class AssetBridge implements AssetBridgeInterface
 {
-    private bool $polyfillLoaded = false;
-
     public function __construct(
-        private readonly AssetResolverInterface $resolver,
-        private readonly RequestStack $requestStack,
-        private readonly UserAgentDeciderInterface $uaDecider,
-        private readonly string $customElementsPolyfillUrl = 'https://unpkg.com/@ungap/custom-elements@1.3.0/min.js',
+        private AssetResolverInterface $resolver,
     ) {
     }
 
-    public function htmlLinkTag(string $entry, array $attrs = []): string
+    /**
+     * @return array<string, mixed>
+     */
+    public function getEntry(string $entry): array
     {
-        $href = $this->resolver->resolveCss($entry);
-        if (null === $href) {
-            return ''; // We load the CSS from js in dev.
-        }
-
-        $attributes = $this->renderAttrs($attrs);
-
-        return sprintf('<link rel="stylesheet" href="%s"%s>', $href, $attributes);
+        return $this->resolver->resolve($entry);
     }
 
-    public function scriptTag(string $entry): string
+    /**
+     * @return string[]
+     */
+    public function getJavascriptFiles(string $entry): array
     {
-        $src = $this->resolver->resolveJs($entry);
-        if (null === $src) {
-            return '';
+        $resolvedEntry = $this->getEntry($entry);
+
+        $files = [];
+
+        // Load the Vite Client (only in dev)
+        $viteClient = $resolvedEntry['vite_client'] ?? null;
+        if (is_string($viteClient) && '' !== $viteClient) {
+            $files[] = $viteClient;
         }
 
-        $preloads = $this->renderModulePreloads($this->resolver->resolveImports($entry));
-        $polyfill = $this->renderPolyfillIfNeeded();
+        // Main file (app.js or app.ts)
+        $file = $resolvedEntry['file'] ?? null;
+        if (is_string($file) && '' !== $file) {
+            $files[] = $file;
+        }
 
-        return $polyfill.$preloads.sprintf(
-            '<script src="%s" type="module" defer></script>',
-            $src
-        );
+        return $files;
     }
 
-    /** @param list<string> $imports */
-    private function renderModulePreloads(array $imports): string
+    /**
+     * @return string[]
+     */
+    /**
+     * @return string[]
+     */
+    public function getCssFiles(string $entry): array
     {
-        if ([] === $imports) {
-            return '';
+        $resolvedEntry = $this->getEntry($entry);
+        
+        $files = $this->extractCssFiles($resolvedEntry);
+        
+        $imports = $resolvedEntry['imports'] ?? [];
+        
+        if (is_array($imports)) {
+            foreach ($imports as $import) {
+                if (!is_string($import) || '' === $import) {
+                    continue;
+                }
+                
+                $importEntry = $this->getEntry($import);
+                
+                $files = array_merge(
+                    $files,
+                    $this->extractCssFiles($importEntry)
+                );
+            }
         }
-
-        $out = [];
-        foreach ($imports as $href) {
-            $out[] = sprintf('<link rel="modulepreload" href="%s">', $href);
-        }
-
-        return implode("\n", $out)."\n";
+        
+        return array_values(array_unique($files));
     }
 
-    private function renderPolyfillIfNeeded(): string
+    /**
+     * Returns the JavaScript files that should be preloaded for the given entry.
+     *
+     * This method resolves the current entry, inspects its "imports" field, and
+     * resolves each imported manifest entry to its JavaScript file.
+     *
+     * If the entry has no imports, an empty array is returned.
+     * Invalid import values are ignored.
+     *
+     * @param string $entry The manifest entry name
+     *
+     * @return string[]
+     */
+    public function getModulePreloadFiles(string $entry): array
     {
-        if ($this->polyfillLoaded) {
-            return '';
+        $resolvedEntry = $this->getEntry($entry);
+        $imports = $resolvedEntry['imports'] ?? [];
+
+        if (!is_array($imports)) {
+            return [];
         }
 
-        $request = $this->requestStack->getCurrentRequest();
-        if (!$request instanceof Request) {
-            return '';
+        $files = [];
+
+        foreach ($imports as $import) {
+            if (!is_string($import) || '' === $import) {
+                continue;
+            }
+
+            $importEntry = $this->getEntry($import);
+            $file = $importEntry['file'] ?? null;
+
+            if (is_string($file) && '' !== $file) {
+                $files[] = $file;
+            }
         }
 
-        $ua = $request->headers->get('User-Agent') ?? '';
-        if (!$this->uaDecider->shouldLoadCustomElementsPolyfill($ua)) {
-            return '';
-        }
-
-        $this->polyfillLoaded = true;
-
-        return sprintf(
-            '<script src="%s" defer></script>'."\n",
-            $this->customElementsPolyfillUrl
-        );
+        return array_values(array_unique($files));
     }
 
-    private function renderAttrs(array $attrs): string
+    /**
+     * @param array<string, mixed> $entry
+     *
+     * @return string[]
+     */
+    private function extractCssFiles(array $entry): array
     {
-        if ([] === $attrs) {
-            return '';
+        $css = $entry['css'] ?? [];
+
+        if (!is_array($css)) {
+            return [];
         }
 
-        $parts = [];
-        foreach ($attrs as $k => $v) {
-            $key = htmlspecialchars((string) $k, ENT_QUOTES);
-            $val = htmlspecialchars((string) $v, ENT_QUOTES);
-            $parts[] = sprintf('%s="%s"', $key, $val);
-        }
-
-        return ' '.implode(' ', $parts);
+        return array_values(array_filter(
+            $css,
+            static fn (mixed $file): bool => is_string($file) && '' !== $file
+        ));
     }
 }

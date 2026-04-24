@@ -9,82 +9,38 @@
 parameters:
     dkim_key: '%env(resolve:default::MAILER_DKIM)%'
     dashboard_prefix: '%env(resolve:DASHBOARD_PREFIX)%'
+    app.vite.manifest_path: '%kernel.project_dir%/public/assets/.vite/manifest.json'
+    app.assets.public_base_path: '/assets'
+    app.vite.dev_server_url: 'https://localhost:3000'
+
 services:
-    # default configuration for services in *this* file
     _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        autowire: true
+        autoconfigure: true
         public: false
         bind:
-            $rootProjectDir: '%kernel.project_dir%'
-            $dashboardPrefix: '%dashboard_prefix%'
+            string $devServerUrl: '%app.vite.dev_server_url%'
+            string $publicBasePath: '%app.assets.public_base_path%'
+            string $rootProjectDir: '%kernel.project_dir%'
+            string $secret: '%kernel.secret%'
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
-        exclude: '../src/{DependencyInjection,Entity,Foundation/Migrations,Tests,Kernel.php}'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Foundation/Migrations/'
+            - '../src/Tests/'
+            - '../src/Kernel.php'
+            - '../src/Foundation/Captcha/CaptchaRegistry.php'
+            - '../src/Domain/Auth/Security/CompositeUserChecker.php'
+            - '../src/Foundation/Bridge/ManifestReader.php'
+            - '../src/Foundation/Bridge/Resolver/EnvironmentAssetResolver.php'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
-
-    # User Checkers for the auth
-    App\Domain\Auth\Security\BannedUserChecker: ~
-    App\Domain\Auth\Security\LoginAttemptsUserChecker: ~
-
-    App\Domain\Auth\Security\CompositeUserChecker:
-        arguments:
-            $checkers:
-                - '@App\Domain\Auth\Security\BannedUserChecker'
-                - '@App\Domain\Auth\Security\LoginAttemptsUserChecker'
-
-    App\Http\Controller\:
-        resource: '../src/Http/controller'
-        tags: ['controller.service_arguments']
-
-    App\Http\Dashboard\Controller\:
-        resource: '../src/Http/Dashboard/Controller'
-        tags: ['controller.service_arguments']
-
-
-    App\Foundation\Bridge\Contract\EntryMapperInterface:
-        class:  App\Foundation\Bridge\SimpleEntryMapper
-
-    App\Foundation\Captcha\Contract\CaptchaSolutionStoreInterface: '@App\Foundation\Captcha\Store\CacheCaptchaSolutionStore'
-
-    App\Foundation\Captcha\CaptchaRegistry:
-        arguments:
-            $challenges: !tagged_locator { tag: 'app.captcha.challenge', index_by: 'type' }
-            $generators: !tagged_locator { tag: 'app.captcha.generator', index_by: 'type' }
-
-    App\Foundation\Captcha\Puzzle\PuzzleCaptchaChallenge:
-        tags:
-            - { name: 'app.captcha.challenge', type: 'puzzle' }
-
-    App\Foundation\Captcha\Puzzle\PuzzleGenerator:
-        arguments:
-            $rootImage: '%kernel.project_dir%/public/images/puzzles'
-            $imageCount: 5
-        tags:
-            - { name: 'app.captcha.generator', type: 'puzzle' }
-
-
-    App\Foundation\Security\Contract\TokenGeneratorInterface:
-        alias: App\Foundation\Security\TokenGeneratorService
-
-    App\Foundation\Security\Contract\TokenHasherInterface:
-        alias: App\Foundation\Security\TokenHasher
-
-    App\Foundation\Security\TokenHasher:
-        arguments:
-            $secret: '%kernel.secret%'
-
-    App\Http\Twig\UserContextTwigExtension:
-        tags: ['twig.extension']
-
-    app.auth.login_rate_limiter:
-        class: Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter
-        arguments:
-            $globalFactory: '@limiter.auth_login_ip'
-            $localFactory: '@limiter.auth_login_username_ip'
-            $secret: '%kernel.secret%'
+imports:
+    - { resource: services/assets.yaml }
+    - { resource: services/auth.yaml }
+    - { resource: services/captcha.yaml } # HERE!
+    - { resource: services/security.yaml }
+    - { resource: services/controllers.yaml }
+    - { resource: services/twig.yaml }
