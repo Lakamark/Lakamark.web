@@ -5,5 +5,10 @@
     --effect-blur-sm: 8px;
     --effect-blur-md: 12px;
     --effect-blur-lg: 20px;
+
+    /* === SHADOWS === */
+    --shadow-subtle: 1px 2px 4px rgba(0, 0, 0, 0.08);
+    --shadow-base: 0px 4px 8px rgba(0, 0, 0, 0.12);
+    --shadow-strong: 0px 12px 50px rgba(0, 0, 0, 0.18);
   }
 }
