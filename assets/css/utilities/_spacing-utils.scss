@@ -1,0 +1,42 @@
+@layer utilities {
+  $spacing-utils: (
+          "0": var(--space-none),
+          "05": var(--space-05),
+          "1": var(--space-1),
+          "2": var(--space-2),
+          "3": var(--space-3),
+          "4": var(--space-4),
+          "5": var(--space-5),
+          "6": var(--space-6),
+          "7": var(--space-7),
+          "8": var(--space-8),
+  );
+
+  @each $key, $value in $spacing-utils {
+    .m-#{$key} { margin: $value; }
+    .mt-#{$key} { margin-top: $value; }
+    .mb-#{$key} { margin-bottom: $value; }
+    .mx-#{$key} {
+      margin-left: $value;
+      margin-right: $value;
+    }
+    .my-#{$key} {
+      margin-top: $value;
+      margin-bottom: $value;
+    }
+
+    .p-#{$key} { padding: $value; }
+    .pt-#{$key} { padding-top: $value; }
+    .pb-#{$key} { padding-bottom: $value; }
+    .px-#{$key} {
+      padding-left: $value;
+      padding-right: $value;
+    }
+    .py-#{$key} {
+      padding-top: $value;
+      padding-bottom: $value;
+    }
+
+    .gap-#{$key} { gap: $value; }
+  }
+}

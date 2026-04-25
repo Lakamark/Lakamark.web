@@ -1,0 +1,34 @@
+@use "../abstracts/responsive";
+
+@layer layout {
+  /**
+   * Main layout grid
+   *
+   * Mobile: 4 columns
+   * Desktop: 12 columns
+   */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: var(--grid-gap-mobile, 18px);
+  }
+
+  @for $i from 1 through 4 {
+    .col-span-#{$i} {
+      grid-column: span #{$i} / span #{$i};
+    }
+  }
+
+  @include responsive.media-up(desktop) {
+    .grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--grid-gap-desktop, 24px);
+    }
+
+    @for $i from 1 through 12 {
+      .col-span-lg-#{$i} {
+        grid-column: span #{$i} / span #{$i};
+      }
+    }
+  }
+}

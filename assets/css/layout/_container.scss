@@ -1,0 +1,28 @@
+@use "../abstracts/responsive";
+
+@layer layout {
+  .container {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: var(--space-2);
+  }
+
+  .page-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .page-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  @include responsive.media-up(desktop) {
+    .container {
+      padding-inline: 120px;
+    }
+  }
+}

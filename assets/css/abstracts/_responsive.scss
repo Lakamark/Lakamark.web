@@ -1,3 +1,5 @@
+@use "sass:map";
+
 /**
  * Responsive Breakpoints
  *
@@ -20,7 +22,7 @@ $breakpoints: (
  * @include media-up(tablet) { ... }
  */
 @mixin media-up($key) {
-  $value: map-get($breakpoints, $key);
+  $value: map.get($breakpoints, $key);
 
   @if $value == null {
     @error "Unknown breakpoint `#{$key}`. Available: #{map-keys($breakpoints)}";
@@ -38,7 +40,7 @@ $breakpoints: (
  * @include media-down(desktop) { ... }
  */
 @mixin media-down($key) {
-  $value: map-get($breakpoints, $key);
+  $value: map.get($breakpoints, $key);
 
   @if $value == null {
     @error "Unknown breakpoint `#{$key}`. Available: #{map-keys($breakpoints)}";
@@ -56,8 +58,8 @@ $breakpoints: (
  * @include media-between(tablet, desktop) { ... }
  */
 @mixin media-between($from, $to) {
-  $min: map-get($breakpoints, $from);
-  $max: map-get($breakpoints, $to);
+  $min: map.get($breakpoints, $from);
+  $max: map.get($breakpoints, $to);
 
   @if $min == null {
     @error "Unknown breakpoint `#{$from}`. Available: #{map-keys($breakpoints)}";
