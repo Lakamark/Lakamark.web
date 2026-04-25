@@ -1,0 +1,73 @@
+/**
+ * Responsive Breakpoints
+ *
+ * Centralized media-query helpers.
+ * Keep layout decisions in components,
+ * but keep breakpoint values here.
+ */
+
+$breakpoints: (
+        mobile: 480px,
+        tablet: 768px,
+        desktop: 980px,
+        wide: 1200px
+);
+
+/**
+ * Applies styles from a breakpoint and up.
+ *
+ * Usage:
+ * @include media-up(tablet) { ... }
+ */
+@mixin media-up($key) {
+  $value: map-get($breakpoints, $key);
+
+  @if $value == null {
+    @error "Unknown breakpoint `#{$key}`. Available: #{map-keys($breakpoints)}";
+  }
+
+  @media (min-width: $value) {
+    @content;
+  }
+}
+
+/**
+ * Applies styles below a breakpoint.
+ *
+ * Usage:
+ * @include media-down(desktop) { ... }
+ */
+@mixin media-down($key) {
+  $value: map-get($breakpoints, $key);
+
+  @if $value == null {
+    @error "Unknown breakpoint `#{$key}`. Available: #{map-keys($breakpoints)}";
+  }
+
+  @media (max-width: ($value - 0.02px)) {
+    @content;
+  }
+}
+
+/**
+ * Applies styles between two breakpoints.
+ *
+ * Usage:
+ * @include media-between(tablet, desktop) { ... }
+ */
+@mixin media-between($from, $to) {
+  $min: map-get($breakpoints, $from);
+  $max: map-get($breakpoints, $to);
+
+  @if $min == null {
+    @error "Unknown breakpoint `#{$from}`. Available: #{map-keys($breakpoints)}";
+  }
+
+  @if $max == null {
+    @error "Unknown breakpoint `#{$to}`. Available: #{map-keys($breakpoints)}";
+  }
+
+  @media (min-width: $min) and (max-width: ($max - 0.02px)) {
+    @content;
+  }
+}

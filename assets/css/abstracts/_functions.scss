@@ -1,0 +1,188 @@
+/**
+ * Design System Helpers
+ *
+ * Lightweight helpers to access CSS variables (tokens).
+ * These helpers DO NOT contain business logic.
+ * They only standardize access to design tokens.
+ *
+ * ----------------------------------------
+ * Token Naming Conventions
+ * ----------------------------------------
+ *
+ * Semantic tokens:
+ *   --color-*
+ *   → Used in components (UI intent)
+ *
+ * Primitive tokens:
+ *   --primitive-color-*
+ *   → Source of truth (Figma)
+ *   → ⚠️ Never used directly in components
+ *
+ * Other tokens:
+ *   --space-*      (spacing scale)
+ *   --radius-*     (border radius)
+ *   --text-*       (font size)
+ *   --font-*       (font weight)
+ *
+ * ----------------------------------------
+ * Usage Guidelines
+ * ----------------------------------------
+ *
+ * ✅ Use helpers inside components
+ * ❌ Do not use primitive tokens in components
+ * ❌ Do not add logic (if/else, conditions) in helpers
+ * ❌ Do not hardcode values in components
+ *
+ * Helpers are simple accessors:
+ * → They DO NOT compute
+ * → They DO NOT decide
+ *
+ * ----------------------------------------
+ * Architecture
+ * ----------------------------------------
+ *
+ * primitives (Figma source of truth)
+ *        ↓
+ * semantic tokens (theme mapping: day/night)
+ *        ↓
+ * helpers (SCSS access layer)
+ *        ↓
+ * components (UI)
+ *
+ * ----------------------------------------
+ * Theme Responsibility
+ * ----------------------------------------
+ *
+ * Theme switching (day/night) is handled by:
+ * - CSS variables
+ * - night-root mixin
+ *
+ * Helpers are theme-agnostic.
+ *
+ * ----------------------------------------
+ * Example
+ * ----------------------------------------
+ *
+ * .card {
+ *   background: color("surface-bg");
+ *   color: color("text-main");
+ *   padding: space(2);
+ *   border-radius: radius("md");
+ * }
+ *
+ * ----------------------------------------
+ * Anti-patterns
+ * ----------------------------------------
+ *
+ * ❌ Direct primitive usage:
+ * .card {
+ *   background: var(--primitive-color-white);
+ * }
+ *
+ * ❌ Logic in helpers:
+ * @function color($name) {
+ *   @if $theme == dark { ... } // forbidden
+ * }
+ *
+ * ❌ Hardcoded values:
+ * .card {
+ *   padding: 16px;
+ * }
+ */
+
+/**
+ * Returns a semantic color token.
+ *
+ * @param {String} $name - Token name without prefix
+ * Example: "page-bg", "text-main", "border"
+ *
+ * @return {String} CSS variable reference
+ *
+ * Usage:
+ * .card {
+ *   background: color("surface-bg");
+ *   color: color("text-main");
+ * }
+ */
+@function color($name) {
+  @return var(--color-#{$name});
+}
+
+/**
+ * Returns a primitive color token.
+ *
+ * WARNING:
+ * Should only be used inside token definition files
+ * (e.g., _semantic.scss), NOT inside components.
+ *
+ * @param {String} $name - Primitive name
+ * Example: "brand-main", "neutral-light"
+ *
+ * Usage (tokens only):
+ * --color-brand: primitive("brand-main");
+ */
+@function primitive($name) {
+  @return var(--primitive-color-#{$name});
+}
+
+/**
+ * Returns a spacing token.
+ *
+ * @param {Number|String} $step - Scale value (0, 05, 1, 2, 3...)
+ *
+ * @return {String} CSS variable reference
+ *
+ * Usage:
+ * .card {
+ *   padding: space(2);
+ *   gap: space(1);
+ * }
+ */
+@function space($step) {
+  @return var(--space-#{$step});
+}
+
+/**
+ * Returns a radius token.
+ *
+ * @param {String} $size - Radius key
+ * Example: "sm", "md", "lg", "full"
+ *
+ * Usage:
+ * .button {
+ *   border-radius: radius("md");
+ * }
+ */
+@function radius($size) {
+  @return var(--radius-#{$size});
+}
+
+/**
+ * Returns a font-size token.
+ *
+ * @param {String} $size - Typography key
+ * Example: "base", "lg", "2xl"
+ *
+ * Usage:
+ * h1 {
+ *   font-size: font-size("3xl");
+ * }
+ */
+@function font-size($size) {
+  @return var(--text-#{$size});
+}
+
+/**
+ * Returns a font-weight token.
+ *
+ * @param {String} $weight - Weight key
+ * Example: "regular", "medium", "bold"
+ *
+ * Usage:
+ * .title {
+ *   font-weight: font-weight("bold");
+ * }
+ */
+@function font-weight($weight) {
+  @return var(--font-#{$weight});
+}

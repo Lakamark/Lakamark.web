@@ -1,0 +1,122 @@
+@use '../abstracts/theme';
+
+@layer tokens {
+  :root {
+    --font-family-base: var(--primitive-font-family-base);
+    --font-family-heading: var(--primitive-font-family-heading);
+    --font-family-mono: var(--primitive-font-family-mono);
+
+    /* === SEMANTIC TOKENS / DAY === */
+    // Surfaces
+    --color-surface-canvas: var(--primitive-color-white);
+    --color-surface-elevated: rgba(250, 250, 250, 0.9);
+    --color-surface-elevated-control: rgba(250, 250, 250, 0.2);
+
+    // Borders
+    --color-border-default: var(--primitive-color-neutral-dark);
+    --color-border-rgb: 0, 0, 0;
+    --color-border-subtle: rgba(var(--color-border-rgb), 0.06); // #back 6% opacity
+    --color-border-soft: rgba(var(--color-border-rgb), 0.12); // back 12%
+    --color-border-control: rgba(var(--color-border-rgb), 0.2); // black 20%
+
+    // texts
+    --color-text-default: var(--primitive-color-black-main);
+    --color-text-subtle: var(--primitive-color-neutral-dark);
+
+    // brand
+    --color-brand-primary: var(--primitive-color-brand-main);
+    --color-brand-secondary: var(--primitive-color-secondary-main);
+
+    // Accents
+    --color-accent: var(--primitive-color-accent-500);
+    --color-accent-soft: var(--primitive-color-accent-400);
+    --color-accent-strong: var(--primitive-color-accent-300);
+
+    // Feedback
+    --color-feedback-success: var(--primitive-color-sucess-main);
+    --color-feedback-waning: var(--primitive-color-warning-main);
+    --color-feedback-danger: var(--primitive-color-danger-main);
+    --color-feedback-info: var(--primitive-color-info-main);
+
+    // Buttons (fill)
+    --color-button-primary-bg: var(--primitive-color-brand-main);
+    --color-button-secondary-bg: var(--primitive-color-secondary-main);
+    --color-button-success-bg: var(--primitive-color-sucess-main);
+    --color-button-danger-bg: var(--primitive-color-danger-main);
+    --color-button-ghost-bg: var(--primitive-color-white);
+    --color-button-ghost-bg-hover: rgba(0, 0, 0, 0);
+
+    // Buttons labels
+    --color-button-primary-label: var(--primitive-color-white);
+    --color-button-secondary-label: var(--primitive-color-brand-deep);
+    --color-button-success-label: var(--primitve-color-succes-deep);
+    --color-button-danger-label: var(--primitive-color-white);
+    --color-button-ghost-label: var(--primitive-color-black-main);
+
+    // Buttons States
+    --color-state-disabled-bg: var(--primitive-color-neutral-base);
+    --color-state-disabled-label: var(--primitive-color-neutral-light);
+
+    // Theme Switcher
+    --color-theme-switch-bg: #FFDF60;
+    --color-theme-switcher-icon: var(--primitive-color-warning-main);
+  }
+
+  /* === NIGHT OVERRIDE === */
+  @include theme.night-root {
+    /* === SEMANTIC TOKENS / Night === */
+    // Surfaces
+    --color-surface-canvas: var(--primitive-color-black-strong);
+    --color-surface-elevated: rgba(18, 18, 18, 0.9);
+    --color-surface-elevated-control: rgba(18, 18, 18, 0.2);
+
+    // Borders
+    --color-border-default: var(--primitive-color-neutral-base);
+    --color-border-rgb: 255, 255, 255;
+    --color-border-subtle: rgba(var(--color-border-rgb), 0.08);
+    --color-border-soft: rgba(var(--color-border-rgb), 0.12);
+    --color-border-control: rgba(var(--color-border-rgb), 0.2);
+
+    // texts
+    --color-text-default: var(--primitive-color-white);
+    --color-text-subtle: var(--primitive-color-neutral-base);
+
+    // brand
+    --color-brand-primary: var(--primitive-color-brand-strong);
+    --color-brand-secondary: var(--primitive-color-secondary-strong);
+
+    // Accents
+    --color-accent: var(--primitive-color-accent-300);
+    --color-accent-soft: var(--primitive-color-accent-400);
+    --color-accent-strong: var(--primitive-color-accent-500);
+
+    // Feedback
+    --color-feedback-success: var(--primitive-color-sucess-strong);
+    --color-feedback-waning: var(--primitive-color-waring-strong);
+    --color-feedback-danger: var(--primitive-color-danger-strong);
+    --color-feedback-info: var(--primitive-color-info-strong);
+
+    // Buttons (fill)
+    --color-button-primary-bg: var(--primitive-color-brand-strong);
+    --color-button-secondary-bg: var(--primitive-color-secondary-strong);
+    --color-button-success-bg: var(--primitive-color-sucess-strong);
+    --color-button-danger-bg: var(--primitive-color-danger-strong);
+    --color-button-ghost-bg: var(--primitive-color-black-strong);
+    --color-button-ghost-bg-hover: var(--primitive-color-neutral-base);
+
+    // Buttons labels
+    --color-button-primary-label: var(--primitive-color-brand-deep);
+    --color-button-secondary-label: var(--primitive-color-white);
+    --color-button-success-label: var(--primitive-color-black-main);
+    --color-button-danger-label: var(--primitive-color-danger-deep);
+    --color-button-ghost-label: var(--primitive-color-white);
+
+    // Buttons States
+    --color-state-disabled-bg: var(--primitive-color-neutral-dark);
+    --color-state-disabled-label: var(--primitive-color-neutral-base);
+
+    // Theme Switcher
+    --color-theme-switch-bg: #0251B9;
+    --color-theme-switcher-icon: var(--primitive-color-white);
+  }
+}

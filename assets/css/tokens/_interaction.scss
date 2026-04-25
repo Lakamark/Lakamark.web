@@ -1,0 +1,36 @@
+@use "../abstracts/theme";
+
+@layer tokens {
+  :root {
+    /* === INTERACTION TOKENS / DAY === */
+    --opacity-accent-hover: 0.08;
+    --opacity-accent-focus: 0.4;
+    --opacity-accent-active: 0.16;
+
+    --color-accent-rgb: 0, 84, 181;
+    --color-border-rgb: 0, 0, 0;
+
+    --color-accent-hover: rgba(var(--color-accent-rgb), var(--opacity-accent-hover));
+    --color-accent-focus: rgba(var(--color-accent-rgb), var(--opacity-accent-focus));
+    --color-accent-active: rgba(var(--color-accent-rgb), var(--opacity-accent-active));
+
+    --color-border-subtle: rgba(var(--color-border-rgb), 0.06);
+    --color-border-soft: rgba(var(--color-border-rgb), 0.12);
+    --color-border-control: rgba(var(--color-border-rgb), 0.2);
+  }
+
+  @include theme.night-root {
+    /* === INTERACTION TOKENS / NIGHT === */
+
+    --opacity-accent-hover: 0.12;
+    --opacity-accent-focus: 0.4;
+    --opacity-accent-active: 0.18;
+
+    --color-accent-rgb: 117, 165, 255;
+    --color-border-rgb: 255, 255, 255;
+
+    --color-border-subtle: rgba(var(--color-border-rgb), 0.08);
+    --color-border-soft: rgba(var(--color-border-rgb), 0.12);
+    --color-border-control: rgba(var(--color-border-rgb), 0.2);
+  }
+}

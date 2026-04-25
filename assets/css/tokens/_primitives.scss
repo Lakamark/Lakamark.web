@@ -1,0 +1,47 @@
+@layer tokens {
+  :root {
+    --primitive-color-black-main: #000000;
+    --primitive-color-black-strong: #121212;
+    --primitive-color-white: #FFFFFF;
+    --primitive-color-neutral-light: #EDEDED;
+    --primitive-color-neutral-base: #A2A2A2;
+    --primitive-color-neutral-dark: #595959;
+
+    // Brands colors
+    --primitive-color-brand-main: #1C3C7D;
+    --primitive-color-brand-strong: #82A2E3;
+    --primitive-color-brand-deep: #162648;
+
+    // Secondary colors
+    --primitive-color-secondary-main: #ADBBEB;
+    --primitive-color-secondary-strong: #96A8E6;
+
+    // Success colors
+    --primitive-color-sucess-main: #015E12;
+    --primitive-color-sucess-strong: #4EB261;
+    --primitve-color-succes-deep: #DFFFE5;
+
+    // Danger colors
+    --primitive-color-danger-main: #9E0000;
+    --primitive-color-danger-strong: #E49D9D;
+    --primitive-color-danger-deep: #2D0000;
+
+    // Warning colors
+    --primitive-color-warning-main: #66500D;
+    --primitive-color-waring-strong: #FFD900;
+
+    // Info colors
+    --primitive-color-info-main: #305599;
+    --primitive-color-info-strong: #75A5FF;
+
+    // Accent colors
+    --primitive-color-accent-300: #75A5FF;
+    --primitive-color-accent-400: #2C77CE;
+    --primitive-color-accent-500: #0054B5;
+
+    // Font-family
+    --primitive-font-family-base: "Roboto", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+    --primitive-font-family-heading: "Roboto", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+    --primitive-font-family-mono: "Fira Code", monospace;
+  }
+}

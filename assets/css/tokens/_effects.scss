@@ -1,0 +1,9 @@
+@layer tokens {
+  :root {
+    // Effects (blur)
+    --effect-blur-none: 0px;
+    --effect-blur-sm: 8px;
+    --effect-blur-md: 12px;
+    --effect-blur-lg: 20px;
+  }
+}

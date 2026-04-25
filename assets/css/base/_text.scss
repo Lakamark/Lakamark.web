@@ -1,0 +1,55 @@
+@layer base {
+  .hero-title,
+  .h1,
+  .h2,
+  .h3,
+  .h4 {
+    font-family: var(--font-family-heading), sans-serif;
+    font-weight: var(--font-bold);
+  }
+
+  .hero-title {
+    font-size: var(--text-hero-title);
+    line-height: var(--leading-hero-title);
+  }
+
+  .h1 {
+    font-size: var(--text-heading-1);
+    line-height: var(--leading-heading-1);
+  }
+
+  .h2 {
+    font-size: var(--text-heading-2);
+    line-height: var(--leading-heading-2);
+  }
+
+  .h3 {
+    font-size: var(--text-heading-3);
+    line-height: var(--leading-heading-3);
+  }
+
+  .h4 {
+    font-size: var(--text-heading-4);
+    line-height: var(--leading-heading-4);
+  }
+
+  .text-body {
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+  }
+
+  .text-lead {
+    font-size: var(--text-lead);
+    line-height: var(--leading-lead);
+  }
+
+  .text-small {
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+
+  .text-caption {
+    font-size: var(--text-caption);
+    line-height: var(--leading-caption);
+  }
+}

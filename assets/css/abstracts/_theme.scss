@@ -1,0 +1,51 @@
+/**
+ * Applies night theme overrides to semantic tokens.
+ *
+ * Supports two sources of dark mode:
+ * 1. Manual override via `.night-theme`
+ * 2. Automatic OS preference via `prefers-color-scheme: dark`
+ *
+ * Respects manual overrides:
+ * - `.day-theme` disables automatic dark mode
+ * - `.night-theme` always wins
+ *
+ * Theme priority:
+ * 1. `.day-theme` → force light
+ * 2. `.night-theme` → force dark
+ * 3. OS preference → fallback only if no theme class is set
+ *
+ * Usage:
+ * :root {
+ *   --color-bg: var(--primitive-color-white);
+ * }
+ *
+ * @include night-root {
+ *   --color-bg: var(--primitive-color-black-strong);
+ * }
+ *
+ * Guidelines:
+ * - Use ONLY for defining semantic tokens
+ * - Do NOT use inside components
+ * - Components must rely on semantic tokens (`var(--color-*)`)
+ *
+ * Architecture:
+ * - :root → primitive tokens (from Figma)
+ * - semantic tokens → defined via light + night overrides
+ * - components → consume semantic tokens only
+ *
+ * This ensures:
+ * - Centralized theme logic
+ * - Predictable overrides
+ * - Clean separation of concerns
+ */
+@mixin night-root {
+  .night-theme {
+    @content;
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    body:not(.day-theme):not(.night-theme) {
+      @content;
+    }
+  }
+}
