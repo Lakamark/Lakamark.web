@@ -1,25 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import {AbstractModule} from "../../core";
-
-class FakeModule extends AbstractModule {
-    public mountCount = 0;
-    public destroyCount = 0;
-
-    protected onMount(): void {
-        this.mountCount++;
-    }
-
-    protected onDestroy(): void {
-        this.destroyCount++;
-    }
-}
+import {AppConfig} from "../../../dom";
+import {createFakeConfig, FakeModule} from "../../Fake";
 
 describe('AbstractModule', () => {
     it('mounts only once', () => {
         const module = new FakeModule();
+        const config: AppConfig = createFakeConfig();
 
-        module.mount();
-        module.mount();
+        module.mount(config);
+        module.mount(config);
 
         expect(module.mountCount).toBe(1);
     });
@@ -34,8 +23,9 @@ describe('AbstractModule', () => {
 
     it('destroys only once after mount', () => {
         const module = new FakeModule();
+        const config: AppConfig = createFakeConfig();
 
-        module.mount();
+        module.mount(config);
         module.destroy();
         module.destroy();
 
@@ -44,10 +34,11 @@ describe('AbstractModule', () => {
 
     it('can mount again after destroy', () => {
         const module = new FakeModule();
+        const config: AppConfig = createFakeConfig();
 
-        module.mount();
+        module.mount(config);
         module.destroy();
-        module.mount();
+        module.mount(config);
 
         expect(module.mountCount).toBe(2);
     });
