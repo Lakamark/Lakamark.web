@@ -1,21 +1,51 @@
 @layer components {
+
   /* =========================
-  HEADER BASE (mobile first)
+     VARIABLES
   ========================= */
 
-  .header {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-
-    background: var(--color-surface-elevated);
-    backdrop-filter: blur(var(--effect-blur-md));
-
-    border-bottom: 1px solid var(--color-border-subtle);
+  :root {
+    --header-height: 81px;
   }
 
   /* =========================
-     BRAND (logo + hamburger)
+     HEADER BASE (mobile first)
+  ========================= */
+
+  .header-wrapper {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    background: var(--color-surface-overlay);
+
+    backdrop-filter: blur(var(--effect-blur-lg));
+    -webkit-backdrop-filter: blur(var(--effect-blur-lg));
+  }
+
+  .header-wrapper.is-menu-open {
+    height: 100dvh;
+    position: fixed;
+    inset: 0;
+  }
+
+  .header {
+    min-height: var(--header-height);
+    align-items: center;
+    background: transparent;
+    border: 1px solid var(--color-border-subtle);
+  }
+
+  /* =========================
+     HEADER STATES (JS)
+  ========================= */
+
+  .header.is-scrolled {
+    //box-shadow: var(--shadow-strong);
+  }
+
+  /* =========================
+     BRAND
   ========================= */
 
   .header__brand {
@@ -25,13 +55,14 @@
     align-items: center;
     justify-content: center;
 
-    min-height: 72px;
+    min-height: var(--header-height);
     padding: var(--space-2);
   }
 
   .header__brand-logo {
     width: 69px;
     height: 49px;
+
     display: flex;
     justify-content: center;
   }
@@ -42,14 +73,12 @@
     justify-content: center;
   }
 
-  /* SVG */
   .header__brand .icon-logo {
     display: block;
     width: 60px;
     height: auto;
 
     fill: var(--color-text-default);
-
     transform: translateY(2px);
   }
 
@@ -62,7 +91,7 @@
   }
 
   /* =========================
-     HAMBURGER ICON
+     HAMBURGER
   ========================= */
 
   .header__hamburger {
@@ -100,16 +129,15 @@
   .header__hamburger span::before {
     position: absolute;
     top: -8px;
-    left: 0;
   }
 
   .header__hamburger span::after {
     position: absolute;
     top: 8px;
-    left: 0;
   }
 
-  /* Animation OPEN */
+  /* OPEN animation */
+
   .header.is-menu-open .header__hamburger span {
     background: transparent;
   }
@@ -130,25 +158,29 @@
 
   .header__nav {
     position: fixed;
-    inset: 72px 0 auto 0;
-
-    padding: var(--space-4);
-
-    background: var(--color-surface-elevated);
-    backdrop-filter: blur(var(--effect-blur-lg));
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: auto;
+    padding: var(--space-2);
 
     border-bottom: 1px solid var(--color-border-subtle);
-
     transform: translateY(-8px);
     opacity: 0;
     pointer-events: none;
-
+    overflow-y: auto;
     transition:
             opacity 180ms ease,
             transform 180ms ease;
   }
 
-  .header.is-menu-open .header__nav {
+  .nav-menu__entry {
+    padding: var(--space-1) 0;
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .header-wrapper.is-menu-open .header__nav {
     transform: translateY(0);
     opacity: 1;
     pointer-events: auto;
@@ -181,41 +213,14 @@
             color 160ms ease;
   }
 
-  .nav-menu__link:hover,
-  .nav-menu__link:focus-visible {
-    background: var(--color-accent-hover);
+  .nav-menu__link:hover {
+    background-color: var(--color-accent-hover);
     color: var(--color-accent);
   }
 
-  /* Active */
   .nav-menu__link.is-active {
-    background: var(--color-accent-active);
+    background-color: var(--color-accent-color);
     color: var(--color-accent);
-  }
-
-  /* Actions (login/signup) */
-  .nav-menu--actions {
-    margin-top: var(--space-4);
-    padding-top: var(--space-4);
-
-    border-top: 1px solid var(--color-border-subtle);
-  }
-
-  /* =========================
-     HEADER STATES (JS)
-  ========================= */
-
-  .header.is-scrolled {
-    background: var(--color-surface-elevated);
-    box-shadow: var(--shadow-strong);
-  }
-
-  .header.is-hidden {
-    transform: translateY(-100%);
-  }
-
-  .header.is-menu-open {
-    transform: translateY(0);
   }
 
   /* =========================
@@ -231,8 +236,11 @@
 
     .header__brand {
       justify-content: flex-start;
-      min-height: 44px;
       padding-inline: var(--space-2);
+    }
+
+    .header__nav {
+      height: var(--header-height);
     }
 
     .header__brand-button {
@@ -246,6 +254,7 @@
       align-items: center;
       justify-content: space-between;
       flex: 1;
+
       padding: 0;
 
       background: transparent;
@@ -263,16 +272,14 @@
       gap: var(--space-1);
     }
 
-    .nav-menu--actions {
-      margin: 0;
-      padding: 0;
-      border: none;
-    }
-
     .nav-menu__link {
       min-height: 40px;
       padding-inline: var(--space-2);
       font-size: 0.875rem;
+    }
+
+    .nav-menu__entry {
+      border-bottom: none;
     }
   }
 }

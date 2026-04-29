@@ -11,6 +11,7 @@
     --color-surface-canvas: var(--primitive-color-white);
     --color-surface-elevated: rgba(250, 250, 250, 0.9);
     --color-surface-elevated-control: rgba(250, 250, 250, 0.2);
+    --color-surface-overlay: rgba(250, 250, 250, 0.45);
 
     // Borders
     --color-border-default: var(--primitive-color-neutral-dark);
@@ -69,6 +70,7 @@
     --color-surface-canvas: var(--primitive-color-black-strong);
     --color-surface-elevated: rgba(18, 18, 18, 0.9);
     --color-surface-elevated-control: rgba(18, 18, 18, 0.2);
+    --color-surface-overlay: rgba(18, 18, 18, 0.45);
 
     // Borders
     --color-border-default: var(--primitive-color-neutral-base);
