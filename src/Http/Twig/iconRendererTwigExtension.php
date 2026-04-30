@@ -16,6 +16,33 @@ use Twig\TwigFunction;
  *
  * You can use a custom CSS class rather than the default CSS class
  * @example {{ iconRenderer('logo', null, 'my-custom-class') }}
+ *
+ */
+/**
+ * TODO(theme-switcher):
+ *
+ * Fix SVG sprite rendering (cropping issue with <use>)
+ *
+ * Problem:
+ * - Icons rendered via <use> are visually cropped
+ * - Inline SVG works correctly
+ *
+ * Investigate:
+ * - Ensure <svg> output includes a proper viewBox (not only width/height)
+ * - Check if sprite <symbol> viewBox is too tight (stroke clipping)
+ * - Verify no implicit overflow/clip-path applied by browser
+ *
+ * Expected fix:
+ * - Render <svg> with viewBox="0 0 24 24"
+ * - Avoid relying only on width/height attributes
+ *
+ * Compare:
+ * - Inline SVG (working)
+ * - Sprite-based SVG via <use> (broken)
+ *
+ * Notes:
+ * - Do NOT fix with CSS overflow hacks
+ * - Fix must be done at SVG/rendering level
  */
 class iconRendererTwigExtension extends AbstractExtension
 {

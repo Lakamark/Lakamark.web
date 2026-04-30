@@ -24,5 +24,3 @@ export interface ThemeManagerContract {
      */
     getCurrentTheme(): ThemeName;
 }
-
-export default ThemeManagerContract

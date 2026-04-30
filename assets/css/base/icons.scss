@@ -1,0 +1,26 @@
+@layer base {
+ .icon-frame {
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+
+   width: var(--icon-frame-size, 24px);
+   height: var(--icon-frame-size, 24px);
+ }
+
+  .icon-element {
+    display: block;
+    width: var(--icon-size, 24px);
+    height: var(--icon-size, 24px);
+    overflow: visible;
+    flex-shrink: 0;
+    transform:
+            translateX(var(--icon-offset-x, 0))
+            translateY(var(--icon-offset-y, 0));
+  }
+
+
+  .icon-element use {
+    overflow: visible;
+  }
+}

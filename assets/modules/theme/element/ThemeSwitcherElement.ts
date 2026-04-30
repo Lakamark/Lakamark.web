@@ -8,20 +8,22 @@ import {ThemeManagerContract} from "../Contracts";
  */
 export class ThemeSwitcherElement extends HTMLElement {
     private manager: ThemeManagerContract | null = null;
+    private button: HTMLButtonElement | null = null;
 
     connectedCallback(): void {
-        this.setAttribute('role', 'button');
-        this.setAttribute('tabindex', '0');
+        this.button = this.querySelector<HTMLButtonElement>('button');
 
-        this.addEventListener('click', this.handleClick);
-        this.addEventListener('keydown', this.handleKeydown);
+        if (!this.button) {
+            return;
+        }
 
+        this.button.addEventListener('click', this.handleClick);
         this.syncState();
     }
 
     disconnectedCallback(): void {
-        this.removeEventListener('click', this.handleClick);
-        this.removeEventListener('keydown', this.handleKeydown);
+        this.button?.removeEventListener('click', this.handleClick);
+        this.button = null;
     }
 
     /**
@@ -37,33 +39,22 @@ export class ThemeSwitcherElement extends HTMLElement {
         this.syncState();
     };
 
-    private handleKeydown = (event: KeyboardEvent): void => {
-        if (event.key !== 'Enter' && event.key !== ' ') {
-            return;
-        }
-
-        event.preventDefault();
-
-        this.manager?.toggle();
-        this.syncState();
-    };
-
     private syncState(): void {
-        if (!this.manager) {
+        if (!this.manager || !this.button) {
             return;
         }
 
         const theme = this.manager.getCurrentTheme();
-        this.setAttribute(
-            'aria-pressed',
-            theme === 'night-theme' ? 'true' : 'false',
-        );
-
-        this.setAttribute(
+        this.button.setAttribute(
             'aria-label',
             theme === 'night-theme'
                 ? 'Switch to day theme'
                 : 'Switch to night theme',
+        );
+
+        this.button.setAttribute(
+            'aria-pressed',
+            theme === 'night-theme' ? 'true' : 'false',
         );
     }
 }

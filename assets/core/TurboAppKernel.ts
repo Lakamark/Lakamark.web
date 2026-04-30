@@ -28,14 +28,14 @@ export class TurboAppKernel {
         document.addEventListener('turbo:before-render', this.destroy);
     }
 
+    public destroy: () => void = (): void => {
+        this.runner.destroy();
+    };
+
     private mount: () => void = (): void => {
         const config: AppConfig = readAppConfig();
 
         this.runner.mount(config);
     }
-
-    private destroy: () => void = (): void => {
-        this.runner.destroy();
-    };
 
 }

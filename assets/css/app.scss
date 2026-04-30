@@ -18,6 +18,7 @@
 // Bases
 @use "base/reset";
 @use "base/body";
+@use "base/icons";
 @use "base/text";
 
 // layouts
@@ -28,6 +29,8 @@
 // Components
 @use "components/card";
 @use "components/header";
+@use "components/themeswitcher";
+
 // Modules
 
 // utilities

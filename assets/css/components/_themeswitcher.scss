@@ -1,0 +1,100 @@
+@layer components {
+  lmk-theme-switcher {
+    display: inline-flex;
+  }
+
+  .theme-switcher__button {
+    --track-width: 64px;
+    --track-height: 30px;
+    --thumb-size: 28px;
+    --thumb-offset: 0px;
+    --icon-size: 16px;
+
+    position: relative;
+
+    width: var(--track-width);
+    height: var(--track-height);
+    padding: 0;
+
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-full);
+
+    background-color: var(--color-surface-canvas);
+
+    cursor: pointer;
+  }
+
+  .theme-switcher__thumb {
+    position: absolute;
+
+    top: var(--thumb-offset);
+    left: var(--thumb-offset);
+
+    width: var(--thumb-size);
+    height: var(--thumb-size);
+
+    border-radius: 50%;
+    background: var(--color-theme-switch-bg);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: transform 0.25s ease;
+  }
+
+  .theme-switcher__thumb .icon-element {
+    position: absolute;
+
+    width: var(--icon-size);
+    height: var(--icon-size);
+
+    display: block;
+
+    transition: opacity 0.2s ease;
+
+    transform:
+            translateX(var(--icon-offset-x, 0))
+            translateY(var(--icon-offset-y, 0));
+  }
+
+
+
+  body.day-theme .theme-switcher__thumb {
+    transform: translateX(0);
+  }
+
+  body.night-theme .theme-switcher__thumb {
+    transform: translateX(
+            calc(var(--track-width) - var(--thumb-size) - (var(--thumb-offset) * 2))
+    );
+  }
+
+  body.day-theme .theme-switcher__thumb .icon--day {
+    opacity: 1;
+  }
+
+  body.day-theme .theme-switcher__thumb .icon--night {
+    opacity: 0;
+  }
+
+  body.night-theme .theme-switcher__thumb .icon--day {
+    opacity: 0;
+  }
+
+  body.night-theme .theme-switcher__thumb .icon--night {
+    opacity: 1;
+  }
+
+  .theme-switcher__button:focus-visible {
+    outline: 2px solid var(--color-accent-focus);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .theme-switcher__thumb,
+    .theme-switcher__thumb .icon-element {
+      transition: none;
+    }
+  }
+}

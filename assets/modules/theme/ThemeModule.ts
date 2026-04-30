@@ -4,7 +4,6 @@ import {
     LocalThemeStorage,
     ThemeManager
 } from "./core";
-import {ThemeModuleOptions} from "./Contracts";
 import {AppConfig} from "../../dom";
 import {ThemeSwitcherElement} from "./element";
 
@@ -21,23 +20,19 @@ const ELEMENT_NAME = 'lmk-theme-switcher';
 export class ThemeModule extends AbstractModule {
     private manager: ThemeManager | null = null;
 
-    constructor(private readonly options: ThemeModuleOptions) {
-        super();
-    }
-
-    protected onMount(_config: AppConfig): void {
-        super.onMount(_config);
+    protected onMount(config: AppConfig): void {
+        super.onMount(config);
 
         this.defineCustomElement();
 
         const storage = new LocalThemeStorage();
-        const resolver = new ConfigThemeResolver(this.options.config);
+        const resolver = new ConfigThemeResolver(config);
 
         const initialTheme = resolver.resolve() ?? storage.get() ?? 'day-theme';
 
         this.manager = new ThemeManager(storage, {
             root: document.body,
-            defaultTheme: initialTheme
+            defaultTheme: initialTheme,
         });
 
         this.manager.init();
@@ -46,7 +41,6 @@ export class ThemeModule extends AbstractModule {
 
     protected onDestroy(): void {
         super.onDestroy();
-
         this.manager = null;
     }
 
@@ -61,10 +55,12 @@ export class ThemeModule extends AbstractModule {
             return;
         }
 
+        const manager: ThemeManager = this.manager;
+
         document
             .querySelectorAll<ThemeSwitcherElement>(ELEMENT_NAME)
             .forEach((element: ThemeSwitcherElement): void => {
-                element.setThemeManager(this.manager!);
+                element.setThemeManager(manager);
             });
     }
 }

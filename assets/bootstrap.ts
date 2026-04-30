@@ -1,15 +1,10 @@
-import {AppRunner, TurboAppKernel} from "./core";
+import { AppRunner, TurboAppKernel } from './core';
 import {
     DebugModule,
     HeaderModule,
-    MenuModule
-} from "./modules";
-
-declare global {
-    interface Window {
-        __lmkKernel?: TurboAppKernel;
-    }
-}
+    MenuModule,
+    ThemeModule,
+} from './modules';
 
 /**
  * Bootstraps the frontend application.
@@ -26,28 +21,21 @@ declare global {
  * Notes:
  * - This function should be called once from the main entry point (`app.ts`)
  * - Modules should be registered here
- *
- * @example
- * ```ts
- * import { bootstrap } from './bootstrap';
- *
- * bootstrap();
- * ```
  */
 export function bootstrap(): void {
-    // Prevent re-initialization across Turbo navigations
     if (window.__lmkKernel) {
-        return;
+        window.__lmkKernel.destroy();
     }
 
-    // Register application modules here
     const runner = new AppRunner([
         new DebugModule(),
         new HeaderModule(),
-        new MenuModule()
+        new MenuModule(),
+        new ThemeModule(),
     ]);
 
-    // Create and boot the Turbo-aware kernel
     window.__lmkKernel = new TurboAppKernel(runner);
     window.__lmkKernel.boot();
 }
+
+export {};
