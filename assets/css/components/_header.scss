@@ -138,16 +138,16 @@
 
   /* OPEN animation */
 
-  .header.is-menu-open .header__hamburger span {
+  .header-wrapper.is-menu-open .header__hamburger span {
     background: transparent;
   }
 
-  .header.is-menu-open .header__hamburger span::before {
+  .header-wrapper.is-menu-open .header__hamburger span::before {
     transform: rotate(45deg);
     top: 0;
   }
 
-  .header.is-menu-open .header__hamburger span::after {
+  .header-wrapper.is-menu-open .header__hamburger span::after {
     transform: rotate(-45deg);
     top: 0;
   }
