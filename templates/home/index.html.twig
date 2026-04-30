@@ -35,22 +35,32 @@
                     </div>
 
                     <div class="card__meta">
-                        <span class="card__category">Category</span>
-                        <span class="card__author">John Doe</span>
+                        <span class="card__category">
+                            <span class="card__meta__tag">
+                                Category:
+                            </span>
+                            Drawings
+                        </span>
+                        <span class="card__author">
+                            <span class="card__meta__tag">Author:</span>
+                            John Doe
+                        </span>
                     </div>
-
                     <div class="card__body">
                         <p class="card__text">
-                            Lorem ipsum dolor sit amet...
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nec erat mollis, lacinia ipsum sed, faucibus metus. Nam porta vulputate nunc non gravida. Pellentesque eget metus nisi. Sed at leo vel nisi aliquet venenatis ac at magna. Cras volutpat justo tortor, vitae hendrerit erat viverra sit amet. Mauris ac luctus nisi. Curabitur non metus malesuada lorem mollis facilisis vitae in nisl. Aenean ornare nec lacus ac consectetur. Nunc vel urna eget metus laoreet vestibulum. Quisque pharetra, turpis ac ultrices posuere, leo turpis molestie ligula, sit amet ornare velit enim at odio.
                         </p>
                     </div>
 
                     <div class="card__footer">
-                        <a href="#" class="card__link">Learn more</a>
+                        <a href="{{ path('home') }}"
+                           title="Learn more about this article.">
+                            <span class="card__link" aria-hidden="true"></span>
+                            Learn more
+                        </a>
                     </div>
                 </article>
             </div>
         </div>
-
     </div>
 {% endblock %}
