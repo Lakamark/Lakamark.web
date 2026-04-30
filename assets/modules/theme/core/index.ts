@@ -1,0 +1,1 @@
+export {isThemeName} from './themeGuards';
