@@ -1,5 +1,10 @@
 // Types
-export type {AppContext, AppModule} from './contracts';
+export type {
+    AppContext,
+    AppModule,
+    AppKernel,
+    MountableApp
+} from './contracts';
 
 // Runtime
 export { AppRunner } from './AppRunner';
