@@ -1,3 +1,5 @@
+import {Theme} from "../../theme";
+
 /**
  * Application configuration injected from Twig.
  *
@@ -12,7 +14,7 @@ export interface AppConfig {
     roles: string[];
     isPremium: boolean;
     isLogged: boolean;
-    preferredTheme: 'day' | 'night' | null;
+    preferredTheme: Theme | null;
     language: 'en' | 'fr';
     environment: 'dev' | 'prod' | 'test';
 }

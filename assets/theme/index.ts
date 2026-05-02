@@ -1,7 +1,14 @@
 export * from './types/Theme'
-export * from './Contracts/ThemeApplier';
-export * from './Contracts/ThemeStorage';
+export {
+    ThemeApplier,
+    ThemeStorage,
+    ThemeResolver,
+} from './Contracts/';
 
 
-export * from './core/BodyClassThemeApplier';
-export * from './core/LocalStorageThemeStorage';
+export {
+    BodyClassThemeApplier,
+    LocalStorageThemeStorage,
+    PreferredThemeResolver,
+    ThemeManager
+} from './core/';
