@@ -1,16 +1,23 @@
-import { AbstractModule } from '../core';
-import type { AppConfig } from '../dom';
+import {
+    AbstractModule,
+    AppContext,
+    MODULE_NAMES
+} from '../core';
 
 export class DebugModule extends AbstractModule {
-    protected onMount(config: AppConfig): void {
-        if (config.environment !== 'dev') {
+    readonly name = MODULE_NAMES.DEBUG;
+
+    protected onMount(context: AppContext): void {
+        const environment = context.config.environment;
+
+        if (environment !== 'dev') {
             return;
         }
 
         this.removeBadge();
 
         console.log('%c[DebugModule] AppConfig', 'color: #00bcd4; font-weight: bold;');
-        console.log(config);
+        console.log(context);
 
         this.injectBadge();
     }

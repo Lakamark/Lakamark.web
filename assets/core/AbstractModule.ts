@@ -1,4 +1,7 @@
-import {AppContext, AppModule} from "./contracts";
+import {
+    AppContext,
+    AppModule
+} from "./contracts";
 
 /**
  * Base class for frontend modules that need a safe lifecycle.

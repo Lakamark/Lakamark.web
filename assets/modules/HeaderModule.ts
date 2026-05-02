@@ -1,5 +1,5 @@
-import {AbstractModule} from "../core";
-import {AppConfig, queryOptional} from "../dom";
+import {AbstractModule, AppContext, MODULE_NAMES} from "../core";
+import {queryOptional} from "../dom";
 
 const HEADER_SELECTOR = '.header';
 const SCROLLED_CLASS = 'is-scrolled';
@@ -27,6 +27,7 @@ const MENU_OPEN_CLASS = 'is-menu-open';
  * ```
  */
 export class HeaderModule extends AbstractModule {
+    readonly name = MODULE_NAMES.HEADER
     private header: HTMLElement | null = null;
     private lastScrollY = 0;
 
@@ -35,7 +36,7 @@ export class HeaderModule extends AbstractModule {
      *
      * @internal
      */
-    protected onMount(_config: AppConfig): void {
+    protected onMount(_context: AppContext): void {
 
         this.header = queryOptional<HTMLElement>(document, HEADER_SELECTOR);
 

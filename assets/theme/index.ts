@@ -1,14 +1,20 @@
+// Types
 export * from './types/Theme'
+
+// Contracts
 export {
-    ThemeApplier,
-    ThemeStorage,
-    ThemeResolver,
+    type ThemeApplier,
+    type ThemeStorage,
+    type ThemeResolver,
 } from './Contracts/';
 
-
+// Cores
 export {
     BodyClassThemeApplier,
     LocalStorageThemeStorage,
     PreferredThemeResolver,
     ThemeManager
 } from './core/';
+
+// Elements
+export {ThemeSwitcherElement} from './element/'

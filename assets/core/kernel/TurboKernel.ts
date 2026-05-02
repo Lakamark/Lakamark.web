@@ -1,8 +1,8 @@
 import {
-    AppContext,
     AppKernel,
     MountableApp
 } from "../contracts";
+import {AppContextFactory} from "../context";
 
 /**
  * Kernel for Turbo-driven applications.
@@ -16,42 +16,54 @@ import {
  * This keeps Turbo lifecycle concerns outside of modules.
  */
 export class TurboKernel implements AppKernel {
-    private readonly handleLoad = (): void => {
-        this.app.mount(this.context);
-    };
-
-    private readonly handleBeforeCache = (): void => {
-        this.app.destroy();
-    };
+    private mounted: boolean = false;
 
     constructor(
         private readonly app: MountableApp,
-        private readonly context: AppContext,
+        private readonly buildContext: AppContextFactory,
     ) {}
+
+    private readonly handleLoad = (): void => {
+        this.mountApp();
+    };
+
+    private readonly handleBeforeCache = (): void => {
+        this.unmountApp();
+    };
 
     /**
      * Starts the Turbo lifecycle.
      */
     boot(): void {
-        this.context.document.addEventListener('turbo:load', this.handleLoad);
-        this.context.document.addEventListener(
-            'turbo:before-cache',
-            this.handleBeforeCache,
-        );
-
-        this.app.mount(this.context);
+        document.addEventListener('turbo:load', this.handleLoad);
+        document.addEventListener('turbo:before-cache', this.handleBeforeCache);
     }
 
     /**
      * Stops the Turbo lifecycle and destroys the app.
      */
     destroy(): void {
-        this.context.document.removeEventListener('turbo:load', this.handleLoad);
-        this.context.document.removeEventListener(
-            'turbo:before-cache',
-            this.handleBeforeCache,
-        );
+        document.removeEventListener('turbo:load', this.handleLoad);
+        document.removeEventListener('turbo:before-cache', this.handleBeforeCache);
+
+        this.unmountApp();
+    }
+
+    private mountApp(): void {
+        if (this.mounted) {
+            this.unmountApp();
+        }
+
+        this.app.mount(this.buildContext());
+        this.mounted = true;
+    }
+
+    private unmountApp(): void {
+        if (!this.mounted) {
+            return;
+        }
 
         this.app.destroy();
+        this.mounted = false;
     }
 }

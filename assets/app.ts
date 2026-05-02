@@ -2,32 +2,49 @@ import "./css/app.scss";
 import '@hotwired/turbo';
 
 import {
-    AppContext,
-    AppRunner
+    AppRunner,
+    buildAppContext
 } from "./core";
-import {TurboKernel} from "./core/kernel";
-import {loadConfig} from "./dom";
+import {
+    attachKernelToWindow,
+    TurboKernel
+} from "./core/kernel";
+import {
+    DebugModule,
+    HeaderModule,
+    MenuModule,
+    ThemeModule
+} from "./modules";
+
+import {
+    registerCustomElements
+} from "./dom";
 import {createApp} from "./application";
+
+// Register custom elements BEFORE creating/mounting the application.
+registerCustomElements();
 
 const app: AppRunner = createApp();
 
-const context: AppContext = {
-    config: loadConfig(),
-    document,
-    window
+
+// Load modules
+app
+    .register(new ThemeModule())
+    .register(new HeaderModule())
+    .register(new MenuModule())
+;
+
+// In development-like environments, register debug modules.
+if (buildAppContext().config.environment !== 'prod') {
+    app.register(new DebugModule());
 }
 
-const kernel = new TurboKernel(app, context);
+// Init the kernel (We use the Turbo script),
+// we created an optimized kernel to run on Turbo.
+const kernel = new TurboKernel(app, buildAppContext);
 
-/**
- * Ensures a single kernel instance is active.
- *
- * Prevents double boot by destroying any existing kernel
- * before assigning and booting the new one.
- */
-window.__lmkKernel?.destroy();
-
-window.__lmkKernel = kernel;
+// Ensure a single global kernel instance
+attachKernelToWindow(kernel);
 
 // Start the kernel
 kernel.boot();

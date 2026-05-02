@@ -1,4 +1,8 @@
-import {AbstractModule} from "../core";
+import {
+    AbstractModule,
+    AppContext,
+    MODULE_NAMES
+} from "../core";
 import {queryOptional} from "../dom";
 
 const HEADER_SELECTOR = '#main-header';
@@ -20,12 +24,14 @@ const MENU_OPEN_CLASS = 'is-menu-open';
  * ```
  */
 export class MenuModule extends AbstractModule {
+    readonly name = MODULE_NAMES.MENU;
+
     private header: HTMLElement | null = null;
     private button: HTMLButtonElement | null = null;
     private menu: HTMLElement | null = null;
     private isOpen = false;
 
-    protected onMount(): void {
+    protected onMount(_context: AppContext): void {
         this.header = queryOptional<HTMLElement>(document, HEADER_SELECTOR);
         this.button = queryOptional<HTMLButtonElement>(document, MENU_BUTTON_SELECTOR);
         this.menu = queryOptional<HTMLElement>(document, MENU_SELECTOR);

@@ -6,6 +6,9 @@
  */
 export const MODULE_NAMES = {
     THEME: 'theme',
+    DEBUG: 'debug',
+    HEADER: 'header',
+    MENU: 'menu',
 } as const;
 
 /**

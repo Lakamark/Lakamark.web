@@ -6,6 +6,10 @@ export type {
     MountableApp
 } from './contracts';
 
+// context
+export type {AppContextFactory} from './context'
+export {buildAppContext} from './context/';
+
 // Modules
 export type { ModuleName } from './modules';
 export { MODULE_NAMES } from './modules';

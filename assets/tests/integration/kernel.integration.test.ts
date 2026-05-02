@@ -22,26 +22,29 @@ class TestModule extends AbstractModule {
 describe('Integration: Kernel → AppRunner → Modules', (): void => {
     it('mounts and destroys modules through Turbo lifecycle', (): void => {
         const context: AppContext = createFakeContext();
+        const buildContext = vi.fn(() => context);
 
         const module = new TestModule();
 
         const app: AppRunner = new AppRunner()
             .register(module);
 
-        const kernel = new TurboKernel(app, context);
+        const kernel = new TurboKernel(app, buildContext);
 
-        // initial boot
         kernel.boot();
 
-        expect(module.onMountSpy).toHaveBeenCalledTimes(1);
+        expect(module.onMountSpy).not.toHaveBeenCalled();
 
-        // simulate navigation
-        context.document.dispatchEvent(new Event('turbo:before-cache'));
+        document.dispatchEvent(new Event('turbo:load'));
+
+        expect(module.onMountSpy).toHaveBeenCalledTimes(1);
+        expect(module.onMountSpy).toHaveBeenCalledWith(context);
+
+        document.dispatchEvent(new Event('turbo:before-cache'));
 
         expect(module.onDestroySpy).toHaveBeenCalledTimes(1);
 
-        // simulate next page load
-        context.document.dispatchEvent(new Event('turbo:load'));
+        document.dispatchEvent(new Event('turbo:load'));
 
         expect(module.onMountSpy).toHaveBeenCalledTimes(2);
     });

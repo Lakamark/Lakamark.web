@@ -7,7 +7,8 @@ import {
     BodyClassThemeApplier,
     LocalStorageThemeStorage,
     PreferredThemeResolver,
-    ThemeManager
+    ThemeManager,
+    ThemeSwitcherElement
 } from "../theme";
 
 /**
@@ -43,6 +44,15 @@ export class ThemeModule extends AbstractModule {
         );
 
         this.manager.init(context);
+
+        // bind manager to switchers
+        document
+            .querySelectorAll<ThemeSwitcherElement>('lmk-theme-switcher')
+            .forEach((element): void => {
+                if (element instanceof ThemeSwitcherElement) {
+                    element.setThemeManager(this.manager!);
+                }
+            });
     }
 
     /**
