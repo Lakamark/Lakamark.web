@@ -1,4 +1,4 @@
-import {AppModule} from "./contracts";
+import {AppContext, AppModule} from "./contracts";
 
 /**
  * Central orchestrator of the frontend application.
@@ -56,9 +56,9 @@ export class AppRunner {
      *
      * Called when the application starts or when a page is loaded.
      */
-    mount(): void {
+    mount(context: AppContext): void {
         for (const module of this.modules) {
-            module.mount();
+            module.mount(context);
         }
     }
 

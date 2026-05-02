@@ -12,7 +12,7 @@ export interface AppConfig {
     roles: string[];
     isPremium: boolean;
     isLogged: boolean;
-    environment: string;
-    preferredTheme: string | null;
+    preferredTheme: 'day' | 'night' | null;
     language: 'en' | 'fr';
+    environment: 'dev' | 'prod' | 'test';
 }

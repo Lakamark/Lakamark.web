@@ -1,9 +1,19 @@
 import "./css/app.scss";
 import '@hotwired/turbo';
 
-import {createApp} from "./core/application";
-import {AppRunner} from "./core";
+import {
+    AppContext,
+    AppRunner
+} from "./core";
+import {createApp} from "./application";
+import {loadConfig} from "./dom";
 
 const app: AppRunner = createApp();
 
-app.mount();
+const context: AppContext = {
+    config: loadConfig(),
+    document,
+    window
+}
+
+app.mount(context);

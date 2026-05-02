@@ -1,9 +1,6 @@
-import {AppRunner} from "../AppRunner";
-import {AppConfig} from "../../dom/contracts";
-import {
-    assertAppConfigShape,
-    loadConfig
-} from "../../dom";
+import {AppRunner} from "../core";
+import {AppConfig} from "../dom/contracts";
+import {assertAppConfigShape, loadConfig} from "../dom";
 
 /**
  * Creates the frontend application instance.
