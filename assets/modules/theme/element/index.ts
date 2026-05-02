@@ -1,1 +1,0 @@
-export {ThemeSwitcherElement} from './ThemeSwitcherElement';
