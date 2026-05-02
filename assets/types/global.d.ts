@@ -1,11 +1,9 @@
-// assets/types/global.d.ts
-
-import type { TurboAppKernel } from '../core';
+import {AppKernel} from "../core";
 
 declare global {
     interface Window {
-        __lmkKernel?: TurboAppKernel;
+        __lmkKernel?: AppKernel
     }
 }
 
-export {};
+export {}
