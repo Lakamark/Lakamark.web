@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file.
 
+## 4.0.0 - Application Architecture Stabilization
+### Added
+- Fluent bootstrap API via `AppRunner`
+- `AppContextFactory` for dynamic context generation (Turbo support)
+- `MODULE_NAMES` registry for typed module identifiers
+- `attachKernelToWindow` helper for global kernel management
+- Modular Theme system (Manager, Applier, Storage, Resolver)
+- `ThemeModule` and `ThemeSwitcherElement` custom element
+
+### Changed
+- Refactored `TurboKernel` to use a context factory instead of static context
+- Application now mounts via `turbo:load` instead of immediate boot
+- Improved module lifecycle handling (`mount` / `destroy`)
+- Updated modules to use `AppContext` instead of static config
+- Refactored application entry point to a cleaner, fluent structure
+
+### Fixed
+- Fixed stale context after Turbo navigation
+- Fixed duplicate mount on initial load
+- Fixed modules not re-mounting after Turbo page transitions
+- Fixed custom elements initialization timing issues
+- Fixed inconsistent module lifecycle state
+
+### Breaking Changes
+- `TurboKernel` now requires `AppContextFactory` instead of `AppContext`
+- Initial app mount is now triggered by `turbo:load`
+- Modules must implement `onMount(context: AppContext)`
+- Static context usage is no longer supported
+
+### Internal
+- Stabilized application lifecycle from bootstrap to modules
+- Improved separation of concerns (kernel / modules / UI)
+- Architecture is now fully Turbo-compatible and extensible
+
 ## v3.0.0 - Design System Refactor
 
 ### Added
