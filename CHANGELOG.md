@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## Archived
+
+The Symfony-based LakaMark platform has been officially archived following the migration to a new Laravel-based architecture.
+
+The active platform repository is now maintained here:
+
+[LakaMark Laravel](https://github.com/Lakamark/lakamark-laravel)
+
+This repository is preserved as a historical and technical reference.
+
 ## 4.0.0 - Application Architecture Stabilization
 ### Added
 - Fluent bootstrap API via `AppRunner`
